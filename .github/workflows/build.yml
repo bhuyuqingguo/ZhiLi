@@ -111,4 +111,4 @@ jobs:
         run: |
           gh release create "$TAG" dist/* --verify-tag --prerelease \
             --title "枝理 ZhiLi $TAG" \
-            --notes $'解压试用版。Windows x64 解压后运行 simplemap.exe；银河麒麟 ARM64 候选包解压后运行 ZhiLi，需要目标机现有 Qt5 运行库。\n\nWindows 与 Linux ARM64 的 CI 构建和离屏测试通过后才会发布本页。银河麒麟 V10 SP1 / 飞腾 D2000 实机、中文系统输入法和混合 DPI 仍需现场验收。使用步骤见仓库 README。'
+            --notes $'解压试用版。Windows x64 解压后运行 simplemap.exe；银河麒麟 ARM64 候选包解压后运行 ZhiLi，需要目标机现有 Qt5 运行库。\n\nWindows 与 Linux ARM64 的 CI 构建和测试通过后才会发布本页。银河麒麟 V10 SP1 / 飞腾 D2000 实机、中文系统输入法和混合 DPI 仍需现场验收。使用步骤见仓库 README。'

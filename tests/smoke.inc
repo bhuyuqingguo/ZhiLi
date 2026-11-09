@@ -8,6 +8,7 @@ int runSmokeTest() {
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, temp.path());
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, temp.path());
+    qInfo() << "Smoke platform:" << QApplication::platformName();
     const QStringList embedded = embeddedFontFamilies();
     CHECK(embedded.size() == 2);
     for (const auto &family : embedded) {
@@ -16,6 +17,7 @@ int runSmokeTest() {
     }
     Window window(false);
     window.show();
+    window.activateWindow();
     window.canvas->setFocus();
     QTest::qWait(60);
     QScreen *screen = QApplication::primaryScreen();

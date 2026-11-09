@@ -36,10 +36,15 @@ if(BUILD_TESTING)
     target_compile_options(zhili_document_test PRIVATE /utf-8)
   endif()
   add_test(NAME zhili_document COMMAND zhili_document_test)
+  set(zhili_test_platform offscreen)
+  if(WIN32)
+    # Qt 5's Windows font engine needs the native QPA integration.
+    set(zhili_test_platform windows)
+  endif()
   foreach(scale IN ITEMS 1 1.25 1.5 2)
     add_test(NAME zhili_smoke_${scale}x COMMAND zhili_smoke)
     set_tests_properties(zhili_smoke_${scale}x PROPERTIES
-      ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_FONT_DPI=96;QT_SCALE_FACTOR=${scale};ZHILI_EXPECT_SCALE=${scale}" TIMEOUT 30)
+      ENVIRONMENT "QT_QPA_PLATFORM=${zhili_test_platform};QT_FORCE_STDERR_LOGGING=1;QT_FONT_DPI=96;QT_SCALE_FACTOR=${scale};ZHILI_EXPECT_SCALE=${scale}" TIMEOUT 30)
   endforeach()
 endif()
 

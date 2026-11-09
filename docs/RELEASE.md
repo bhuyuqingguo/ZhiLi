@@ -1,6 +1,6 @@
 # 枝理候选包构建与验收
 
-测试 tag 形如 `v1.0.0-test.1`。GitHub Actions 并行构建 ARM64 和 Windows x64，运行离屏测试并生成 SHA-256。两个平台都通过后，工作流才把压缩包发布到 GitHub 预发布页。ARM64 使用 Ubuntu 20.04 构建容器，Qt 和 glibc 的版本选择与部分银河麒麟 V10 SP1 版本相近，实际兼容性须在目标机验收。
+测试 tag 形如 `v1.0.0-test.1`。GitHub Actions 并行构建 ARM64 和 Windows x64，运行 GUI 冒烟测试并生成 SHA-256。两个平台都通过后，工作流才把压缩包发布到 GitHub 预发布页。ARM64 使用 Ubuntu 20.04 构建容器，Qt 和 glibc 的版本选择与部分银河麒麟 V10 SP1 版本相近，实际兼容性须在目标机验收。
 
 ## Linux ARM64 免安装包
 

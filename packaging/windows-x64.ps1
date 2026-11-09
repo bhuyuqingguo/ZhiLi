@@ -30,9 +30,7 @@ try {
     "[Paths]`nPrefix=.`nPlugins=." | Set-Content -LiteralPath (Join-Path $bundle 'qt.conf') -Encoding ascii
     $plugins = Join-Path $bundle 'platforms'
     New-Item -ItemType Directory -Path $plugins | Out-Null
-    foreach ($platform in @('qwindows.dll', 'qoffscreen.dll')) {
-        Copy-Item -LiteralPath (Join-Path $QtPrefix "plugins/platforms/$platform") -Destination $plugins
-    }
+    Copy-Item -LiteralPath (Join-Path $QtPrefix 'plugins/platforms/qwindows.dll') -Destination $plugins
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
     $vsRoot = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
     if ($LASTEXITCODE -ne 0 -or !$vsRoot) { throw 'Visual Studio C++ tools were not found.' }
@@ -48,7 +46,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $root 'README.md') -Destination $bundle
     Copy-Item -LiteralPath (Join-Path $root 'examples') -Recurse -Destination $bundle
     $env:Path = $previousPath
-    $env:QT_QPA_PLATFORM = 'offscreen'
+    $env:QT_QPA_PLATFORM = 'windows'
     $proc = Start-Process -FilePath $exe -WorkingDirectory $bundle -PassThru
     try {
         if ($proc.WaitForExit(3000)) { throw "Portable app exited during startup (exit $($proc.ExitCode))." }
