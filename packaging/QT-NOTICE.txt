@@ -1,0 +1,12 @@
+ZhiLi dynamically links to Qt 5.15.2 (Qt Base and Qt SVG).
+The Qt libraries in this distribution are licensed under the GNU Lesser
+General Public License version 3. Qt remains separately replaceable in the
+application folder. Your rights to modify the Qt libraries and reverse
+engineer for debugging those modifications are preserved.
+
+The matching Qt Base and Qt SVG source archives, including build files and
+third-party notices, are available alongside the Windows ZIP on the same
+ZhiLi GitHub Release page:
+https://github.com/bhuyuqingguo/ZhiLi/releases
+
+See LICENSE.LGPL3 and LICENSE.GPL3 in this directory.
