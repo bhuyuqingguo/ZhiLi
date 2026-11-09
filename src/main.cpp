@@ -163,6 +163,7 @@ private:
     QColor ink, moss, paper, line, accent, branchFill, leafFill;
     QToolBar *wideToolbar = nullptr;
     QToolBar *compactToolbar = nullptr;
+    QVector<QToolButton *> compactButtons;
     QLabel *zoomLevel = nullptr;
     QTimer fitTimer;
     bool fitMode = false;
@@ -835,20 +836,26 @@ private:
         compactToolbar->setMovable(false);
         compactToolbar->setFloatable(false);
         addToolBar(Qt::TopToolBarArea, compactToolbar);
-        auto compactButton = [this](QAction *action, const QString &label) {
+        auto compactButton = [this](QAction *action, const QString &label, QStyle::StandardPixmap icon) {
             auto *button = new QToolButton(compactToolbar);
             button->setText(label);
+            button->setIcon(style()->standardIcon(icon));
+            button->setIconSize(QSize(22, 22));
             button->setAccessibleName(action->text());
             button->setToolTip(action->text());
             button->setEnabled(action->isEnabled());
             connect(button, &QToolButton::clicked, action, &QAction::trigger);
             connect(action, &QAction::changed, button, [button, action] { button->setEnabled(action->isEnabled()); });
             compactToolbar->addWidget(button);
+            compactButtons.append(button);
         };
-        compactButton(saveAction, QStringLiteral("保存"));
-        compactButton(child, QStringLiteral("加子"));
+        compactButton(saveAction, QStringLiteral("保存"), QStyle::SP_DialogSaveButton);
+        compactButton(child, QStringLiteral("加子"), QStyle::SP_FileDialogNewFolder);
         auto *layouts = new QToolButton(compactToolbar);
         layouts->setText(QStringLiteral("布局"));
+        layouts->setIcon(style()->standardIcon(QStyle::SP_FileDialogListView));
+        layouts->setIconSize(QSize(22, 22));
+        layouts->setToolTip(QStringLiteral("切换导图布局"));
         layouts->setAccessibleName(QStringLiteral("切换导图布局"));
         layouts->setPopupMode(QToolButton::InstantPopup);
         auto *layoutMenu = new QMenu(layouts);
@@ -856,7 +863,8 @@ private:
         layoutMenu->addAction(hierarchyAction);
         layouts->setMenu(layoutMenu);
         compactToolbar->addWidget(layouts);
-        compactButton(fitAction, QStringLiteral("适应"));
+        compactButtons.append(layouts);
+        compactButton(fitAction, QStringLiteral("适应"), QStyle::SP_TitleBarMaxButton);
         compactToolbar->hide();
     }
 
@@ -972,6 +980,14 @@ private:
         if (!wideToolbar || !compactToolbar) return;
         const bool compact = width < qMax(840, wideToolbar->sizeHint().width() + 24);
         const QString priorHint = canvasHint();
+        if (compact) {
+            // Leave room for platform toolbar margins and the layout menu indicator.
+            int textWidth = 54;
+            for (const auto *button : compactButtons)
+                textWidth += button->fontMetrics().boundingRect(button->text()).width() + 24;
+            const auto buttonStyle = width < textWidth ? Qt::ToolButtonIconOnly : Qt::ToolButtonTextOnly;
+            for (auto *button : compactButtons) button->setToolButtonStyle(buttonStyle);
+        }
         wideToolbar->setVisible(!compact);
         compactToolbar->setVisible(compact);
         if (statusBar()->currentMessage() == priorHint) statusBar()->showMessage(canvasHint());

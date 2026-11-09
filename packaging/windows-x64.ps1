@@ -29,7 +29,7 @@ try {
     New-Item -ItemType Directory -Path $bundle | Out-Null
     $exe = Join-Path $bundle 'simplemap.exe'
     Copy-Item -LiteralPath (Join-Path $build 'Release/simplemap.exe') -Destination $exe
-    & $deploy --release --no-translations --no-compiler-runtime --no-plugins $exe
+    & $deploy --release --no-translations --no-compiler-runtime --no-plugins --no-angle --no-opengl-sw --no-system-d3d-compiler $exe
     if ($LASTEXITCODE -ne 0) { throw 'windeployqt failed.' }
     $plugins = Join-Path $bundle 'platforms'
     New-Item -ItemType Directory -Path $plugins | Out-Null
