@@ -1,216 +1,832 @@
+#include "document.h"
+#include "layout.h"
+
 #include <QtWidgets>
 #include <QtSvg/QSvgGenerator>
+#include <QPdfWriter>
+#include <QtMath>
 #include <functional>
-#include <algorithm>
+#include <memory>
 
-struct Node {
-    QString id, text;
-    QStringList children;
-    bool collapsed = false;
-};
+namespace {
+const QColor ink("#203d36");
+const QColor moss("#286557");
+const QColor paper("#f7f7f1");
+const QColor line("#92afa3");
+const QColor accent("#b97035");
 
 class Canvas : public QGraphicsView {
 public:
-    explicit Canvas(QGraphicsScene *scene, QWidget *parent=nullptr): QGraphicsView(scene,parent) {
-        setRenderHint(QPainter::Antialiasing); setDragMode(QGraphicsView::ScrollHandDrag);
-        setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    explicit Canvas(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent) {
+        setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+        setDragMode(ScrollHandDrag);
+        setViewportUpdateMode(BoundingRectViewportUpdate);
+        setTransformationAnchor(AnchorUnderMouse);
     }
-protected:
-    void wheelEvent(QWheelEvent *e) override {
-        if (e->modifiers() & Qt::ControlModifier) { double factor=e->angleDelta().y()>0?1.12:1.0/1.12;
-            const double s=transform().m11()*factor;
-            if(s>=0.2 && s<=3.5) scale(factor,factor);
-            e->accept(); return;
-        }
-        QGraphicsView::wheelEvent(e);
-    }
-};
 
-class Window : public QMainWindow {
-    QGraphicsScene *scene;
-    Canvas *canvas;
-    QMap<QString,Node> nodes;
-    QString root, selected, filePath;
-    bool mindMap=true, dirty=false, rendering=false;
-    QVector<QByteArray> undoStack, redoStack;
-    QMap<QString,QPointF> positions;
-    QMap<QString,QGraphicsRectItem*> graphics;
-public:
-    Window(){
-        setWindowTitle(QStringLiteral("SimpleMap — 未命名")); resize(1160,760);
-        scene=new QGraphicsScene(this); scene->setBackgroundBrush(QColor("#f7f9fc"));
-        canvas=new Canvas(scene,this); setCentralWidget(canvas);
-        makeMenus(); resetDocument(); statusBar()->showMessage(QStringLiteral("Ctrl+滚轮缩放 · 拖动空白区域平移 · 双击节点编辑"));
+    std::function<bool(QPoint)> press;
+    std::function<bool(QPoint)> doubleClick;
+    std::function<void(QPoint, QPoint)> drop;
+
+protected:
+    void wheelEvent(QWheelEvent *event) override {
+        if (!(event->modifiers() & Qt::ControlModifier)) return QGraphicsView::wheelEvent(event);
+        const qreal factor = event->angleDelta().y() > 0 ? 1.12 : 1 / 1.12;
+        const qreal current = transform().m11();
+        const qreal next = qBound(0.05, current * factor, 3.5);
+        scale(next / current, next / current);
+        event->accept();
     }
-private:
-    QString newId() const {return QUuid::createUuid().toString(QUuid::WithoutBraces);}
-    QJsonObject document() const {
-        QJsonObject o; o["format"]="simplemap-json"; o["version"]=1; o["root"]=root;
-        QJsonArray a;
-        for(auto it=nodes.constBegin();it!=nodes.constEnd();++it){
-            QJsonObject n; n["id"]=it.value().id;n["text"]=it.value().text;n["collapsed"]=it.value().collapsed;
-            QJsonArray c; for(const QString &id:it.value().children)c.append(id);n["children"]=c;a.append(n);
-        }
-        o["nodes"]=a; o["layout"]=mindMap?"mindmap":"organization";return o;
-    }
-    QByteArray snapshot() const {return QJsonDocument(document()).toJson(QJsonDocument::Compact);}
-    bool apply(const QByteArray &bytes,QString *error=nullptr){
-        QJsonParseError pe; QJsonDocument d=QJsonDocument::fromJson(bytes,&pe);
-        if(pe.error!=QJsonParseError::NoError || !d.isObject()) {if(error)*error=QStringLiteral("JSON 文件解析失败");return false;}
-        QJsonObject o=d.object();if(o["format"].toString()!="simplemap-json" || o["version"].toInt()!=1){if(error)*error=QStringLiteral("不是受支持的 SimpleMap JSON v1 文件");return false;}
-        QMap<QString,Node> next;QJsonArray arr=o["nodes"].toArray();
-        if(arr.size()<1 || arr.size()>100000){if(error)*error=QStringLiteral("节点数量不合法");return false;}
-        for(const auto &v:arr){if(!v.isObject())return false;QJsonObject obj=v.toObject();Node n;
-            n.id=obj["id"].toString(); n.text=obj["text"].toString();n.collapsed=obj["collapsed"].toBool();
-            if(n.id.isEmpty()||next.contains(n.id)||n.text.size()>100000)return false;
-            for(const auto &c:obj["children"].toArray()) {if(!c.isString())return false;n.children<<c.toString();}
-            next.insert(n.id,n);
-        }
-        QString nextRoot=o["root"].toString();if(!next.contains(nextRoot))return false;
-        QSet<QString> visited, active;
-        std::function<bool(QString)> valid=[&](QString id){
-            if(!next.contains(id)||active.contains(id)||visited.contains(id))return false;
-            active.insert(id);visited.insert(id);
-            for(const QString &c:next[id].children)if(!valid(c))return false;
-            active.remove(id);return true;
-        };
-        if(!valid(nextRoot)||visited.size()!=next.size()){if(error)*error=QStringLiteral("导图结构存在环、重复引用或孤立节点");return false;}
-        nodes=next;root=nextRoot;mindMap=o["layout"].toString()!="organization";selected=root;
-        render();return true;
-    }
-    void checkpoint(){undoStack.append(snapshot());if(undoStack.size()>80)undoStack.remove(0);redoStack.clear();dirty=true;}
-    void history(bool backwards){auto &from=backwards?undoStack:redoStack;auto &to=backwards?redoStack:undoStack;if(from.isEmpty())return;
-        QByteArray prior=from.takeLast(), current=snapshot();if(apply(prior)){to.append(current);dirty=true;updateTitle();}}
-    void resetDocument(){nodes.clear();Node n; n.id=newId();n.text=QStringLiteral("中心主题");root=n.id;nodes[n.id]=n;
-        selected=root;filePath.clear();dirty=false;undoStack.clear();redoStack.clear();mindMap=true;render();updateTitle();}
-    void updateTitle(){setWindowTitle(QString("SimpleMap — %1%2").arg(filePath.isEmpty()?QStringLiteral("未命名"):QFileInfo(filePath).fileName(),dirty?" *":""));}
-    bool confirmDiscard(){if(!dirty)return true;
-        auto r=QMessageBox::question(this,QStringLiteral("未保存修改"),QStringLiteral("当前导图有修改，是否放弃？"),QMessageBox::Yes|QMessageBox::No,QMessageBox::No);return r==QMessageBox::Yes;}
-    void createNode(bool child){if(selected.isEmpty() || !nodes.contains(selected))selected=root;
-        QString parent=selected;
-        if(!child){if(selected==root)return;parent=findParent(selected);}
-        if(parent.isEmpty())return;
-        checkpoint();Node n;n.id=newId();n.text=QStringLiteral("新主题");nodes[n.id]=n;
-        if(child){nodes[parent].collapsed=false;nodes[parent].children<<n.id;}
-        else {auto &kids=nodes[parent].children;int pos=kids.indexOf(selected);kids.insert(pos+1,n.id);}
-        selected=n.id;render();editSelected();
-    }
-    QString findParent(const QString &id)const{for(auto it=nodes.constBegin();it!=nodes.constEnd();++it)if(it.value().children.contains(id))return it.key();return QString();}
-    void editSelected(){if(!nodes.contains(selected))return;bool ok=false;QString value=QInputDialog::getMultiLineText(this,QStringLiteral("编辑主题"),QStringLiteral("主题内容"),nodes[selected].text,&ok);
-        if(ok && value!=nodes[selected].text){checkpoint();nodes[selected].text=value;render();}}
-    void removeSelected(){if(selected==root || !nodes.contains(selected))return;
-        checkpoint();QString p=findParent(selected);nodes[p].children.removeAll(selected);
-        std::function<void(QString)> del=[&](QString id){QStringList cs=nodes[id].children;for(auto &c:cs)del(c);nodes.remove(id);};del(selected);selected=p;render();}
-    void toggleCollapse(){if(!nodes.contains(selected) || nodes[selected].children.isEmpty())return;checkpoint();nodes[selected].collapsed=!nodes[selected].collapsed;render();}
-    void chooseLayout(bool classic){if(mindMap==classic)return;mindMap=classic;render();updateTitle();}
-    void saveAs(){QString p=QFileDialog::getSaveFileName(this,QStringLiteral("保存导图"),filePath.isEmpty()?"Untitled.smap.json":filePath,QStringLiteral("SimpleMap JSON (*.smap.json)"));if(p.isEmpty())return;
-        if(!p.endsWith(".smap.json",Qt::CaseInsensitive))p+=".smap.json";writeFile(p);}
-    void writeFile(QString p){QSaveFile file(p);if(!file.open(QIODevice::WriteOnly)){QMessageBox::warning(this,QStringLiteral("保存失败"),file.errorString());return;}
-        QByteArray data=QJsonDocument(document()).toJson(QJsonDocument::Indented);
-        if(file.write(data)!=data.size()||!file.commit()){QMessageBox::warning(this,QStringLiteral("保存失败"),file.errorString());return;}
-        filePath=p;dirty=false;updateTitle();statusBar()->showMessage(QStringLiteral("已保存：")+p,4000);
-    }
-    void openFile(){if(!confirmDiscard())return;QString p=QFileDialog::getOpenFileName(this,QStringLiteral("打开导图"),QString(),QStringLiteral("SimpleMap JSON (*.smap.json *.json)"));if(p.isEmpty())return;
-        QFile f(p);if(!f.open(QIODevice::ReadOnly)){QMessageBox::warning(this,QStringLiteral("打开失败"),f.errorString());return;}
-        if(f.size()>50*1024*1024){QMessageBox::warning(this,QStringLiteral("打开失败"),QStringLiteral("文件过大"));return;}
-        QByteArray b=f.readAll();QString error;if(!apply(b,&error)){QMessageBox::warning(this,QStringLiteral("打开失败"),error.isEmpty()?QStringLiteral("文件结构无效"):error);return;}
-        filePath=p;dirty=false;undoStack.clear();redoStack.clear();updateTitle();
-    }
-    void exportImage(bool svg){QString path=QFileDialog::getSaveFileName(this,QStringLiteral("导出图像"),QString(),svg?QStringLiteral("SVG (*.svg)"):QStringLiteral("PNG (*.png)"));if(path.isEmpty())return;
-        if(svg){if(!path.endsWith(".svg",Qt::CaseInsensitive))path+=".svg";QSvgGenerator g;g.setFileName(path);QRectF bounds=scene->itemsBoundingRect().adjusted(-24,-24,24,24);g.setSize(bounds.size().toSize());g.setViewBox(QRect(QPoint(0,0),bounds.size().toSize()));QPainter pt(&g);scene->render(&pt,QRectF(QPointF(0,0),bounds.size()),bounds);}
-        else {if(!path.endsWith(".png",Qt::CaseInsensitive))path+=".png";QRectF b=scene->itemsBoundingRect().adjusted(-24,-24,24,24);QImage im(b.size().toSize(),QImage::Format_ARGB32);im.fill(Qt::white);QPainter pt(&im);pt.setRenderHint(QPainter::Antialiasing);scene->render(&pt,QRectF(QPointF(0,0),b.size()),b);pt.end();if(!im.save(path))QMessageBox::warning(this,QStringLiteral("导出失败"),QStringLiteral("无法保存 PNG"));}
-    }
-    void makeMenus(){
-        auto act=[&](QMenu *m,const QString &name,const QKeySequence &key,std::function<void()> f){QAction *a=m->addAction(name);if(!key.isEmpty())a->setShortcut(key);connect(a,&QAction::triggered,this,[f]{f();});return a;};
-        QMenu *file=menuBar()->addMenu(QStringLiteral("文件"));
-        act(file,QStringLiteral("新建"),QKeySequence("Ctrl+N"),[this]{if(confirmDiscard())resetDocument();});
-        act(file,QStringLiteral("打开"),QKeySequence("Ctrl+O"),[this]{openFile();});
-        act(file,QStringLiteral("保存"),QKeySequence("Ctrl+S"),[this]{filePath.isEmpty()?saveAs():writeFile(filePath);});
-        act(file,QStringLiteral("另存为"),QKeySequence("Ctrl+Shift+S"),[this]{saveAs();});
-        file->addSeparator();act(file,QStringLiteral("导出 PNG"),QKeySequence(),[this]{exportImage(false);});
-        act(file,QStringLiteral("导出 SVG"),QKeySequence(),[this]{exportImage(true);});
-        QMenu *edit=menuBar()->addMenu(QStringLiteral("编辑"));
-        act(edit,QStringLiteral("新增同级"),QKeySequence("Return"),[this]{createNode(false);});
-        act(edit,QStringLiteral("新增子级"),QKeySequence("Tab"),[this]{createNode(true);});
-        act(edit,QStringLiteral("编辑主题"),QKeySequence("F2"),[this]{editSelected();});
-        act(edit,QStringLiteral("删除节点"),QKeySequence("Delete"),[this]{removeSelected();});
-        act(edit,QStringLiteral("折叠 / 展开"),QKeySequence("Space"),[this]{toggleCollapse();});
-        edit->addSeparator();act(edit,QStringLiteral("撤销"),QKeySequence("Ctrl+Z"),[this]{history(true);});
-        act(edit,QStringLiteral("重做"),QKeySequence("Ctrl+Y"),[this]{history(false);});
-        QMenu *layout=menuBar()->addMenu(QStringLiteral("布局"));
-        act(layout,QStringLiteral("经典思维导图"),QKeySequence("Ctrl+1"),[this]{chooseLayout(true);});
-        act(layout,QStringLiteral("专业结构图"),QKeySequence("Ctrl+2"),[this]{chooseLayout(false);});
-        act(layout,QStringLiteral("适应窗口"),QKeySequence("Ctrl+0"),[this]{canvas->fitInView(scene->itemsBoundingRect().adjusted(-60,-60,60,60),Qt::KeepAspectRatio);});
-        QToolBar *bar=addToolBar(QStringLiteral("常用"));bar->setMovable(false);
-        for(auto name:{QStringLiteral("新增子级"),QStringLiteral("编辑主题"),QStringLiteral("撤销"),QStringLiteral("重做")})for(QAction *a:edit->actions())if(a->text()==name)bar->addAction(a);
-        bar->addSeparator();for(QAction *a:layout->actions())if(a->text()==QStringLiteral("经典思维导图")||a->text()==QStringLiteral("专业结构图"))bar->addAction(a);
-    }
-    void render(){
-        rendering=true;scene->clear();positions.clear();graphics.clear();
-        // Calculate subtree heights: descendants determine vertical space, not arbitrary coordinates.
-        QMap<QString,double> heights;
-        std::function<double(QString)> measure=[&](QString id)->double{
-            Node n=nodes.value(id);if(n.collapsed||n.children.isEmpty())return heights[id]=56.;
-            double h=0;for(QString c:n.children)h+=measure(c);return heights[id]=std::max(56.,h);
-        };
-        measure(root);
-        std::function<void(QString,double,double,int)> placeTree=[&](QString id,double x,double center,int direction){
-            positions[id]=QPointF(x,center);
-            Node n=nodes.value(id);if(n.collapsed)return;
-            double y=center-heights[id]/2.0;
-            for(const QString &c:n.children){double h=heights[c];placeTree(c,x+direction*200,y+h/2.0,direction);y+=h;}
-        };
-        if(!mindMap){
-            // Horizontal center by subtree width; depth on vertical axis.
-            std::function<double(QString)> width=[&](QString id)->double{
-                Node n=nodes.value(id);if(n.collapsed||n.children.isEmpty())return heights[id]=160;
-                double w=0;for(QString c:n.children)w+=width(c);return heights[id]=std::max(160.,w);
-            };width(root);
-            std::function<void(QString,double,double)> place=[&](QString id,double x,double top){
-                positions[id]=QPointF(x,top+heights[id]/2);Node n=nodes.value(id);if(n.collapsed)return;
-                double off=top;for(QString c:n.children){place(c,x+145,off);off+=heights[c];}
-            };place(root,0,0);
-            // Rotate the logical orientation so parent-to-child is top-to-bottom.
-            for(auto it=positions.begin();it!=positions.end();++it){QPointF p=it.value();it.value()=QPointF(p.y(),p.x());}
-        }else{
-            positions[root]=QPointF(0,0);QStringList left,right;
-            for(int i=0;i<nodes[root].children.size();++i){QString c=nodes[root].children[i];(i%2==0?right:left).append(c);}
-            for(int side=0;side<2;++side){QStringList cs=side==0?right:left;int dir=side==0?1:-1;double total=0;for(QString c:cs)total+=heights[c];double y=-total/2;
-                for(QString c:cs){placeTree(c,200*dir,y+heights[c]/2,dir);y+=heights[c];}
+
+    void mousePressEvent(QMouseEvent *event) override {
+        if (event->button() == Qt::LeftButton) {
+            origin = event->pos();
+            nodeDrag = press(origin);
+            if (nodeDrag) {
+                setFocus();
+                event->accept();
+                return;
             }
         }
-        for(auto it=positions.constBegin();it!=positions.constEnd();++it){QString id=it.key();if(id==root)continue;
-            QString p=findParent(id);if(!positions.contains(p))continue;QPointF a=positions[p],b=it.value();QPainterPath path;
-            if(mindMap){double startX=a.x()+(b.x()>a.x()?64:-64);double endX=b.x()+(b.x()>a.x()?-64:64);
-                path.moveTo(startX,a.y());path.cubicTo((startX+endX)/2,a.y(),(startX+endX)/2,b.y(),endX,b.y());}
-            else{path.moveTo(a.x(),a.y()+19);path.cubicTo(a.x(),(a.y()+b.y())/2,b.x(),(a.y()+b.y())/2,b.x(),b.y()-19);}
-            QPen pen(QColor("#93b2cd"),2);pen.setCosmetic(true);scene->addPath(path,pen);
-        }
-        for(auto it=positions.constBegin();it!=positions.constEnd();++it){QString id=it.key();Node n=nodes[id];QPointF p=it.value();
-            QGraphicsRectItem *rect=scene->addRect(QRectF(-64,-19,128,38),QPen(id==selected?QColor("#e29b41"):QColor("#a9c4df"),id==selected?2.5:1),QBrush(id==root?QColor("#245d99"):QColor("#e6f0fa")));
-            rect->setPos(p);rect->setData(0,id);rect->setFlag(QGraphicsItem::ItemIsSelectable);
-            QGraphicsTextItem *label=scene->addText(n.text);label->setDefaultTextColor(id==root?Qt::white:QColor("#234866"));label->setTextWidth(120);
-            QFont ft=label->font();ft.setPointSize(10);label->setFont(ft);
-            QRectF tb=label->boundingRect();label->setPos(p-QPointF(60,std::min(tb.height()/2.0,15.0)));label->setAcceptedMouseButtons(Qt::NoButton);
-            graphics[id]=rect;
-            if(!n.children.isEmpty() && n.collapsed){auto badge=scene->addEllipse(p.x()+57,p.y()-24,13,13,QPen(Qt::white),QBrush(QColor("#de984b")));badge->setAcceptedMouseButtons(Qt::NoButton);}
-        }
-        scene->setSceneRect(scene->itemsBoundingRect().adjusted(-80,-80,80,80));
-        if(canvas && positions.size()<=5)canvas->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
-        rendering=false;updateTitle();
+        QGraphicsView::mousePressEvent(event);
     }
-protected:
-    bool eventFilter(QObject *obj,QEvent *event) override {return QMainWindow::eventFilter(obj,event);}
-    void mousePressEvent(QMouseEvent *e) override {QMainWindow::mousePressEvent(e);}
-    bool event(QEvent *e) override {return QMainWindow::event(e);}
-    void closeEvent(QCloseEvent *e) override {confirmDiscard()?e->accept():e->ignore();}
-public:
-    // Click handling is delegated to the scene's selectionChanged signal.
-    void activateSelection(){QList<QGraphicsItem*> items=scene->selectedItems();if(items.isEmpty())return;
-        QString id=items.first()->data(0).toString();if(!id.isEmpty() && nodes.contains(id)){selected=id;render();}}
-    void activateDoubleClick(QGraphicsSceneMouseEvent *e){Q_UNUSED(e);editSelected();}
-    void bindSelection(){connect(scene,&QGraphicsScene::selectionChanged,this,[this]{if(!rendering)activateSelection();});}
+
+    void mouseDoubleClickEvent(QMouseEvent *event) override {
+        if (event->button() == Qt::LeftButton && doubleClick(event->pos())) {
+            event->accept();
+            return;
+        }
+        QGraphicsView::mouseDoubleClickEvent(event);
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) override {
+        if (nodeDrag) {
+            event->accept();
+            return;
+        }
+        QGraphicsView::mouseMoveEvent(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override {
+        if (event->button() == Qt::LeftButton && nodeDrag) {
+            nodeDrag = false;
+            if ((event->pos() - origin).manhattanLength() >= QApplication::startDragDistance())
+                drop(origin, event->pos());
+            event->accept();
+            return;
+        }
+        QGraphicsView::mouseReleaseEvent(event);
+    }
+
+private:
+    QPoint origin;
+    bool nodeDrag = false;
 };
-int main(int argc,char *argv[]){QApplication app(argc,argv);app.setApplicationName("SimpleMap");
-    Window w;w.bindSelection();w.show();return app.exec();}
+
+struct NodeItem {
+    QGraphicsPathItem *body;
+    QGraphicsTextItem *label;
+    QGraphicsSimpleTextItem *badge;
+};
+}
+
+class Window : public QMainWindow {
+public:
+    explicit Window(bool enableRecovery = true) {
+        resize(1160, 760);
+        setMinimumSize(640, 440);
+        scene = new QGraphicsScene(this);
+        scene->setBackgroundBrush(paper);
+        canvas = new Canvas(scene, this);
+        canvas->setObjectName("mapCanvas");
+        setCentralWidget(canvas);
+        canvas->press = [this](QPoint at) {
+            if (editor && itemAt(at, editorProxy)) return false;
+            const QString id = nodeAt(at);
+            finishEdit();
+            if (!id.isEmpty()) selectNode(id);
+            return !id.isEmpty();
+        };
+        canvas->doubleClick = [this](QPoint at) {
+            const QString id = nodeAt(at);
+            if (id.isEmpty()) return false;
+            finishEdit();
+            selectNode(id);
+            startEdit();
+            return true;
+        };
+        canvas->drop = [this](QPoint origin, QPoint end) {
+            if (editor) return;
+            const QString source = nodeAt(origin);
+            const QString target = nodeAt(end);
+            if (source.isEmpty() || target.isEmpty() || source == target) return;
+            const QRectF bounds = items.value(target).body->sceneBoundingRect();
+            const QPointF offset = canvas->mapToScene(end) - bounds.center();
+            const qreal relative = doc.mindMap ? offset.y() / bounds.height() : offset.x() / bounds.width();
+            moveNode(source, target, relative < -0.25 ? -1 : (relative > 0.25 ? 1 : 0));
+        };
+        makeMenus();
+        setStyleSheet(QStringLiteral(
+            "QToolBar {background:#fffdf7;border:0;border-bottom:1px solid #d9e2d9;padding:8px;spacing:5px}"
+            "QToolButton {color:#203d36;padding:6px 10px;border-radius:5px}"
+            "QToolButton:hover,QToolButton:checked {background:#deebe1}"
+            "QStatusBar {background:#fffdf7;color:#38534b}"
+            "QGraphicsView {border:0}"
+            "QPlainTextEdit {background:#fffdf7;color:#203d36;border:2px solid #b97035;border-radius:5px}"));
+        recoveryTimer.setSingleShot(true);
+        recoveryTimer.setInterval(900);
+        connect(&recoveryTimer, &QTimer::timeout, this, [this] { writeRecovery(); });
+        resetDocument();
+        statusBar()->showMessage(QStringLiteral("双击编辑  ·  拖到主题中心移入子级，拖到边缘调整顺序  ·  Ctrl+滚轮缩放"));
+        if (enableRecovery) QTimer::singleShot(0, this, [this] { setupRecovery(); });
+    }
+
+private:
+    struct Revision {
+        Document document;
+        QString selected;
+    };
+
+    QGraphicsScene *scene;
+    Canvas *canvas;
+    Document doc;
+    Document saved;
+    QString selected, filePath, query, lastMatch;
+    QVector<Revision> undoStack, redoStack;
+    QMap<QString, NodeItem> items;
+    QMap<QString, QGraphicsPathItem *> edges;
+    QMap<QString, QString> parents;
+    QVector<QAction *> canvasActions;
+    QAction *classicAction = nullptr;
+    QAction *hierarchyAction = nullptr;
+    QPlainTextEdit *editor = nullptr;
+    QGraphicsProxyWidget *editorProxy = nullptr;
+    QString editId;
+    bool dirty = false;
+    QTimer recoveryTimer;
+    QString recoveryPath;
+    std::unique_ptr<QLockFile> recoveryLock;
+
+    void resetDocument() {
+        doc = Document();
+        Node root;
+        root.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        root.text = QStringLiteral("中心主题");
+        doc.root = root.id;
+        doc.nodes.insert(root.id, root);
+        filePath.clear();
+        needsSaveAs = false;
+        initializeDocument();
+    }
+
+    void initializeDocument() {
+        undoStack.clear();
+        redoStack.clear();
+        query.clear();
+        lastMatch.clear();
+        selected = doc.root;
+        saved = doc;
+        dirty = false;
+        clearRecovery();
+        canvas->resetTransform();
+        render();
+        canvas->centerOn(0, 0);
+    }
+
+    void updateTitle() {
+        const QString name = filePath.isEmpty() ? QStringLiteral("未命名导图") : QFileInfo(filePath).fileName();
+        setWindowTitle(QStringLiteral("%1%2  ·  枝理").arg(name, dirty ? QStringLiteral(" *") : QString()));
+    }
+
+    void checkpoint() {
+        undoStack.append({doc, selected});
+        if (undoStack.size() > 80) undoStack.removeFirst();
+        redoStack.clear();
+    }
+
+    void changed() {
+        dirty = doc.serialize() != saved.serialize();
+        if (dirty) scheduleRecovery();
+        else clearRecovery();
+        render();
+    }
+
+    void history(bool backwards) {
+        auto &from = backwards ? undoStack : redoStack;
+        auto &to = backwards ? redoStack : undoStack;
+        if (from.isEmpty()) return;
+        to.append({doc, selected});
+        Revision revision = from.takeLast();
+        doc = std::move(revision.document);
+        selected = revision.selected;
+        changed();
+    }
+
+    int depth(QString id) const {
+        int count = 0;
+        while (parents.contains(id)) {
+            id = parents.value(id);
+            ++count;
+        }
+        return count;
+    }
+
+    void createNode(bool child) {
+        const QString parent = child ? selected : parents.value(selected);
+        if (parent.isEmpty()) return;
+        if (doc.nodes.size() >= Document::maxNodes || depth(parent) >= Document::maxDepth) {
+            statusBar()->showMessage(QStringLiteral("已达节点数量或层级上限"), 4000);
+            return;
+        }
+        checkpoint();
+        Node node;
+        node.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        node.text = QStringLiteral("新主题");
+        doc.nodes.insert(node.id, node);
+        Node &destination = doc.nodes[parent];
+        if (child) destination.children.append(node.id);
+        else destination.children.insert(destination.children.indexOf(selected) + 1, node.id);
+        destination.collapsed = false;
+        selected = node.id;
+        changed();
+        canvas->ensureVisible(items.value(selected).body, 30, 30);
+        startEdit();
+    }
+
+    void removeSelected() {
+        const QString parent = parents.value(selected);
+        if (parent.isEmpty()) return;
+        checkpoint();
+        doc.nodes[parent].children.removeOne(selected);
+        QStringList pending{selected};
+        while (!pending.isEmpty()) {
+            const QString id = pending.takeLast();
+            pending.append(doc.nodes.take(id).children);
+        }
+        selected = parent;
+        changed();
+    }
+
+    void moveNode(const QString &source, const QString &target, int side) {
+        if (source == doc.root || source == target) return;
+        const QString oldParent = parents.value(source);
+        const bool sibling = target != doc.root && side != 0;
+        const QString newParent = sibling ? parents.value(target) : target;
+        for (QString id = newParent; !id.isEmpty(); id = parents.value(id)) {
+            if (id == source) {
+                statusBar()->showMessage(QStringLiteral("无法将主题移入自己的分支"), 4000);
+                return;
+            }
+        }
+        QVector<QPair<QString, int>> pending{{source, depth(newParent) + 1}};
+        while (!pending.isEmpty()) {
+            const auto entry = pending.takeLast();
+            if (entry.second > Document::maxDepth) {
+                statusBar()->showMessage(QStringLiteral("移动后将超过层级上限"), 4000);
+                return;
+            }
+            for (const auto &child : doc.nodes.value(entry.first).children)
+                pending.append(qMakePair(child, entry.second + 1));
+        }
+        QStringList newOrder = doc.nodes.value(newParent).children;
+        newOrder.removeOne(source);
+        const int index = sibling ? newOrder.indexOf(target) + (side > 0 ? 1 : 0) : newOrder.size();
+        newOrder.insert(index, source);
+        if (newParent == oldParent && newOrder == doc.nodes.value(oldParent).children) return;
+        checkpoint();
+        doc.nodes[oldParent].children.removeOne(source);
+        doc.nodes[newParent].children = newOrder;
+        doc.nodes[newParent].collapsed = false;
+        selected = source;
+        changed();
+        canvas->ensureVisible(items.value(source).body, 30, 30);
+    }
+
+    void toggleCollapse() {
+        if (doc.nodes.value(selected).children.isEmpty()) return;
+        checkpoint();
+        doc.nodes[selected].collapsed = !doc.nodes.value(selected).collapsed;
+        changed();
+    }
+
+    void chooseLayout(bool classic) {
+        if (doc.mindMap == classic) return;
+        checkpoint();
+        doc.mindMap = classic;
+        changed();
+        canvas->ensureVisible(items.value(selected).body, 25, 25);
+    }
+
+    bool itemAt(QPoint at, const QGraphicsItem *item) const {
+        return canvas->items(at).contains(const_cast<QGraphicsItem *>(item));
+    }
+
+    QString nodeAt(QPoint at) const {
+        for (QGraphicsItem *item : canvas->items(at)) {
+            const QString id = item->data(0).toString();
+            if (!id.isEmpty()) return id;
+        }
+        return {};
+    }
+
+    void styleNode(const QString &id) {
+        if (!items.contains(id)) return;
+        const bool active = id == selected;
+        items.value(id).body->setPen(QPen(active ? accent : line, active ? 2.5 : 1));
+    }
+
+    void selectNode(const QString &id) {
+        if (!items.contains(id) || selected == id) return;
+        const QString old = selected;
+        selected = id;
+        styleNode(old);
+        styleNode(selected);
+    }
+
+    void startEdit() {
+        if (editor || !items.contains(selected)) return;
+        editId = selected;
+        editor = new QPlainTextEdit;
+        editor->setObjectName("topicEditor");
+        editor->setPlainText(doc.nodes.value(selected).text);
+        editor->setTabChangesFocus(false);
+        editor->selectAll();
+        editorProxy = scene->addWidget(editor);
+        editorProxy->setZValue(5);
+        QRectF bounds = items.value(selected).body->sceneBoundingRect();
+        bounds.setWidth(qMax(bounds.width(), 230.0));
+        bounds.setHeight(qMax(bounds.height(), 78.0));
+        bounds.moveCenter(items.value(selected).body->pos());
+        editorProxy->setGeometry(bounds);
+        canvas->ensureVisible(editorProxy, 30, 30);
+        for (auto *action : canvasActions) action->setEnabled(false);
+        editor->setFocus(Qt::OtherFocusReason);
+        auto *accept = new QShortcut(QKeySequence("Ctrl+Return"), editor);
+        auto *cancel = new QShortcut(QKeySequence("Escape"), editor);
+        connect(accept, &QShortcut::activated, this, [this] { finishEdit(); });
+        connect(cancel, &QShortcut::activated, this, [this] { finishEdit(false); });
+        connect(editor, &QPlainTextEdit::textChanged, this, [this] { scheduleRecovery(); });
+        statusBar()->showMessage(QStringLiteral("编辑主题  ·  Ctrl+Enter 确认  ·  Esc 取消  ·  Enter 换行"));
+    }
+
+    void finishEdit(bool accept = true) {
+        if (!editor) return;
+        if (accept) QApplication::inputMethod()->commit();
+        const QString value = editor->toPlainText();
+        const QString id = editId;
+        QGraphicsProxyWidget *proxy = editorProxy;
+        editor = nullptr;
+        editorProxy = nullptr;
+        scene->removeItem(proxy);
+        proxy->deleteLater();
+        canvas->setFocus();
+        for (auto *action : canvasActions) action->setEnabled(true);
+        if (accept && value.size() <= Document::maxText && value != doc.nodes.value(id).text) {
+            checkpoint();
+            doc.nodes[id].text = value;
+            changed();
+        } else if (dirty) {
+            writeRecovery();
+        } else {
+            clearRecovery();
+        }
+        statusBar()->showMessage(accept && value.size() > Document::maxText
+            ? QStringLiteral("文字超过 10 万字符，本次修改未保存")
+            : QStringLiteral("双击编辑  ·  拖到主题中心移入子级，拖到边缘调整顺序  ·  Ctrl+滚轮缩放"), 5000);
+    }
+
+    void search(bool prompt) {
+        if (prompt || query.isEmpty()) {
+            bool ok = false;
+            const QString value = QInputDialog::getText(this, QStringLiteral("查找主题"),
+                QStringLiteral("输入主题关键词"), QLineEdit::Normal, query, &ok).trimmed();
+            if (!ok || value.isEmpty()) return;
+            query = value;
+            lastMatch.clear();
+        }
+        QStringList matches;
+        QVector<QString> pending{doc.root};
+        while (!pending.isEmpty()) {
+            const QString id = pending.takeLast();
+            const Node &node = qAsConst(doc.nodes)[id];
+            if (node.text.contains(query, Qt::CaseInsensitive)) matches.append(id);
+            for (auto child = node.children.crbegin(); child != node.children.crend(); ++child)
+                pending.append(*child);
+        }
+        if (matches.isEmpty()) {
+            statusBar()->showMessage(QStringLiteral("未找到匹配主题"), 4000);
+            return;
+        }
+        const int index = (matches.indexOf(lastMatch) + 1) % matches.size();
+        lastMatch = matches.at(index);
+        QStringList collapsed;
+        for (QString id = parents.value(lastMatch); !id.isEmpty(); id = parents.value(id))
+            if (doc.nodes.value(id).collapsed) collapsed.append(id);
+        if (!collapsed.isEmpty()) {
+            checkpoint();
+            for (const QString &id : collapsed) doc.nodes[id].collapsed = false;
+            selected = lastMatch;
+            changed();
+        } else {
+            selectNode(lastMatch);
+        }
+        canvas->centerOn(items.value(selected).body);
+        statusBar()->showMessage(QStringLiteral("匹配 %1 / %2  ·  F3 下一个").arg(index + 1).arg(matches.size()), 5000);
+    }
+
+    void scheduleRecovery() {
+        if (!recoveryPath.isEmpty() && !recoveryTimer.isActive()) recoveryTimer.start();
+    }
+
+    void setupRecovery(const QString &directory = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)) {
+        if (directory.isEmpty() || !QDir().mkpath(directory)) {
+            statusBar()->showMessage(QStringLiteral("无法创建自动恢复目录"), 8000);
+            return;
+        }
+        recoveryPath = QDir(directory).filePath("recovery.json");
+        recoveryLock.reset(new QLockFile(recoveryPath + ".lock"));
+        recoveryLock->setStaleLockTime(0);
+        if (!recoveryLock->tryLock()) {
+            recoveryPath.clear();
+            statusBar()->showMessage(QStringLiteral("另一实例正在使用自动恢复功能"), 8000);
+            return;
+        }
+        QFile file(recoveryPath);
+        if (!file.open(QIODevice::ReadOnly)) return;
+        const QJsonObject envelope = QJsonDocument::fromJson(file.read(Document::maxBytes + 16384)).object();
+        file.close();
+        const QByteArray data = QJsonDocument(envelope.value("document").toObject()).toJson(QJsonDocument::Compact);
+        Document recovered;
+        if (!recovered.parse(data)) {
+            statusBar()->showMessage(QStringLiteral("上次的恢复文件无法读取"), 8000);
+            return;
+        }
+        const auto answer = QMessageBox::question(this, QStringLiteral("恢复导图"),
+            QStringLiteral("发现上次会话留下的未保存内容。是否恢复？"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        if (answer == QMessageBox::No) {
+            clearRecovery();
+            return;
+        }
+        doc = std::move(recovered);
+        selected = doc.root;
+        dirty = true;
+        render();
+        canvas->centerOn(0, 0);
+        const QString original = envelope.value("file").toString();
+        if (!original.isEmpty()) {
+            filePath = QFileInfo(original).absolutePath() + "/" + QFileInfo(original).completeBaseName()
+                + QStringLiteral("（已恢复）.smap");
+            needsSaveAs = true;
+        }
+        updateTitle();
+        statusBar()->showMessage(QStringLiteral("已恢复未保存的内容。请保存为新文件。"), 8000);
+    }
+
+    void writeRecovery() {
+        if (recoveryPath.isEmpty()) return;
+        Document draft = doc;
+        if (editor && editor->toPlainText().size() <= Document::maxText)
+            draft.nodes[editId].text = editor->toPlainText();
+        const QByteArray data = draft.serialize();
+        if (!dirty && data == saved.serialize()) {
+            clearRecovery();
+            return;
+        }
+        QString error;
+        const QByteArray envelope = QJsonDocument(QJsonObject{
+            {"file", filePath}, {"document", QJsonDocument::fromJson(data).object()}
+        }).toJson(QJsonDocument::Compact);
+        if (data.size() > Document::maxBytes || !writeAtomically(recoveryPath, envelope, &error))
+            statusBar()->showMessage(QStringLiteral("自动恢复写入失败，请手动保存"), 8000);
+    }
+
+    void clearRecovery() {
+        recoveryTimer.stop();
+        if (!recoveryPath.isEmpty()) QFile::remove(recoveryPath);
+    }
+
+    bool confirmLeave() {
+        finishEdit();
+        if (!dirty) return true;
+        const auto answer = QMessageBox::warning(this, QStringLiteral("未保存的修改"),
+            QStringLiteral("关闭当前导图前，是否保存修改？"),
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+        if (answer == QMessageBox::Save) return save();
+        return answer == QMessageBox::Discard;
+    }
+
+    bool needsSaveAs = false;
+
+    bool save(bool as = false) {
+        QString path = filePath;
+        if (as || needsSaveAs || path.isEmpty()) {
+            path = QFileDialog::getSaveFileName(this, QStringLiteral("保存导图"),
+                path.isEmpty() ? QStringLiteral("未命名.smap") : path,
+                QStringLiteral("枝理导图 (*.smap)"));
+            if (path.isEmpty()) return false;
+            if (!path.endsWith(".smap", Qt::CaseInsensitive) && !path.endsWith(".smap.json", Qt::CaseInsensitive))
+                path += ".smap";
+        }
+        return saveTo(path);
+    }
+
+    bool saveTo(const QString &path) {
+        const QByteArray data = doc.serialize();
+        QString error = QStringLiteral("文件超过 50 MiB");
+        if (data.size() > Document::maxBytes || !writeAtomically(path, data, &error)) {
+            QMessageBox::warning(this, QStringLiteral("保存失败"), error);
+            return false;
+        }
+        filePath = path;
+        needsSaveAs = false;
+        saved = doc;
+        dirty = false;
+        clearRecovery();
+        updateTitle();
+        statusBar()->showMessage(QStringLiteral("已保存  %1").arg(QFileInfo(path).fileName()), 4000);
+        return true;
+    }
+
+    bool loadFrom(const QString &path, QString *error) {
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) {
+            *error = file.errorString();
+            return false;
+        }
+        Document next;
+        if (!next.parse(file.read(Document::maxBytes + 1), error)) return false;
+        doc = std::move(next);
+        filePath = path;
+        needsSaveAs = false;
+        initializeDocument();
+        fit();
+        return true;
+    }
+
+    void openFile() {
+        const QString path = QFileDialog::getOpenFileName(this, QStringLiteral("打开导图"), {},
+            QStringLiteral("枝理导图 (*.smap *.smap.json *.json)"));
+        if (path.isEmpty() || !confirmLeave()) return;
+        QString error;
+        if (!loadFrom(path, &error)) QMessageBox::warning(this, QStringLiteral("打开失败"), error);
+    }
+
+    void fit() {
+        canvas->fitInView(scene->itemsBoundingRect().adjusted(-45, -45, 45, 45), Qt::KeepAspectRatio);
+        const qreal scale = canvas->transform().m11();
+        if (scale > 1.25) canvas->scale(1.25 / scale, 1.25 / scale);
+    }
+
+    bool exportTo(const QString &path, const QString &format, QString *error) {
+        const QRectF bounds = scene->itemsBoundingRect().adjusted(-24, -24, 24, 24);
+        const QSize size(qCeil(bounds.width()), qCeil(bounds.height()));
+        QSaveFile file(path);
+        if (!file.open(QIODevice::WriteOnly)) {
+            *error = file.errorString();
+            return false;
+        }
+        auto paint = [&](QPaintDevice *device, const QRectF &target) {
+            QPainter painter;
+            if (!painter.begin(device)) return false;
+            painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+            scene->render(&painter, target, bounds, Qt::KeepAspectRatio);
+            return painter.end();
+        };
+        const QString previous = selected;
+        selected.clear();
+        styleNode(previous);
+        bool written = false;
+        if (format == "svg") {
+            QSvgGenerator svg;
+            svg.setOutputDevice(&file);
+            svg.setSize(size);
+            svg.setViewBox(QRect(QPoint(0, 0), size));
+            svg.setTitle(QStringLiteral("枝理导图"));
+            written = paint(&svg, QRectF(QPointF(), size));
+        } else if (format == "pdf") {
+            QPdfWriter pdf(&file);
+            pdf.setResolution(144);
+            pdf.setPageSize(QPageSize(QPageSize::A4));
+            pdf.setPageOrientation(size.width() > size.height() ? QPageLayout::Landscape : QPageLayout::Portrait);
+            pdf.setTitle(doc.nodes.value(doc.root).text);
+            const qreal ratio = qMin(pdf.width() / bounds.width(), pdf.height() / bounds.height());
+            const QSizeF extent = bounds.size() * ratio;
+            const QPointF corner((pdf.width() - extent.width()) / 2, (pdf.height() - extent.height()) / 2);
+            written = paint(&pdf, QRectF(corner, extent));
+        } else if (qint64(size.width()) * size.height() <= 32000000 && size.width() <= 32767 && size.height() <= 32767) {
+            QImage image(size, QImage::Format_ARGB32);
+            image.fill(paper);
+            written = paint(&image, QRectF(QPointF(), size)) && image.save(&file, "PNG");
+        } else {
+            *error = QStringLiteral("导图过大，请折叠部分分支或导出为 SVG / PDF。");
+        }
+        selectNode(previous);
+        if (written && file.commit()) return true;
+        if (error->isEmpty())
+            *error = file.error() == QFileDevice::NoError ? QStringLiteral("无法生成导出文件") : file.errorString();
+        return false;
+    }
+
+    void exportFile(const QString &format) {
+        const QString suffix = "." + format;
+        QString path = QFileDialog::getSaveFileName(this, QStringLiteral("导出导图"), {},
+            QStringLiteral("%1 (*%2)").arg(format.toUpper(), suffix));
+        if (path.isEmpty()) return;
+        if (!path.endsWith(suffix, Qt::CaseInsensitive)) path += suffix;
+        QString error;
+        if (!exportTo(path, format, &error)) QMessageBox::warning(this, QStringLiteral("导出失败"), error);
+        else statusBar()->showMessage(QStringLiteral("已导出  %1").arg(QFileInfo(path).fileName()), 4000);
+    }
+
+    void makeMenus() {
+        auto action = [&](QMenu *menu, const QString &name, const char *shortcut,
+                          std::function<void()> run, bool canvasOnly = false) {
+            QAction *item = menu->addAction(name);
+            item->setShortcut(QKeySequence(QString::fromLatin1(shortcut)));
+            connect(item, &QAction::triggered, this, [this, run] { finishEdit(); run(); });
+            if (canvasOnly) canvasActions.append(item);
+            return item;
+        };
+        auto *file = menuBar()->addMenu(QStringLiteral("文件"));
+        action(file, QStringLiteral("新建"), "Ctrl+N", [this] { if (confirmLeave()) resetDocument(); });
+        action(file, QStringLiteral("打开"), "Ctrl+O", [this] { openFile(); });
+        auto *saveAction = action(file, QStringLiteral("保存"), "Ctrl+S", [this] { save(); });
+        action(file, QStringLiteral("另存为"), "Ctrl+Shift+S", [this] { save(true); });
+        file->addSeparator();
+        for (const QString &format : {QString("png"), QString("svg"), QString("pdf")})
+            action(file, QStringLiteral("导出 %1").arg(format.toUpper()), "", [this, format] { exportFile(format); });
+
+        auto *edit = menuBar()->addMenu(QStringLiteral("编辑"));
+        auto *child = action(edit, QStringLiteral("新增子级"), "Tab", [this] { createNode(true); }, true);
+        action(edit, QStringLiteral("新增同级"), "Return", [this] { createNode(false); }, true);
+        action(edit, QStringLiteral("编辑主题"), "F2", [this] { startEdit(); }, true);
+        action(edit, QStringLiteral("删除分支"), "Delete", [this] { removeSelected(); }, true);
+        action(edit, QStringLiteral("折叠 / 展开"), "Space", [this] { toggleCollapse(); }, true);
+        edit->addSeparator();
+        auto *undo = action(edit, QStringLiteral("撤销"), "Ctrl+Z", [this] { history(true); }, true);
+        action(edit, QStringLiteral("重做"), "Ctrl+Y", [this] { history(false); }, true);
+        auto *find = action(edit, QStringLiteral("查找"), "Ctrl+F", [this] { search(true); });
+        action(edit, QStringLiteral("查找下一个"), "F3", [this] { search(false); }, true);
+
+        auto *view = menuBar()->addMenu(QStringLiteral("视图"));
+        classicAction = action(view, QStringLiteral("经典导图"), "Ctrl+1", [this] { chooseLayout(true); });
+        hierarchyAction = action(view, QStringLiteral("结构图"), "Ctrl+2", [this] { chooseLayout(false); });
+        for (auto *item : {classicAction, hierarchyAction}) item->setCheckable(true);
+        // Keep checked state tied to the actual document, including undo and open.
+        auto *group = new QActionGroup(this);
+        group->addAction(classicAction);
+        group->addAction(hierarchyAction);
+        auto *fitAction = action(view, QStringLiteral("适应窗口"), "Ctrl+0", [this] { fit(); });
+
+        auto *bar = addToolBar(QStringLiteral("常用"));
+        bar->setMovable(false);
+        auto *brand = new QLabel(QStringLiteral("枝理  /  ZHILI"), bar);
+        brand->setStyleSheet(QStringLiteral("font-weight:700;color:#286557;padding:0 14px 0 7px"));
+        bar->addWidget(brand);
+        for (auto *item : {saveAction, child, undo, find}) bar->addAction(item);
+        auto *spacer = new QWidget(bar);
+        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        bar->addWidget(spacer);
+        for (auto *item : {classicAction, hierarchyAction, fitAction}) bar->addAction(item);
+    }
+
+    void render() {
+        parents.clear();
+        const auto &nodes = qAsConst(doc.nodes);
+        for (const Node &node : nodes)
+            for (const auto &child : node.children) parents.insert(child, node.id);
+
+        QMap<QString, QSizeF> sizes;
+        QVector<QString> visible{doc.root};
+        for (int i = 0; i < visible.size(); ++i) {
+            const QString id = visible.at(i);
+            const Node &node = nodes[id];
+            if (!node.collapsed) for (const auto &child : node.children) visible.append(child);
+            if (!items.contains(id)) {
+                NodeItem item{scene->addPath(QPainterPath()), scene->addText(QString()), scene->addSimpleText(QString())};
+                item.body->setZValue(1);
+                item.label->setZValue(2);
+                item.badge->setZValue(3);
+                for (auto *part : {static_cast<QGraphicsItem *>(item.body), static_cast<QGraphicsItem *>(item.label),
+                                   static_cast<QGraphicsItem *>(item.badge)}) {
+                    part->setData(0, id);
+                    part->setAcceptedMouseButtons(Qt::NoButton);
+                }
+                items.insert(id, item);
+            }
+            const NodeItem item = items.value(id);
+            const bool root = id == doc.root;
+            const bool branch = parents.value(id) == doc.root;
+            QString display = node.text.left(360);
+            if (node.text.size() > display.size()) display += QChar(0x2026);
+            QFont font = QApplication::font();
+            font.setPointSize(root ? 15 : 11);
+            font.setBold(root || branch);
+            if (item.label->toPlainText() != display || item.label->textWidth() < 0 || item.label->font() != font) {
+                item.label->setFont(font);
+                item.label->setTextWidth(-1);
+                item.label->setPlainText(display);
+                item.label->setTextWidth(qBound(root ? 136.0 : 78.0, item.label->boundingRect().width(), 248.0));
+            }
+            item.label->setDefaultTextColor(root ? Qt::white : ink);
+            const QSizeF label = item.label->boundingRect().size();
+            const QSizeF size(label.width() + 24, qMax(root ? 50.0 : 36.0, label.height() + 12));
+            sizes[id] = size;
+            QPainterPath shape;
+            shape.addRoundedRect(QRectF(QPointF(-size.width() / 2, -size.height() / 2), size), 9, 9);
+            item.body->setPath(shape);
+            item.body->setBrush(root ? moss : QColor(branch ? "#e0ede4" : "#fffdf7"));
+            item.badge->setText(QStringLiteral("+%1").arg(node.children.size()));
+            item.badge->setBrush(accent);
+            item.badge->setVisible(node.collapsed && !node.children.isEmpty());
+        }
+
+        for (auto it = items.begin(); it != items.end();) {
+            if (sizes.contains(it.key())) { ++it; continue; }
+            delete it->body;
+            delete it->label;
+            delete it->badge;
+            it = items.erase(it);
+        }
+        for (auto it = edges.begin(); it != edges.end();) {
+            if (sizes.contains(it.key())) { ++it; continue; }
+            delete it.value();
+            it = edges.erase(it);
+        }
+
+        const auto positions = layoutNodes(doc, sizes);
+        if (!positions.contains(selected)) selected = doc.root;
+        for (auto it = positions.cbegin(); it != positions.cend(); ++it) {
+            const QString &id = it.key();
+            const QPointF point = it.value();
+            const NodeItem item = items.value(id);
+            const QSizeF label = item.label->boundingRect().size();
+            const QSizeF size = sizes.value(id);
+            item.body->setPos(point);
+            item.label->setPos(point - QPointF(label.width() / 2, label.height() / 2));
+            item.badge->setPos(point + QPointF(size.width() / 2 + 5, -item.badge->boundingRect().height() / 2));
+            styleNode(id);
+            if (id == doc.root) continue;
+
+            const QString parent = parents.value(id);
+            QPointF a = positions.value(parent);
+            QPointF b = point;
+            QPainterPath path;
+            if (doc.mindMap) {
+                const qreal direction = b.x() > a.x() ? 1 : -1;
+                a.rx() += direction * sizes.value(parent).width() / 2;
+                b.rx() -= direction * size.width() / 2;
+                const qreal middle = (a.x() + b.x()) / 2;
+                path.moveTo(a);
+                path.cubicTo(middle, a.y(), middle, b.y(), b.x(), b.y());
+            } else {
+                a.ry() += sizes.value(parent).height() / 2;
+                b.ry() -= size.height() / 2;
+                const qreal middle = (a.y() + b.y()) / 2;
+                path.moveTo(a);
+                path.lineTo(a.x(), middle);
+                path.lineTo(b.x(), middle);
+                path.lineTo(b);
+            }
+            if (edges.contains(id)) edges.value(id)->setPath(path);
+            else edges.insert(id, scene->addPath(path, QPen(line, 1.6)));
+        }
+        scene->setSceneRect(scene->itemsBoundingRect().adjusted(-100, -100, 100, 100));
+        classicAction->setChecked(doc.mindMap);
+        hierarchyAction->setChecked(!doc.mindMap);
+        updateTitle();
+    }
+
+protected:
+    void closeEvent(QCloseEvent *event) override {
+        if (confirmLeave()) {
+            clearRecovery();
+            event->accept();
+        } else {
+            event->ignore();
+        }
+    }
+
+#ifdef ZHILI_TEST
+    friend int runSmokeTest();
+#endif
+};
+
+#ifdef ZHILI_TEST
+#include "../tests/smoke.inc"
+#endif
+
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    app.setApplicationName("ZhiLi");
+    app.setApplicationDisplayName(QStringLiteral("枝理"));
+    app.setOrganizationName("ZhiLi");
+#ifdef ZHILI_TEST
+    return runSmokeTest();
+#else
+    Window window;
+    window.show();
+    return app.exec();
+#endif
+}

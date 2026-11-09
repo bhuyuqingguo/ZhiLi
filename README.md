@@ -1,44 +1,29 @@
-# SimpleMap MVP-01 — Qt5 原型源码
+# 枝理 / ZhiLi
 
-目标：银河麒麟桌面 V10 / 飞腾 D2000 ARM64，兼顾 Windows x64。C++11 / Qt5 Widgets / QtSvg。
+枝理是纯离线的桌面思维导图编辑器。中心主题下的同一棵树可以在经典左右导图和自上而下结构图之间切换。当前工作区为 **1.0 设计验收版**，首发目标是银河麒麟桌面 V10 / 飞腾 D2000 ARM64，另支持 Windows x64 构建验证。
 
-## 已实现的原型功能
-- 双布局：经典左右思维导图、层级自上而下结构图（Ctrl+1 / Ctrl+2）
-- 节点新增子级（Tab）、新增同级（Enter）、编辑（F2）、删除（Del）、折叠（Space）
-- 撤销/重做（Ctrl+Z / Ctrl+Y）；打开（Ctrl+O）、保存（Ctrl+S）、另存为
-- 原子保存 `.smap.json`（实验格式）、导出 PNG / SVG、Ctrl+鼠标滚轮缩放、空白拖动画布
-- 读取 JSON 时做格式版本、节点数、结构环与重复引用校验
+## 体验
 
-## 已知限制（重要）
-- 此交付为**源码原型，尚未在目标麒麟 D2000 或 Windows 设备编译/运行验证**，不能宣称已完成兼容认证。
-- 双击直接编辑、鼠标拖拽节点重排、自动保存恢复、节点备注、关联线、XMind/MindManager/MindMaster 文件转换尚未实现。
-- 当前编辑使用 Qt 输入对话框，能够调用系统输入法，但需要在真机测试中文输入。
-- `.smap.json` 是开发阶段的中间格式，并非最终 ZIP 封装 `.smap`。
-- 结构图树较宽时需要继续优化布局算法；当前采用保守简单布局。
-- Qt5 的授权、动态链接和分发方式应在发布前核查。
+- 双击主题或按 F2 原位编辑。Enter 换行，Ctrl+Enter 确认，Esc 取消。macOS 上的 Qt Ctrl 快捷键显示为 ⌘。
+- 在画布上按 Tab 新增子级、Enter 新增同级、Space 折叠、Delete 删除分支。拖到目标主题中心可移入子级，拖到边缘可排到目标前后。
+- Ctrl+1 / Ctrl+2 切换布局，Ctrl+0 适应窗口，Ctrl+滚轮缩放。拖动空白区域平移。
+- Ctrl+F 查找主题，F3 跳到下一项。匹配在折叠分支内时会展开路径，该展开可以撤销。
+- 文件菜单提供新建、打开、保存、另存为和 PNG、SVG、PDF 导出。意外关闭后，下次打开可恢复最近的本地快照。恢复内容会另存，原文件保留。
 
-## 麒麟 ARM64 上编译（需本机已有开发依赖）
-```bash
-sudo apt install build-essential cmake qtbase5-dev libqt5svg5-dev
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j2
-./build/simplemap
-```
-上述安装命令仅供网络/离线软件源允许的开发机使用；如为隔离环境，应由管理员提供离线依赖包。无需 sudo 运行软件本体。
+## 构建
 
-## Windows 上编译
-安装 Qt5（Widgets、Svg）、CMake 和匹配的 C++ 工具链，使用 Qt 命令行环境运行：
-```powershell
+以下命令使用 CMake 3.13+、C++11、Qt 5.9+ Widgets / Svg。启用自动化测试时还需要 Qt Test。
+
+```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
 ```
 
-## 设计约束
-一份树结构，多个布局视图；保存不依赖坐标；纯离线；无账号、云同步和 AI。保留文件版本字段供迁移。
+麒麟原生构建需要本机仓库对应的编译工具链和 Qt 开发包，通常为 `build-essential cmake qtbase5-dev libqt5svg5-dev`。构建后运行 `./build/simplemap`。若 CMake 早于 3.20，请在构建目录内执行 `ctest`。
 
-## 下一步优先级
-1. 麒麟 D2000 本机编译并修复编译错误；检查中文输入法、字体、窗口缩放。
-2. 把画布拆分为 NodeModel / DocumentService / LayoutEngine / CanvasView / MainWindow。
-3. 实现点击选中、双击原位编辑与节点拖拽重排；修复节点尺寸与长文本溢出。
-4. 完整 QUndoStack、自动恢复文件、单元测试和 100/500/1000/3000 节点压力测试。
-5. 将开发格式升级为版本化 ZIP `.smap`，做安全校验及跨平台往返测试。
+Windows 使用匹配编译器与架构的 Qt5 SDK，并通过 `-DCMAKE_PREFIX_PATH=...` 指向 SDK。多配置生成器的程序一般位于 `build/Release/simplemap.exe`。macOS 在构建目录生成 `simplemap.app`，安装预览包需另外嵌入 Qt 运行库。
+
+## 设计和验收记录
+
+参见 [1.0 设计与验收](docs/V1_DESIGN.md)。
