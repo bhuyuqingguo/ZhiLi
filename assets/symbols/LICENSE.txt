@@ -1,0 +1,20 @@
+SPDX-License-Identifier: CC0-1.0
+
+ZhiLi original illustrative symbol set
+
+To the extent possible under law, all copyright and related or neighboring
+rights to the original SVG artwork, its descriptive catalog, and the generated
+HTML gallery in this directory are waived under CC0 1.0 Universal.
+
+You may copy, modify, distribute and use these materials, including for
+commercial purposes, without asking permission. The materials are supplied
+without warranty. No trademark, patent, publicity, privacy or endorsement
+rights are granted or implied.
+
+CC0 1.0 Universal legal text: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Provenance: these SVGs were created for this project from geometric primitives
+by tools/generate_symbols.py. They contain no third-party artwork, logos,
+external images or fonts, and do not claim compliance with any standardized
+military or engineering symbology. These are illustrative diagram assets,
+not real equipment specifications or operational instructions.

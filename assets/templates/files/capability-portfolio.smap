@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "能力组合优先级",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "能力清单",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "列出候选能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "说明当前覆盖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "标记相关业务目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "价值判断",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "影响的用户与场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "预期质量和效率改善",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "复用与协同收益",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "实施条件",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "人员与时间投入",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "前置能力依赖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "主要不确定性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "组合选择",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "确定近期重点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "保留后续候选",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "明确暂缓原因",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "滚动验证",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "设置阶段成果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "检查实际收益",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "动态调整优先级",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

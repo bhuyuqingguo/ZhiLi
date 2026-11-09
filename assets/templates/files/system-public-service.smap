@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "公共服务协同体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "服务需求",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "服务人群与场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "需要解决的问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "服务可达性要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "服务主体",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "受理与咨询角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "业务办理角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "协同支撑角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "服务过程",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "需求受理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "协同处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "结果反馈与确认",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "协同保障",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "职责与交接标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "信息共享边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "问题协调机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "体验改进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "收集服务反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "检查等待和重复环节",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "持续优化服务说明",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

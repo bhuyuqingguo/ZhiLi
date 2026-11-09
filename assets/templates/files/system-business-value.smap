@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "业务价值链",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "需求识别",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "收集用户反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "确认问题和机会",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "形成需求优先级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "方案设计",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "分析可行性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "明确服务方案",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "定义交付标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "资源组织",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "配置人员与能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "准备资料和工具",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "协调外部依赖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "服务交付",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "执行约定活动",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "检查交付质量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "完成用户确认",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "价值反馈",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "评价使用效果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "识别流程改进",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "更新知识与标准",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

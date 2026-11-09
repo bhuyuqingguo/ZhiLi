@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "访问边界视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "数据分类",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "公开资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "内部业务资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "需特别保护的资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "参与角色",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "内容使用者",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "内容维护者",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "管理与审核者",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "访问边界",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "可见范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "可执行的操作",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "授权和撤回责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "过程保障",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "输入和输出检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "变更记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "异常反馈与复核",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "治理维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "权限定期复核",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "角色变化交接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "规则和培训更新",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

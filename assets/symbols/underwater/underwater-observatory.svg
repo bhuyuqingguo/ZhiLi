@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>水下观测舱 · Underwater observatory</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#355f93" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M12 30 Q12 13 32 13 Q52 13 52 30 L52 48 12 48Z" fill="#e9effb"/><circle cx="23" cy="31" r="6" fill="none"/><circle cx="41" cy="31" r="6" fill="none"/><line x1="19" y1="48" x2="15" y2="56"/><line x1="45" y1="48" x2="49" y2="56"/><line x1="32" y1="13" x2="32" y2="6"/></g></g>
+</svg>

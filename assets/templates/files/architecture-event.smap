@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "事件协作架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "事件来源",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "用户操作结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "业务状态变化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "定时或外部输入",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "事件契约",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "事件名称和语义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "标识与发生时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "版本与关联信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "发布与消费",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "发布者职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "订阅者职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "顺序和重复约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "状态与异常",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "处理完成状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "失败与补偿边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "中断后恢复约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "观察与验证",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "事件记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "流程追踪",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "重复和缺失场景测试",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

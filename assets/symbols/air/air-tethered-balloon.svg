@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>系留气球 · Tethered balloon</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#226384" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><ellipse cx="32" cy="22" rx="16" ry="13" fill="#e5f3fa"/><path d="M22 33 L27 40 37 40 42 33" fill="none"/><path d="M32 40 Q25 48 35 56" fill="none"/><line x1="27" y1="56" x2="43" y2="56"/></g></g>
+</svg>

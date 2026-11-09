@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>观测浮标 · Observation buoy</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#196c83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M8 38 L56 38 48 50 19 50Z" fill="#e3f4f8"/><ellipse cx="32" cy="40" rx="20" ry="7" fill="#e3f4f8"/><line x1="32" y1="38" x2="32" y2="10"/><path d="M14 25 L29 20 29 29 14 33Z" fill="#e3f4f8"/><path d="M35 20 L50 25 50 33 35 29Z" fill="#e3f4f8"/><circle cx="32" cy="8" r="2" fill="none"/><path d="M7 56 Q12 52 17 56 T27 56 T37 56 T47 56 T57 56" fill="none"/></g></g>
+</svg>

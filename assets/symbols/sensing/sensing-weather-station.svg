@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>气象站 · Weather station</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#806039" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><line x1="32" y1="13" x2="32" y2="56"/><line x1="18" y1="56" x2="46" y2="56"/><line x1="16" y1="21" x2="48" y2="21"/><circle cx="15" cy="21" r="6" fill="#fcf0df"/><circle cx="49" cy="21" r="6" fill="#fcf0df"/><rect x="25" y="33" width="14" height="14" rx="2" fill="#fcf0df"/><path d="M32 13 L47 8 43 16Z" fill="#fcf0df"/></g></g>
+</svg>

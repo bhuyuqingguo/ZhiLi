@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "项目协同能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "目标对齐",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "统一问题与结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "明确范围边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确认成功标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "计划组织",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "分解工作与里程碑",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "匹配责任和资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "识别关键依赖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "协同推进",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "同步进度和阻碍",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "协调跨团队接口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "维护决策记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "变化管理",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "分析变化影响",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "协商优先级调整",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "同步新版计划",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "交付复盘",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "检查成果与验收",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "总结协作经验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "改进工作约定",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

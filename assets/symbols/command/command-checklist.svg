@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>检查清单 · Checklist</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="15" y="12" width="34" height="44" rx="2" fill="#f0eafa"/><rect x="24" y="7" width="16" height="10" rx="2" fill="#f0eafa"/><path d="M22 28 L25 31 30 25 M22 40 L25 43 30 37" fill="none"/><line x1="35" y1="28" x2="42" y2="28"/><line x1="35" y1="40" x2="42" y2="40"/><line x1="22" y1="49" x2="42" y2="49"/></g></g>
+</svg>

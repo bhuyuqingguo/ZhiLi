@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>水声观测节点 · Acoustic observation node</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#355f93" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="24" y="26" width="16" height="18" rx="2" fill="#e9effb"/><line x1="32" y1="44" x2="32" y2="55"/><line x1="20" y1="55" x2="44" y2="55"/><path d="M18 25 Q9 34 18 44 M46 25 Q55 34 46 44 M23 18 Q32 11 41 18" fill="none"/><circle cx="32" cy="33" r="3" fill="none"/></g></g>
+</svg>

@@ -25,6 +25,10 @@ install -D -m 644 "$source_dir/packaging/org.zhili.simplemap.desktop" \
 for notice in "$source_dir"/assets/fonts/OFL-*.txt; do
     install -D -m 644 "$notice" "$stage/usr/share/doc/zhili/${notice##*/}"
 done
+install -D -m 644 "$source_dir/assets/symbols/LICENSE.txt" \
+    "$stage/usr/share/doc/zhili/SYMBOLS-CC0.txt"
+install -D -m 644 "$source_dir/src/vendor/miniz/LICENSE" \
+    "$stage/usr/share/doc/zhili/MINIZ-MIT.txt"
 
 # Derive minimum library versions from the actual native executable.
 mkdir -p "$work/debian" "$stage/DEBIAN"

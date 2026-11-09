@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "架构演进路线",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "现状架构",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "现有组件和职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "已知限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "必须保持的能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "目标架构",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "目标边界和职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "预期改进",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "关键设计原则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "过渡阶段",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "拆分可独立交付变化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "管理前置依赖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "保留兼容和回退路径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "验证与切换",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "功能和数据一致性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "性能与体验检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "阶段进入退出条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "收尾维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "退役冗余组件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "更新资料与责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "回顾收益与残留问题",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

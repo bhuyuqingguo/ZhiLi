@@ -1,0 +1,175 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "多会场活动统筹",
+      "children": [
+        "n2",
+        "n6",
+        "n12",
+        "n16",
+        "n20"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "统一安排",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "确定总日程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "明确会场主题与容量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "设定共同信息口径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "会场责任",
+      "children": [
+        "n7",
+        "n10",
+        "n11"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "指定各会场联系人",
+      "children": [
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "会场甲：负责人待填",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "会场乙：负责人待填",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "分配主持与技术支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "确认独立检查清单",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "共享资源",
+      "children": [
+        "n13",
+        "n14",
+        "n15"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "协调嘉宾时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "安排共用设备流转",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "管理休息与公共空间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "信息同步",
+      "children": [
+        "n17",
+        "n18",
+        "n19"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "发布统一议程版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "及时通知地点时间变更",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "汇总现场问题状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "整体收尾",
+      "children": [
+        "n21",
+        "n22",
+        "n23"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "收集各会场成果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n22",
+      "text": "核对人员物资交接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n23",
+      "text": "汇总共性改进点",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

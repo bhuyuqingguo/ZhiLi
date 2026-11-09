@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "领域划分视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "核心领域",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "关键业务目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "核心规则与概念",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "主要业务输出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "支撑领域",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "支撑业务职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "共享资料与能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "可复用流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "通用领域",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "基础信息管理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "通知与协作",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "资料检索与归档",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "领域关系",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "上游输入",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "下游输出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "跨边界交接约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "边界维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "职责重叠检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "概念歧义消除",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "变化影响与演进",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

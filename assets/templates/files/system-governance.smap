@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "治理机制视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "目标和原则",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "治理目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "职责与授权边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "透明和可追踪原则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "决策机制",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "议题提出与准备",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "参与角色与确认方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "决策记录与传达",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "规则管理",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "制度和流程目录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "规则解释责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "修订与发布机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "监督评价",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "检查范围和频次",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "证据收集与反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "问题整改跟踪",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "持续改进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "治理效果评价",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "冲突和例外分析",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "机制调整与复核",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

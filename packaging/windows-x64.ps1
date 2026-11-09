@@ -31,6 +31,13 @@ try {
     $plugins = Join-Path $bundle 'platforms'
     New-Item -ItemType Directory -Path $plugins | Out-Null
     Copy-Item -LiteralPath (Join-Path $QtPrefix 'plugins/platforms/qwindows.dll') -Destination $plugins
+    # SVGs are used both by the map renderer and by icon/preview widgets. Keep
+    # Qt's image and icon engines in the portable bundle, not just Qt5Svg.dll.
+    foreach ($plugin in @('iconengines/qsvgicon.dll', 'imageformats/qsvg.dll')) {
+        $destination = Join-Path $bundle $plugin
+        New-Item -ItemType Directory -Force -Path (Split-Path $destination) | Out-Null
+        Copy-Item -LiteralPath (Join-Path $QtPrefix "plugins/$plugin") -Destination $destination
+    }
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
     $vsRoot = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
     if ($LASTEXITCODE -ne 0 -or !$vsRoot) { throw 'Visual Studio C++ tools were not found.' }
@@ -38,7 +45,7 @@ try {
         Sort-Object { [version]$_.Parent.Parent.Name } -Descending | Select-Object -First 1
     if (!$crt) { throw 'The x64 Visual C++ application-local runtime was not found.' }
     Copy-Item -Path (Join-Path $crt.FullName '*.dll') -Destination $bundle
-    foreach ($file in @('Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Svg.dll', 'platforms/qwindows.dll', 'vcruntime140.dll', 'msvcp140.dll')) {
+    foreach ($file in @('Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Svg.dll', 'platforms/qwindows.dll', 'iconengines/qsvgicon.dll', 'imageformats/qsvg.dll', 'vcruntime140.dll', 'msvcp140.dll')) {
         if (!(Test-Path -LiteralPath (Join-Path $bundle $file) -PathType Leaf)) {
             throw "Bundle is missing $file"
         }
@@ -57,6 +64,8 @@ try {
     $licenses = Join-Path $bundle 'licenses'
     New-Item -ItemType Directory -Path $licenses | Out-Null
     Copy-Item -Path (Join-Path $root 'assets/fonts/OFL-*.txt') -Destination $licenses
+    Copy-Item -LiteralPath (Join-Path $root 'assets/symbols/LICENSE.txt') -Destination (Join-Path $licenses 'SYMBOLS-CC0.txt')
+    Copy-Item -LiteralPath (Join-Path $root 'src/vendor/miniz/LICENSE') -Destination (Join-Path $licenses 'MINIZ-MIT.txt')
     $qtNotices = Join-Path $build 'qt-license-notices'
     foreach ($notice in @('LICENSE.LGPL3', 'LICENSE.GPL3')) {
         Copy-Item -LiteralPath (Join-Path $qtNotices $notice) -Destination $licenses

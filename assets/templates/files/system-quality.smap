@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "质量管理体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "质量策划",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "质量目标与指标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "适用标准和要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "检查责任与资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "过程保障",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "关键活动检查点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "工作输入输出标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "过程记录和追踪",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "结果验证",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "评审与测试方法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "验收证据要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "偏差和不符合项记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "问题改进",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "原因分析",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "纠正与预防措施",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "效果复核与关闭",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "体系维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "质量知识沉淀",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "规则与培训更新",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "定期评价与调整",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

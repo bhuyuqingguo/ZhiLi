@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "接口视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "接口定位",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "接口名称与用途",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "提供者与使用者",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "使用范围与限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "输入约定",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "字段与含义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "必填和可选条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "格式与边界约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "输出约定",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "正常结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "错误和状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "结果顺序与一致性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "行为约定",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "调用时机",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "重复与中断处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "版本和兼容策略",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "验证资料",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "示例和反例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "测试覆盖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "变更记录与联系人",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

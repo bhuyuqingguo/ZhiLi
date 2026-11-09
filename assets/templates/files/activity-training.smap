@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "专题培训",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "学习目标",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "定义目标学员与前置知识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "列出培训后的可见能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "约定考核与完成标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "课程准备",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "拆分知识单元",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "准备演示与练习材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "检查教室或线上环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "教学过程",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "导入实际问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "讲解关键概念",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "安排分组练习与答疑",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "效果验证",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "收集练习成果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "检查易错点与遗漏",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "提供个性化改进建议",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "持续学习",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "整理课件与问答",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "安排课后实践",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "跟踪应用效果",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

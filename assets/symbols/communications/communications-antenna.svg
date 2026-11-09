@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>通信天线 · Antenna</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#386b69" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><line x1="32" y1="23" x2="32" y2="55"/><line x1="21" y1="55" x2="43" y2="55"/><circle cx="32" cy="20" r="4" fill="#e4f3ef"/><path d="M22 11 Q12 20 22 29 M42 11 Q52 20 42 29 M15 5 Q-1 20 15 36 M49 5 Q65 20 49 36" fill="none"/></g></g>
+</svg>

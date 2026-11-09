@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "现场调研",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "调研准备",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确研究问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "选择典型场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确认访问授权与时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "调研方法",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "编写开放式访谈提纲",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "安排流程观察",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "准备匿名记录方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "现场执行",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "说明调研目的",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "记录事实与原话",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "标记待进一步核实事项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "分析整理",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "按主题归纳发现",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "比较共性与差异",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "区分证据和推断",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "成果确认",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "反馈初步结论",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "确认需求与优先级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "形成后续验证计划",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

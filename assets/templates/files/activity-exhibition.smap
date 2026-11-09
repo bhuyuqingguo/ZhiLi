@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "成果展示活动",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "展示定位",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确观众与核心信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "选择成果和案例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "定义展示效果指标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "展项准备",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "整理展板与说明文字",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "准备演示样件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "核查公开内容授权",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "空间与动线",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "规划入口和主题区域",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "设置导览及指引",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "预留休息和无障碍通道",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "服务与保障",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "安排讲解员轮班",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "检查设备与用电",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "制定现场问题转接方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "反馈与收尾",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "收集观众问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "核对物资归还",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "汇总改进建议",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

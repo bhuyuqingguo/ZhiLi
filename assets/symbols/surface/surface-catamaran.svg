@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>双体无人船 · Catamaran</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#196c83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M12 10 Q6 26 12 52 L22 52 22 15Z" fill="#e3f4f8"/><path d="M42 15 L42 52 52 52 Q58 26 52 10Z" fill="#e3f4f8"/><rect x="20" y="23" width="24" height="15" rx="2" fill="#e3f4f8"/><rect x="26" y="26" width="12" height="9" rx="2" fill="none"/><line x1="32" y1="23" x2="32" y2="14"/></g></g>
+</svg>

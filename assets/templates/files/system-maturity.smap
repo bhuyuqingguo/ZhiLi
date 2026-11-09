@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "体系成熟度评价",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "评价设计",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确评价范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "定义等级和证据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "选定评价参与方",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "目标与治理",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "目标清晰程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "责任落实程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "决策记录完整性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "流程与协同",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "流程一致性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "跨团队衔接程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "异常反馈与闭环",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "信息与资源",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "信息质量和可用性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "资源匹配程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "知识复用程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "改进路线",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "识别主要差距",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "选择优先改进项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "设定复评时间",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

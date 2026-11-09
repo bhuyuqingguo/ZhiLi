@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "学术交流会议",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "主题与内容",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确会议方向",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "设置分论坛主题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "制定征集与审核规则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "议程与嘉宾",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "确认报告人和主持人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "安排报告与讨论时长",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "收集摘要和演示材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "参会服务",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "发布报名与参会说明",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "安排签到及问询",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "提供无障碍参与方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "现场保障",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "检查音视频和演示设备",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "设置议程提示和时间管理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "准备临时变更沟通方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "成果整理",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "归档经授权的资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "收集参会反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "整理后续合作线索",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

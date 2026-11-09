@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "知识分享会",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "选题定位",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确听众与使用场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "提出一个核心问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "界定内容深度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "内容准备",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "组织背景和案例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "准备演示与练习",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "标注资料来源和使用范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "分享组织",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "确定讲解与讨论时长",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "收集会前问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "确认展示环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "互动沉淀",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "记录问答和不同做法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "补充适用条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "整理可复用清单",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "知识维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "归档材料和索引",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "指定后续更新人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "收集实际应用反馈",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

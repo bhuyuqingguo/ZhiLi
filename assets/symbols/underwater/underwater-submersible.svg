@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>观测潜器 · Observation submersible</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#355f93" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><ellipse cx="31" cy="34" rx="23" ry="13" fill="#e9effb"/><rect x="23" y="14" width="15" height="8" rx="2" fill="#e9effb"/><line x1="30" y1="14" x2="30" y2="8"/><line x1="30" y1="8" x2="38" y2="8"/><circle cx="22" cy="34" r="5" fill="none"/><circle cx="38" cy="34" r="5" fill="none"/><path d="M53 28 L58 24 58 44 53 40" fill="none"/></g></g>
+</svg>

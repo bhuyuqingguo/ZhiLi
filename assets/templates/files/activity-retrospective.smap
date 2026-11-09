@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "阶段复盘",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "事实回顾",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "列出阶段目标与结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "补齐时间线和关键变化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "区分事实与主观判断",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "经验提炼",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "总结有效做法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "识别影响结果的条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "记录可复用材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "问题分析",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "描述具体阻碍",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "寻找流程与协作原因",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "核实待确认的假设",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "改进试验",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "选择少量优先改进项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "明确行动与责任人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "设定观察指标和期限",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "后续跟踪",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "约定检查时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "比较改进前后表现",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "更新团队工作约定",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

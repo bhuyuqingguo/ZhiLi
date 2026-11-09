@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "多视图关系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "业务视图",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "谁需要什么结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "关键业务活动",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "活动输入和输出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "能力视图",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "需要哪些能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "现有能力覆盖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "建设差距与路线",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "系统视图",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "由哪些系统支撑",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "系统职责和边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "系统间协作",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "数据视图",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "需要什么信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "信息语义与责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "共享和质量约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "部署与追踪",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "在哪里运行",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "依赖和资源条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "跨视图一致性检查",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>状态仪表板 · Status dashboard</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="8" y="12" width="48" height="33" rx="2" fill="#f0eafa"/><path d="M15 34 A12 12 0 0 1 39 34" fill="none"/><line x1="27" y1="34" x2="33" y2="25"/><line x1="44" y1="21" x2="49" y2="21"/><line x1="44" y1="28" x2="49" y2="28"/><line x1="44" y1="35" x2="49" y2="35"/><line x1="32" y1="45" x2="32" y2="54"/><line x1="22" y1="54" x2="42" y2="54"/></g></g>
+</svg>

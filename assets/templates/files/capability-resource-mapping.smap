@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "能力资源映射",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "目标能力",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "能力定义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "服务场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "输出与质量要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "人员支撑",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "所需角色与技能",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "可用人员与缺口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "培训和替补安排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "流程支撑",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "关键活动与步骤",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "责任和交接点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "异常与反馈机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "工具信息支撑",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "必需工具与设施",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "输入数据与知识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "访问和更新条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "匹配评价",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "关键依赖与瓶颈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "资源使用冲突",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "补齐和优化顺序",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>移动机械臂 · Mobile manipulator</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#6a6334" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="12" y="40" width="40" height="11" rx="2" fill="#f5f1dc"/><circle cx="19" cy="52" r="4" fill="#f5f1dc"/><circle cx="45" cy="52" r="4" fill="#f5f1dc"/><path d="M25 40 L25 28 38 18 46 27" fill="none"/><circle cx="25" cy="28" r="4" fill="#f5f1dc"/><circle cx="38" cy="18" r="4" fill="#f5f1dc"/><path d="M43 25 L45 32 52 30 M49 26 L53 21" fill="none"/></g></g>
+</svg>

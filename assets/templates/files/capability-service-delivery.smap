@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "服务交付能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "需求响应",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "识别需求类型",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "澄清目标与条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确认服务范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "交付策划",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "制定交付方案",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "协调资源和时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "定义验收证据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "交付执行",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "组织工作与协作",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "检查过程质量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "管理变化与问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "交付确认",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "核对输出完整性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "收集使用者确认",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "记录限制与待办",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "持续支持",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "提供使用说明",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "响应后续问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "复用经验与知识",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "项目启动会",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "会前准备",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "收集背景与待决问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "发送议程与预读材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确认参会角色与时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "目标与范围",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "描述待解决的问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "列出本阶段交付物",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "说明不包含的事项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "协作安排",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "明确负责人和协作人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "约定信息同步节奏",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "记录跨团队依赖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "计划与风险",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "划分阶段和里程碑",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "确认资源与时间约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "记录风险和备选方案",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "会后闭环",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "整理决策与行动项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "指定完成时间和验收人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "发布纪要并跟踪反馈",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

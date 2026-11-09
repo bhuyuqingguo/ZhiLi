@@ -17,10 +17,12 @@ bool isUnicode(const QString &text) {
 QByteArray Document::serialize() const {
     QJsonArray entries;
     for (const Node &node : nodes) {
-        entries.append(QJsonObject{
+        QJsonObject fields{
             {"id", node.id}, {"text", node.text}, {"collapsed", node.collapsed},
             {"children", QJsonArray::fromStringList(node.children)}
-        });
+        };
+        if (!node.symbolId.isEmpty()) fields.insert("symbolId", node.symbolId);
+        entries.append(fields);
     }
     return QJsonDocument(QJsonObject{
         {"format", "simplemap-json"}, {"version", 1}, {"root", root},
@@ -59,9 +61,12 @@ bool Document::parse(const QByteArray &bytes, QString *error) {
         Node node;
         node.id = fields.value("id").toString();
         node.text = fields.value("text").toString();
+        node.symbolId = fields.value("symbolId").toString();
         node.collapsed = fields.value("collapsed").toBool();
         if (node.id.isEmpty() || next.nodes.contains(node.id) || !fields.value("text").isString()
             || node.text.size() > maxText || !isUnicode(node.id) || !isUnicode(node.text)
+            || (fields.contains("symbolId") && !fields.value("symbolId").isString())
+            || node.symbolId.size() > 128 || !isUnicode(node.symbolId)
             || !fields.value("children").isArray()
             || (fields.contains("collapsed") && !fields.value("collapsed").isBool()))
             return reject(invalidNode);

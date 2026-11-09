@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>网状网络 · Mesh network</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#386b69" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M32 10 L10 29 19 52 45 52 54 29Z M32 10 L32 34 10 29 M54 29 L32 34 19 52 M32 34 L45 52" fill="none"/><circle cx="32" cy="10" r="5" fill="#e4f3ef"/><circle cx="10" cy="29" r="5" fill="#e4f3ef"/><circle cx="19" cy="52" r="5" fill="#e4f3ef"/><circle cx="45" cy="52" r="5" fill="#e4f3ef"/><circle cx="54" cy="29" r="5" fill="#e4f3ef"/><circle cx="32" cy="34" r="5" fill="#e4f3ef"/></g></g>
+</svg>

@@ -216,7 +216,458 @@ int runSmokeTest() {
             format == "png" ? header.startsWith("\x89PNG") : header.contains("<svg"));
     }
 
+    // Long topics must remain complete on the canvas and in exported files.
+    // The emoji straddles the old 360 UTF-16-unit cutoff.
+    {
+        Window longTopic(false);
+        longTopic.show();
+        longTopic.activateWindow();
+        QTest::qWait(30);
+        const QString text = QString(359, QChar(0x679D)) + QString::fromUtf8("🌱")
+            + QStringLiteral("\n完整内容，不能截断。\n").repeated(20)
+            + QStringLiteral("EXPORT_END_MARKER");
+        const QString id = longTopic.doc.root;
+        longTopic.startEdit();
+        longTopic.editor->setPlainText(text);
+        CHECK(longTopic.finishEdit());
+        CHECK(longTopic.items.value(id).label->toPlainText() == text);
+        longTopic.chooseLayout(false);
+        CHECK(longTopic.items.value(id).label->toPlainText() == text);
+        const QString fullPath = temp.filePath("long-topic.smap");
+        CHECK(longTopic.saveTo(fullPath));
+        CHECK(longTopic.loadFrom(fullPath, &error));
+        CHECK(longTopic.items.value(id).label->toPlainText() == text);
+        for (const QString &format : {QString("png"), QString("svg"), QString("pdf")}) {
+            const QString outputPath = temp.filePath("long-topic." + format);
+            error.clear();
+            CHECK(longTopic.exportTo(outputPath, format, &error));
+            if (format == "svg") {
+                QFile output(outputPath);
+                CHECK(output.open(QIODevice::ReadOnly));
+                QXmlStreamReader xml(&output);
+                QString exportedText;
+                while (!xml.atEnd()) {
+                    xml.readNext();
+                    if (xml.isStartElement() && xml.name() == QStringLiteral("text"))
+                        exportedText += xml.readElementText();
+                }
+                CHECK(!xml.hasError());
+                CHECK(exportedText.contains(QStringLiteral("EXPORT_END_MARKER")));
+                CHECK(exportedText.contains(QString::fromUtf8("🌱")));
+            }
+        }
+        longTopic.fit();
+        longTopic.startEdit();
+        CHECK(longTopic.canvas->transform().m11() >= 0.65);
+        CHECK(longTopic.editorProxy->size().height() <= 320);
+        CHECK(longTopic.editor->toPlainText() == text);
+        const QByteArray beforeOversize = longTopic.doc.serialize();
+        const int historySize = longTopic.undoStack.size();
+        const QString tooLong(Document::maxText + 1, QLatin1Char('x'));
+        longTopic.editor->setPlainText(tooLong);
+        CHECK(!longTopic.finishEdit());
+        CHECK(longTopic.editor && longTopic.editor->toPlainText() == tooLong);
+        CHECK(longTopic.doc.serialize() == beforeOversize && longTopic.undoStack.size() == historySize);
+        CHECK(!longTopic.confirmLeave());
+        longTopic.classicAction->trigger();
+        CHECK(!longTopic.doc.mindMap && longTopic.editor);
+        CHECK(longTopic.hierarchyAction->isChecked() && !longTopic.classicAction->isChecked());
+        CHECK(!longTopic.close() && longTopic.isVisible());
+        // A correction can be committed normally, and an explicit cancel still works.
+        longTopic.editor->setPlainText(text + QStringLiteral(" 已修订"));
+        CHECK(longTopic.finishEdit());
+        CHECK(longTopic.doc.nodes.value(id).text.endsWith(QStringLiteral("已修订")));
+        longTopic.history(true);
+        CHECK(longTopic.doc.nodes.value(id).text == text);
+        longTopic.startEdit();
+        longTopic.editor->setPlainText(tooLong);
+        CHECK(longTopic.finishEdit(false));
+        CHECK(!longTopic.editor && longTopic.doc.nodes.value(id).text == text);
+
+        // Exercise the supported boundary, including a linebreak-heavy topic.
+        // Giant raster output must fail without replacing an existing file.
+        for (const QString &maximum : {QString(Document::maxText, QChar(0x679D)),
+                                      QStringLiteral("行\n").repeated(Document::maxText / 2)}) {
+            QElapsedTimer timer;
+            timer.start();
+            longTopic.startEdit();
+            longTopic.editor->setPlainText(maximum);
+            CHECK(longTopic.finishEdit());
+            CHECK(longTopic.items.value(id).label->toPlainText() == maximum);
+            qInfo() << "Maximum-length topic render:" << timer.elapsed() << "ms"
+                    << longTopic.items.value(id).label->boundingRect() << longTopic.scene->itemsBoundingRect();
+            const QString guardedPath = temp.filePath("guarded-long-topic.png");
+            const QByteArray originalBytes("existing export must survive");
+            CHECK(writeAtomically(guardedPath, originalBytes, &error));
+            error.clear();
+            CHECK(!longTopic.exportTo(guardedPath, "png", &error));
+            CHECK(!error.isEmpty() && longTopic.selected == id);
+            QFile originalOutput(guardedPath);
+            CHECK(originalOutput.open(QIODevice::ReadOnly) && originalOutput.readAll() == originalBytes);
+            // Restore a manageable topic before the next editor opens.
+            longTopic.history(true);
+            CHECK(longTopic.doc.nodes.value(id).text == text);
+        }
+    }
+
+    // Broken UTF-16 from a clipboard/plugin must neither commit an unreopenable
+    // document nor replace/delete the previous valid recovery snapshot.
+    {
+        Window unicode(false);
+        const QString unicodeRoot = unicode.doc.root;
+        const QByteArray originalDocument = unicode.doc.serialize();
+        unicode.recoveryPath = temp.filePath("unicode-recovery.json");
+        unicode.startEdit();
+        unicode.editor->setPlainText(QString(QChar(0xd800)));
+        unicode.writeRecovery();
+        CHECK(!QFile::exists(unicode.recoveryPath));
+        const QString validDraft = QStringLiteral("有效草稿 ") + QString::fromUtf8("🌱");
+        unicode.editor->setPlainText(validDraft);
+        unicode.writeRecovery();
+        QFile snapshot(unicode.recoveryPath);
+        CHECK(snapshot.open(QIODevice::ReadOnly));
+        const QByteArray lastValidSnapshot = snapshot.readAll();
+        snapshot.close();
+        Document draft;
+        CHECK(draft.parse(QJsonDocument(QJsonDocument::fromJson(lastValidSnapshot).object()
+            .value("document").toObject()).toJson(), &error));
+        CHECK(draft.nodes.value(unicodeRoot).text == validDraft);
+        const QStringList invalidText{
+            QString(QChar(0xd800)), QString(QChar(0xdc00)),
+            QStringLiteral("前文") + QChar(0xd800) + QStringLiteral("后文"),
+            QString(Document::maxText + 1, QLatin1Char('x'))
+        };
+        for (const QString &value : invalidText) {
+            unicode.editor->setPlainText(value);
+            CHECK(unicode.editor->toPlainText() == value);
+            CHECK(!unicode.finishEdit() && unicode.editor);
+            CHECK(!unicode.save() && !unicode.confirmLeave());
+            CHECK(unicode.editor->toPlainText() == value && unicode.doc.serialize() == originalDocument);
+            CHECK(unicode.undoStack.isEmpty());
+            unicode.writeRecovery();
+            CHECK(snapshot.open(QIODevice::ReadOnly) && snapshot.readAll() == lastValidSnapshot);
+            snapshot.close();
+        }
+        unicode.editor->setPlainText(validDraft);
+        CHECK(unicode.finishEdit() && !unicode.editor);
+        CHECK(unicode.doc.nodes.value(unicodeRoot).text == validDraft);
+        const QString unicodePath = temp.filePath("unicode-valid.smap");
+        CHECK(unicode.saveTo(unicodePath));
+        Document reopened;
+        CHECK(reopened.readFile(unicodePath, &error) && reopened.serialize() == unicode.doc.serialize());
+        unicode.startEdit();
+        unicode.editor->setPlainText(QString(QChar(0xdc00)));
+        CHECK(unicode.finishEdit(false) && !unicode.editor);
+        CHECK(unicode.doc.nodes.value(unicodeRoot).text == validDraft);
+    }
+
+    // Clipboard shortcuts operate on whole branches, but remain ordinary text
+    // shortcuts while the topic editor is active.
+    {
+        Window branches(false);
+        branches.show();
+        branches.activateWindow();
+        branches.canvas->setFocus();
+        QTest::qWait(30);
+        const QString branchRoot = branches.doc.root;
+        branches.createNode(true);
+        branches.editor->setPlainText(QStringLiteral("分支🌱\n完整内容"));
+        CHECK(branches.finishEdit());
+        const QString source = branches.selected;
+        branches.createNode(true);
+        branches.editor->setPlainText(QStringLiteral("子主题"));
+        CHECK(branches.finishEdit());
+        branches.selectNode(source);
+        branches.toggleCollapse();
+        const QByteArray beforeCopy = branches.doc.serialize();
+        QTest::keyClick(branches.canvas, Qt::Key_C, Qt::ControlModifier);
+        CHECK(QApplication::clipboard()->mimeData()->hasFormat(BranchClipboard::mimeType()));
+        CHECK(QApplication::clipboard()->text().contains(QStringLiteral("子主题")));
+        CHECK(branches.doc.serialize() == beforeCopy);
+        branches.selectNode(branchRoot);
+        const int historyBeforePaste = branches.undoStack.size();
+        QTest::keyClick(branches.canvas, Qt::Key_V, Qt::ControlModifier);
+        const QString pasted = branches.selected;
+        CHECK(pasted != source && branches.doc.nodes.size() == 5);
+        CHECK(branches.doc.nodes.value(pasted).text == branches.doc.nodes.value(source).text);
+        CHECK(branches.doc.nodes.value(pasted).collapsed);
+        CHECK(branches.undoStack.size() == historyBeforePaste + 1);
+        branches.history(true);
+        CHECK(branches.doc.serialize() == beforeCopy);
+        branches.history(false);
+        CHECK(branches.doc.nodes.contains(pasted));
+        QTest::keyClick(branches.canvas, Qt::Key_X, Qt::ControlModifier);
+        CHECK(!branches.doc.nodes.contains(pasted) && branches.doc.nodes.size() == 3);
+        branches.history(true);
+        CHECK(branches.doc.nodes.contains(pasted));
+        branches.selectNode(branchRoot);
+        const QByteArray beforeRootCut = branches.doc.serialize();
+        const QByteArray clipboardBeforeRootCut = QApplication::clipboard()->mimeData()->data(BranchClipboard::mimeType());
+        QTest::keyClick(branches.canvas, Qt::Key_X, Qt::ControlModifier);
+        CHECK(branches.doc.serialize() == beforeRootCut);
+        CHECK(QApplication::clipboard()->mimeData()->data(BranchClipboard::mimeType()) == clipboardBeforeRootCut);
+        branches.selectNode(pasted);
+        QTest::keyClick(branches.canvas, Qt::Key_Up, Qt::ControlModifier | Qt::ShiftModifier);
+        CHECK(branches.doc.nodes.value(branchRoot).children == (QStringList{pasted, source}));
+        QTest::keyClick(branches.canvas, Qt::Key_Down, Qt::ControlModifier | Qt::ShiftModifier);
+        CHECK(branches.doc.nodes.value(branchRoot).children == (QStringList{source, pasted}));
+        const int historyAtEdge = branches.undoStack.size();
+        QTest::keyClick(branches.canvas, Qt::Key_Down, Qt::ControlModifier | Qt::ShiftModifier);
+        CHECK(branches.undoStack.size() == historyAtEdge);
+        branches.history(true);
+        branches.history(true);
+        QTest::keyClick(branches.canvas, Qt::Key_Z, Qt::ControlModifier | Qt::ShiftModifier);
+        CHECK(branches.doc.nodes.value(branchRoot).children == (QStringList{pasted, source}));
+        QTest::keyClick(branches.canvas, Qt::Key_Y, Qt::ControlModifier);
+        CHECK(branches.doc.serialize() == beforeRootCut);
+        branches.selectNode(branchRoot);
+        QApplication::clipboard()->setText(QStringLiteral("计划\n\t需求\n\t开发\n验收"));
+        QTest::keyClick(branches.canvas, Qt::Key_V, Qt::ControlModifier);
+        CHECK(branches.doc.nodes.size() == 9);
+        CHECK(branches.doc.nodes.value(branches.selected).text == QStringLiteral("计划"));
+        CHECK(branches.doc.nodes.value(branches.selected).children.size() == 2);
+        branches.history(true);
+        CHECK(branches.doc.serialize() == beforeRootCut);
+        auto *malformed = new QMimeData;
+        malformed->setData(BranchClipboard::mimeType(), "not valid JSON");
+        malformed->setText(QStringLiteral("不可静默回退到文本"));
+        QApplication::clipboard()->setMimeData(malformed);
+        const int historyBeforeFailure = branches.undoStack.size();
+        QTest::keyClick(branches.canvas, Qt::Key_V, Qt::ControlModifier);
+        CHECK(branches.doc.serialize() == beforeRootCut && branches.undoStack.size() == historyBeforeFailure);
+        branches.fit();
+        const QPoint atSource = branches.canvas->mapFromScene(branches.items.value(source).body->pos());
+        QContextMenuEvent contextEvent(QContextMenuEvent::Mouse, atSource,
+            branches.canvas->viewport()->mapToGlobal(atSource));
+        QCoreApplication::sendEvent(branches.canvas->viewport(), &contextEvent);
+        auto *contextMenu = branches.findChild<QMenu *>("topicContextMenu");
+        CHECK(contextMenu && contextMenu->isVisible() && branches.selected == source);
+        CHECK(branches.cutAction->isEnabled() && branches.removeAction->isEnabled());
+        QTest::keyClick(contextMenu, Qt::Key_Escape);
+        CHECK(!contextMenu->isVisible() && branches.doc.serialize() == beforeRootCut);
+        branches.selectNode(branchRoot);
+        CHECK(!branches.cutAction->isEnabled() && !branches.removeAction->isEnabled() && !branches.siblingAction->isEnabled());
+        branches.activateWindow();
+        branches.canvas->setFocus();
+        QTest::qWait(30);
+        branches.startEdit();
+        branches.editor->setPlainText(QStringLiteral("编辑器文本"));
+        branches.editor->selectAll();
+        CHECK(!branches.findChild<QAction *>("copyBranchAction")->isEnabled());
+        QTest::keyClick(branches.editor, Qt::Key_C, Qt::ControlModifier);
+        CHECK(QApplication::clipboard()->text() == QStringLiteral("编辑器文本"));
+        CHECK(!QApplication::clipboard()->mimeData()->hasFormat(BranchClipboard::mimeType()));
+        CHECK(branches.finishEdit(false));
+        CHECK(branches.findChild<QAction *>("copyBranchAction")->isEnabled());
+        CHECK(branches.doc.serialize() == beforeRootCut);
+    }
+
+    // Symbols are an undoable, persistent part of the topic, never file paths.
+    {
+        qInfo() << "Symbol UI checks";
+        Window symbols(false);
+        const QString symbolRoot = symbols.doc.root;
+        CHECK(!SymbolLibrary::assets().isEmpty());
+        const QString symbolId = SymbolLibrary::assets().first().id;
+        symbols.setSelectedSymbol(symbolId);
+        CHECK(symbols.doc.nodes.value(symbolRoot).symbolId == symbolId);
+        CHECK(symbols.items.value(symbolRoot).symbol && symbols.items.value(symbolRoot).symbolPad->isVisible());
+        CHECK(symbols.items.value(symbolRoot).body->sceneBoundingRect().contains(
+            symbols.items.value(symbolRoot).label->sceneBoundingRect()));
+        CHECK(symbols.items.value(symbolRoot).body->sceneBoundingRect().contains(
+            symbols.items.value(symbolRoot).symbolPad->sceneBoundingRect()));
+        const QString symbolPath = temp.filePath("symbol.smap");
+        CHECK(symbols.saveTo(symbolPath));
+        CHECK(symbols.loadFrom(symbolPath, &error));
+        CHECK(symbols.doc.nodes.value(symbolRoot).symbolId == symbolId);
+        symbols.copyBranch();
+        Window destination(false);
+        destination.pasteBranch();
+        CHECK(destination.doc.nodes.value(destination.selected).symbolId == symbolId);
+        const QByteArray beforePicker = symbols.doc.serialize();
+        QTimer::singleShot(0, &symbols, [&] {
+            auto *dialog = symbols.findChild<QDialog *>("symbolPickerDialog");
+            if (dialog) dialog->reject();
+        });
+        symbols.chooseSymbol();
+        qInfo() << "Symbol picker cancelled";
+        CHECK(symbols.doc.serialize() == beforePicker && !symbols.dirty);
+        bool removed = false;
+        QTimer::singleShot(0, &symbols, [&] {
+            auto *dialog = symbols.findChild<QDialog *>("symbolPickerDialog");
+            if (!dialog) return;
+            auto *remove = dialog->findChild<QPushButton *>("symbolRemove");
+            if (!remove) { dialog->reject(); return; }
+            removed = true;
+            remove->click();
+        });
+        symbols.chooseSymbol();
+        qInfo() << "Symbol picker applied";
+        CHECK(removed && symbols.doc.nodes.value(symbolRoot).symbolId.isEmpty());
+        CHECK(!symbols.items.value(symbolRoot).symbolPad->isVisible());
+        symbols.history(true);
+        CHECK(symbols.doc.serialize() == beforePicker && symbols.items.value(symbolRoot).symbolPad->isVisible());
+        for (const QString &format : {QString("png"), QString("svg"), QString("pdf")}) {
+            const QString output = temp.filePath("symbols." + format);
+            CHECK(symbols.exportTo(output, format, &error));
+            if (format == "svg") {
+                QFile svg(output);
+                CHECK(svg.open(QIODevice::ReadOnly));
+                CHECK(!svg.readAll().contains("<image"));
+            }
+        }
+        const QString pptxPath = temp.filePath("symbols.pptx");
+        CHECK(symbols.exportPowerPointTo(pptxPath, &error));
+        QFile pptxOutput(pptxPath);
+        CHECK(pptxOutput.open(QIODevice::ReadOnly));
+        const QByteArray package = pptxOutput.readAll();
+        CHECK(package.startsWith("PK") && package.contains("ppt/media/"));
+        CHECK(symbols.doc.serialize() == beforePicker && !symbols.dirty);
+        symbols.doc.nodes[symbolRoot].symbolId = QStringLiteral("future-unknown-symbol");
+        symbols.render();
+        CHECK(!symbols.items.value(symbolRoot).symbolPad->isVisible());
+        CHECK(symbols.doc.nodes.value(symbolRoot).symbolId == QStringLiteral("future-unknown-symbol"));
+        CHECK(!symbols.exportPowerPointTo(temp.filePath("unknown-symbol.pptx"), &error));
+        CHECK(!QFile::exists(temp.filePath("unknown-symbol.pptx")));
+    }
+
+    // Template selection is cancel-safe and starts a new unsaved document.
+    {
+        qInfo() << "Template UI checks";
+        Window templates(false);
+        const QByteArray blank = templates.doc.serialize();
+        QTimer::singleShot(0, &templates, [&] {
+            auto *dialog = templates.findChild<QDialog *>("templateDialog");
+            if (dialog) dialog->reject();
+        });
+        templates.newFromTemplate();
+        qInfo() << "Template picker cancelled";
+        CHECK(templates.doc.serialize() == blank && !templates.dirty);
+        bool chosen = false;
+        QTimer::singleShot(0, &templates, [&] {
+            auto *dialog = templates.findChild<QDialog *>("templateDialog");
+            if (!dialog) return;
+            auto *list = dialog->findChild<QListWidget *>("templateList");
+            auto *create = dialog->findChild<QPushButton *>("templateCreateButton");
+            if (!list || !create || !list->count()) { dialog->reject(); return; }
+            list->setCurrentRow(0);
+            chosen = true;
+            create->click();
+        });
+        templates.newFromTemplate();
+        qInfo() << "Template picker applied";
+        CHECK(chosen && templates.doc.nodes.size() > 1 && templates.dirty);
+        CHECK(templates.filePath.isEmpty() && templates.needsSaveAs);
+        CHECK(templates.undoStack.isEmpty());
+        const QByteArray unsavedTemplate = templates.doc.serialize();
+        bool cancelledLeave = false;
+        QTimer cancelLeaveTimer;
+        QObject::connect(&cancelLeaveTimer, &QTimer::timeout, &templates, [&] {
+            auto *warning = qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
+            if (warning) {
+                cancelledLeave = true;
+                cancelLeaveTimer.stop();
+                warning->button(QMessageBox::Cancel)->click();
+            }
+        });
+        cancelLeaveTimer.start(10);
+        QTimer::singleShot(0, &templates, [&] {
+            auto *dialog = templates.findChild<QDialog *>("templateDialog");
+            if (!dialog) return;
+            auto *list = dialog->findChild<QListWidget *>("templateList");
+            auto *create = dialog->findChild<QPushButton *>("templateCreateButton");
+            if (!list || !create || list->count() < 2) { dialog->reject(); return; }
+            list->setCurrentRow(1);
+            create->click();
+        });
+        templates.newFromTemplate();
+        cancelLeaveTimer.stop();
+        qInfo() << "Template replacement cancelled";
+        CHECK(cancelledLeave && templates.doc.serialize() == unsavedTemplate && templates.dirty);
+        const QString templatePath = temp.filePath("new-template.smap");
+        CHECK(templates.saveTo(templatePath) && !templates.dirty && !templates.needsSaveAs);
+        CHECK(templates.loadFrom(templatePath, &error) && templates.doc.serialize() == unsavedTemplate);
+        CHECK(templates.findChild<QAction *>("importMindMapAction"));
+        CHECK(templates.findChild<QAction *>("exportPptxAction"));
+    }
+
+    // Import creates an editable copy without binding Save to the source file.
+    {
+        Window imported(false);
+        const QString sourcePath = QFileInfo(QString::fromUtf8(__FILE__)).absoluteDir().filePath("fixtures/ui-import.mmap");
+        QFile sourceFile(sourcePath);
+        CHECK(sourceFile.open(QIODevice::ReadOnly));
+        const QByteArray original = sourceFile.readAll();
+        sourceFile.close();
+        QStringList warnings;
+        CHECK(imported.importFrom(sourcePath, &warnings, &error));
+        CHECK(imported.doc.nodes.size() == 4 && !warnings.isEmpty());
+        CHECK(imported.dirty && imported.needsSaveAs && imported.filePath.isEmpty());
+        CHECK(imported.doc.nodes.value(imported.doc.root).text.contains(QString::fromUtf8("🌿")));
+        const QByteArray beforeCancelledImport = imported.doc.serialize();
+        bool importCancelled = false;
+        // Qt 5.12's offscreen backend can dispatch a zero-delay callback before
+        // the modal widget becomes active. Wait for this exact dialog instead.
+        QTimer importCancelTimer;
+        importCancelTimer.setInterval(10);
+        QObject::connect(&importCancelTimer, &QTimer::timeout, &imported, [&] {
+            auto *dialog = imported.findChild<QMessageBox *>();
+            if (dialog && dialog->isVisible()) {
+                importCancelled = true;
+                importCancelTimer.stop();
+                dialog->button(QMessageBox::Cancel)->click();
+            }
+        });
+        importCancelTimer.start();
+        CHECK(!imported.importFrom(sourcePath, &warnings, &error));
+        importCancelTimer.stop();
+        CHECK(importCancelled && error.isEmpty() && imported.doc.serialize() == beforeCancelledImport);
+        const QString broken = temp.filePath("broken.mmap");
+        CHECK(writeAtomically(broken, "not a map", &error));
+        CHECK(!imported.importFrom(broken, &warnings, &error));
+        CHECK(!error.isEmpty() && imported.doc.serialize() == beforeCancelledImport && imported.dirty);
+        const QString nativeCopy = temp.filePath("imported-copy.smap");
+        CHECK(imported.saveTo(nativeCopy));
+        CHECK(imported.filePath == nativeCopy && !imported.needsSaveAs && !imported.dirty);
+        CHECK(sourceFile.open(QIODevice::ReadOnly) && sourceFile.readAll() == original);
+    }
+
     const QString previewDir = qEnvironmentVariable("ZHILI_PREVIEW_DIR");
+    // Preserve an ultrawide-sized workspace, but keep restored windows usable
+    // after moving to a smaller screen or disconnecting a monitor.
+    {
+        const QRect ultrawide(0, 0, 5120, 2160);
+        const QRect laptop(0, 0, 1366, 768);
+        const QRect leftScreen(-3440, 0, 3440, 1440);
+        CHECK(boundedWindowGeometry(QRect(120, 80, 4500, 1800), ultrawide, QSize(360, 280))
+            == QRect(120, 80, 4500, 1800));
+        CHECK(laptop.contains(boundedWindowGeometry(QRect(3800, 200, 2300, 1200), laptop, QSize(360, 280))));
+        CHECK(leftScreen.contains(boundedWindowGeometry(QRect(-4000, -300, 1800, 1000), leftScreen, QSize(360, 280))));
+        QSettings().setValue("window/geometry", QByteArray("invalid geometry"));
+        Window remembered(false);
+        remembered.show();
+        remembered.resize(QSize(620, 420).boundedTo(available).expandedTo(remembered.minimumSize()));
+        QTest::qWait(30);
+        const QSize requested = remembered.size();
+        CHECK(remembered.close());
+        const QByteArray savedGeometry = QSettings().value("window/geometry").toByteArray();
+        CHECK(!savedGeometry.isEmpty() && savedGeometry != QByteArray("invalid geometry"));
+        Window restored(false);
+        restored.show();
+        QTest::qWait(30);
+        CHECK(restored.size() == requested);
+        restored.startEdit();
+        restored.editor->setPlainText(QString(Document::maxText + 1, QLatin1Char('x')));
+        CHECK(!restored.close());
+        CHECK(QSettings().value("window/geometry").toByteArray() == savedGeometry);
+        CHECK(restored.finishEdit(false));
+        restored.showMaximized();
+        QTest::qWait(30);
+        CHECK(restored.close());
+        Window maximized(false);
+        CHECK(maximized.isMaximized());
+        QSettings().remove("window/geometry");
+    }
     const auto toolbar = window.findChild<QToolBar *>("wideToolbar");
     const auto compact = window.findChild<QToolBar *>("compactToolbar");
     const auto zoomLevel = window.findChild<QLabel *>("zoomLevel");
@@ -352,6 +803,38 @@ int runSmokeTest() {
         window.fit();
         QTest::qWait(100);
         CHECK(window.grab().save(QDir(previewDir).filePath("mindmap.png")));
+
+        // A useful, original built-in example for visual and Office acceptance,
+        // rather than only synthetic numbered topics.
+        Document research;
+        CHECK(zhili::loadBuiltInTemplate("architecture-research-platform", &research, &error));
+        const QMap<QString, QString> icons{
+            {QStringLiteral("多类型科研平台架构"), "command-control-center"},
+            {QStringLiteral("空中平台分类资料"), "air-quadcopter"},
+            {QStringLiteral("水面与水下平台资料"), "underwater-auv"},
+            {QStringLiteral("地面与专用平台资料"), "ground-four-wheel-rover"},
+            {QStringLiteral("通信连接抽象"), "communications-antenna"},
+            {QStringLiteral("设备与接口资料"), "support-battery"},
+            {QStringLiteral("质量检查与标注"), "sensing-camera"}
+        };
+        for (Node &node : research.nodes) {
+            node.symbolId = icons.value(node.text);
+            CHECK(node.symbolId.isEmpty() || SymbolLibrary::find(node.symbolId));
+        }
+        research.mindMap = true;
+        Window showcase(false);
+        showcase.appearance.topicFont.points = 14;
+        showcase.applyAppearance();
+        showcase.adoptUnsavedDocument(research);
+        showcase.resize(1920, 1080);
+        showcase.show();
+        QTest::qWait(60);
+        showcase.fit();
+        const QString exampleBase = QDir(previewDir).filePath(QStringLiteral("多类型科研平台架构"));
+        CHECK(showcase.saveTo(exampleBase + ".smap"));
+        CHECK(showcase.exportPowerPointTo(exampleBase + ".pptx", &error));
+        CHECK(showcase.exportTo(exampleBase + ".svg", "svg", &error));
+        CHECK(showcase.grab().save(QDir(previewDir).filePath("research-platform-workspace.png")));
     }
 
     for (int count : {100, 500, 1000, 3000}) {
@@ -374,6 +857,20 @@ int runSmokeTest() {
         window.chooseLayout(false);
         qInfo().nospace() << count << " nodes: open+render " << openMs << " ms, layout switch " << timer.elapsed() << " ms";
         CHECK(window.doc.nodes.size() == count && window.items.size() == count);
+    }
+    {
+        const QString icon = SymbolLibrary::assets().first().id;
+        for (int i = 0; i < 3000; i += 3) window.doc.nodes[QString::number(i)].symbolId = icon;
+        QElapsedTimer timer;
+        timer.start();
+        window.render();
+        qInfo() << "3000 nodes with 1000 symbols: render" << timer.elapsed() << "ms";
+        CHECK(window.items.value("0").symbol && window.items.value("3").symbol);
+        CHECK(window.items.value("0").symbol->renderer() == window.items.value("3").symbol->renderer());
+        for (int i = 0; i < 3000; i += 3) {
+            const NodeItem item = window.items.value(QString::number(i));
+            CHECK(item.symbolPad->isVisible() && item.body->sceneBoundingRect().contains(item.symbolPad->sceneBoundingRect()));
+        }
     }
     qInfo() << "ZhiLi smoke test passed";
     return 0;

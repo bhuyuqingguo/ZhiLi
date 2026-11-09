@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>全景相机 · Panoramic camera</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#806039" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><circle cx="32" cy="30" r="17" fill="#fcf0df"/><circle cx="25" cy="30" r="6" fill="none"/><circle cx="43" cy="30" r="3" fill="none"/><line x1="32" y1="47" x2="32" y2="54"/><path d="M12 17 Q6 30 12 43 M52 17 Q58 30 52 43" fill="none"/><line x1="24" y1="54" x2="40" y2="54"/></g></g>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>清扫机器人 · Cleaning robot</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#6a6334" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="15" y="23" width="34" height="24" rx="6" fill="#f5f1dc"/><path d="M20 23 L23 14 41 14 44 23Z" fill="#f5f1dc"/><circle cx="20" cy="48" r="4" fill="#f5f1dc"/><circle cx="44" cy="48" r="4" fill="#f5f1dc"/><line x1="16" y1="43" x2="8" y2="51"/><line x1="48" y1="43" x2="56" y2="51"/><path d="M7 47 L13 53 M51 53 L57 47" fill="none"/></g></g>
+</svg>

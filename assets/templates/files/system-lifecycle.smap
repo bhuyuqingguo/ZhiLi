@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "全生命周期视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "立项论证",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "问题与目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "可行性与约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "立项决策材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "设计建设",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "需求与设计基线",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "实施与验证",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "交付准备和培训",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "运行使用",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "日常服务与支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "状态和质量观察",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "用户反馈管理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "持续改进",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "变更需求分析",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "版本计划与验证",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "经验知识更新",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "有序退出",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "替代与迁移安排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "资料和责任交接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "归档与复盘",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

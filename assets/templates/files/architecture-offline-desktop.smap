@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "离线桌面应用架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "用户交互",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "画布与编辑",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "菜单和快捷键",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "无障碍与显示适配",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "文档模型",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "内容与层级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "格式和版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "数据校验与边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "编辑与布局",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "编辑命令",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "撤销与重做",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "布局与视图状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "文件与恢复",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "原子保存",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "导入与导出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "恢复快照与提示",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "离线资源",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "模板与素材",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "内置字体和许可",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "本机设置与帮助",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

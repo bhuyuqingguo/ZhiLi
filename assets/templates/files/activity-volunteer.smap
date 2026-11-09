@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "志愿服务活动",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "服务设计",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "了解服务对象需求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "确认服务范围与限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "设定服务时间和地点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "人员准备",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "明确岗位与班次",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "开展必要说明和培训",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "建立联络与签到方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "物资准备",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "统计物资与数量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "安排借用和补充",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "核对保管与归还责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "现场服务",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "说明服务流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "登记问题并协调处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "尊重隐私与拍摄意愿",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "收尾评估",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "完成场地和物资交接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "收集服务对象反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "记录可改进事项",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

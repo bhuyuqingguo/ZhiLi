@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>履带移动平台 · Tracked rover</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#6a6334" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="8" y="36" width="48" height="18" rx="9" fill="#f5f1dc"/><circle cx="18" cy="45" r="5" fill="none"/><circle cx="32" cy="45" r="5" fill="none"/><circle cx="46" cy="45" r="5" fill="none"/><rect x="17" y="22" width="30" height="14" rx="2" fill="#f5f1dc"/><line x1="32" y1="22" x2="32" y2="13"/><circle cx="32" cy="10" r="3" fill="none"/></g></g>
+</svg>

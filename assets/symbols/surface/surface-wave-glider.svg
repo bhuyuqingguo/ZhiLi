@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>波浪滑翔平台 · Wave glider</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#196c83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><ellipse cx="32" cy="16" rx="23" ry="6" fill="#e3f4f8"/><line x1="32" y1="22" x2="32" y2="41"/><path d="M10 41 L54 41 44 48 20 48Z" fill="#e3f4f8"/><line x1="19" y1="41" x2="19" y2="49"/><line x1="29" y1="41" x2="29" y2="49"/><line x1="39" y1="41" x2="39" y2="49"/><path d="M7 29 Q12 25 17 29 T27 29 T37 29 T47 29 T57 29" fill="none"/></g></g>
+</svg>

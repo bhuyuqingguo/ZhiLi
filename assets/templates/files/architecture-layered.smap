@@ -1,0 +1,175 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "分层架构",
+      "children": [
+        "n2",
+        "n6",
+        "n12",
+        "n16",
+        "n20"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "体验与交互层",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "用户入口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "信息展示",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "操作反馈与帮助",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "业务服务层",
+      "children": [
+        "n7",
+        "n10",
+        "n11"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "业务规则",
+      "children": [
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "规则输入与判断条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "规则输出与例外",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "流程协调",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "服务编排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "数据与知识层",
+      "children": [
+        "n13",
+        "n14",
+        "n15"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "业务数据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "文档与知识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "目录与索引",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "基础支撑层",
+      "children": [
+        "n17",
+        "n18",
+        "n19"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "运行环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "存储与交换",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "公共工具和组件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "横向治理",
+      "children": [
+        "n21",
+        "n22",
+        "n23"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "接口与标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n22",
+      "text": "质量与可观察性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n23",
+      "text": "权限边界与审计",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

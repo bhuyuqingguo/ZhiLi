@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>现场工作站 · Field shelter</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#6c6474" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M8 30 L20 10 44 10 56 30 56 55 8 55Z" fill="#f0edf3"/><path d="M8 30 L56 30 M24 55 L24 35 40 35 40 55" fill="none"/><rect x="12" y="36" width="7" height="10" rx="2" fill="none"/><rect x="45" y="36" width="7" height="10" rx="2" fill="none"/></g></g>
+</svg>

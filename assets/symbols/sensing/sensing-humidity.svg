@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>湿度传感器 · Humidity sensor</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#806039" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M32 7 Q14 28 14 39 A18 18 0 0 0 50 39 Q50 28 32 7Z" fill="#fcf0df"/><circle cx="26" cy="32" r="4" fill="none"/><circle cx="38" cy="44" r="4" fill="none"/><line x1="24" y1="46" x2="40" y2="30"/></g></g>
+</svg>

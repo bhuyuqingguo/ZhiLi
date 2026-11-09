@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "标准规范体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "基础规范",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "术语与定义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "分类与编码",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "文档与命名约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "业务规范",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "业务流程要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "服务交付标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "质量评价方法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "信息规范",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "信息模型约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "数据质量规则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "交换格式与版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "技术规范",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "接口与兼容要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "运行环境约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "测试与验收约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "管理规范",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "职责和审批流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "变更与例外处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "维护与定期复核",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

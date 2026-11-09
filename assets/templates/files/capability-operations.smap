@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "运营支持能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "运行理解",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "识别服务与用户",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "理解依赖和约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "维护运行资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "状态观察",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "收集服务状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "识别异常变化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "保留观察记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "问题协作",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "接收和描述问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "协调责任与处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "跟踪用户反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "维护组织",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "规划维护活动",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "评估变更影响",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "确认结果与交接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "持续优化",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "分析重复问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "更新知识和流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "评价服务改善",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

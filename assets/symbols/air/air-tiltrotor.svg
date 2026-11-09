@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>倾转旋翼平台 · Tiltrotor</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#226384" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M30 10 L34 10 37 34 48 43 48 48 34 43 32 53 30 43 16 48 16 43 27 34Z" fill="#e5f3fa"/><line x1="14" y1="27" x2="50" y2="27"/><circle cx="14" cy="27" r="7" fill="#e5f3fa"/><line x1="9" y1="27" x2="19" y2="27"/><line x1="14" y1="22" x2="14" y2="32"/><circle cx="50" cy="27" r="7" fill="#e5f3fa"/><line x1="45" y1="27" x2="55" y2="27"/><line x1="50" y1="22" x2="50" y2="32"/></g></g>
+</svg>

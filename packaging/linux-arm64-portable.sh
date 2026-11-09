@@ -19,6 +19,8 @@ mkdir -p "$stage/licenses" "$stage/examples"
 install -m 755 "$build/simplemap" "$stage/ZhiLi"
 cp "$root/README.md" "$stage/"
 cp "$root"/assets/fonts/OFL-*.txt "$stage/licenses/"
+cp "$root/assets/symbols/LICENSE.txt" "$stage/licenses/SYMBOLS-CC0.txt"
+cp "$root/src/vendor/miniz/LICENSE" "$stage/licenses/MINIZ-MIT.txt"
 cp "$root"/examples/*.smap "$stage/examples/"
 
 file "$stage/ZhiLi"

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>团队协同 · Team coordination</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><circle cx="32" cy="12" r="6" fill="#f0eafa"/><circle cx="13" cy="42" r="6" fill="#f0eafa"/><circle cx="51" cy="42" r="6" fill="#f0eafa"/><path d="M23 27 Q23 19 32 19 Q41 19 41 27 M5 57 Q5 49 13 49 Q21 49 21 57 M43 57 Q43 49 51 49 Q59 49 59 57 M18 33 L24 29 M40 29 L46 33 M25 49 L39 49" fill="none"/></g></g>
+</svg>

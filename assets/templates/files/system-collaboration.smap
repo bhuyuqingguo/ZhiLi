@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "跨组织协作体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "共同目标",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "联合交付成果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "成功判定标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "共同约束与原则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "分工边界",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "各方职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "共享事项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "待明确的责任空白",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "协作接口",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "信息和交付物约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "对接角色与节奏",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "交接确认方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "协调机制",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "日常问题沟通",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "变更影响协商",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "分歧与升级处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "合作评估",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "阶段成果复核",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "协作成本与体验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "经验和规则更新",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

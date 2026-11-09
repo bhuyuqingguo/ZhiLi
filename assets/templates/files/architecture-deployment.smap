@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "部署视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "运行环境",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "用户终端环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "应用运行环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "数据存储环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "部署单元",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "界面与交互模块",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "业务服务模块",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "资料与配置模块",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "环境依赖",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "操作系统与运行库",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "资源与容量条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "外部服务约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "发布安排",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "版本与构建标识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "安装和升级说明",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "回退条件与资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "验收与维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "启动和关键流程检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "诊断信息与支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "环境变更记录",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

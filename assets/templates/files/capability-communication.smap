@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "信息沟通能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "受众理解",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确读者与目的",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "识别背景知识差异",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确定必要信息范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "信息表达",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "先说明结论与请求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "提供事实和依据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "区分确定与待核实内容",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "渠道与节奏",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "匹配同步或异步方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "约定时限和反馈渠道",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "减少重复和无效通知",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "理解确认",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "检查共同理解",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "记录分歧与问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "明确下一步责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "沟通改进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "收集反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "复用清晰表达范例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "调整沟通约定",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

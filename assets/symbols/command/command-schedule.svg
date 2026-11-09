@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>活动日程 · Activity schedule</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="9" y="13" width="46" height="43" rx="2" fill="#f0eafa"/><line x1="9" y1="24" x2="55" y2="24"/><line x1="21" y1="8" x2="21" y2="18"/><line x1="43" y1="8" x2="43" y2="18"/><rect x="17" y="31" width="8" height="7" rx="2" fill="#f0eafa"/><rect x="30" y="31" width="8" height="7" rx="2" fill="#f0eafa"/><rect x="17" y="43" width="8" height="7" rx="2" fill="#f0eafa"/><path d="M35 46 L39 50 48 40" fill="none"/></g></g>
+</svg>

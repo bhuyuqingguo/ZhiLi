@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "利益相关方视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "需求提出方",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "主要目标与痛点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "需求确认责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "反馈与验收方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "服务提供方",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "提供的服务范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "交付与支持责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "依赖的资源条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "治理协调方",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "规则与决策边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "跨方协调机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "争议处理与升级路径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "外部合作方",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "合作内容与边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "输入输出约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "协作变化通知方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "关系维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "定期沟通机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "信息共享范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "角色变更记录",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}
