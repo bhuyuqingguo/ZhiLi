@@ -8,13 +8,8 @@ $QtPrefix = (Resolve-Path -LiteralPath $QtPrefix).Path
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $build = Join-Path $root 'build-windows-x64'
 $qtBin = Join-Path $QtPrefix 'bin'
-$deploy = Join-Path $qtBin 'windeployqt.exe'
 $previousPath = $env:Path
 $stage = Join-Path $build ("stage-" + [Guid]::NewGuid().ToString('N'))
-
-if (!(Test-Path -LiteralPath $deploy -PathType Leaf)) {
-    throw "windeployqt.exe is missing from the Qt SDK at $QtPrefix"
-}
 
 try {
     $env:Path = "$qtBin;$previousPath"
@@ -29,8 +24,10 @@ try {
     New-Item -ItemType Directory -Path $bundle | Out-Null
     $exe = Join-Path $bundle 'simplemap.exe'
     Copy-Item -LiteralPath (Join-Path $build 'Release/simplemap.exe') -Destination $exe
-    & $deploy --release --no-translations --no-compiler-runtime --no-plugins --no-angle --no-opengl-sw --no-system-d3d-compiler $exe
-    if ($LASTEXITCODE -ne 0) { throw 'windeployqt failed.' }
+    foreach ($library in @('Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Svg.dll')) {
+        Copy-Item -LiteralPath (Join-Path $qtBin $library) -Destination $bundle
+    }
+    "[Paths]`nPrefix=.`nPlugins=." | Set-Content -LiteralPath (Join-Path $bundle 'qt.conf') -Encoding ascii
     $plugins = Join-Path $bundle 'platforms'
     New-Item -ItemType Directory -Path $plugins | Out-Null
     foreach ($platform in @('qwindows.dll', 'qoffscreen.dll')) {
