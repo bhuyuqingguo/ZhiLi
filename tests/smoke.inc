@@ -224,9 +224,15 @@ int runSmokeTest() {
     const auto zoomOut = window.findChild<QToolButton *>("zoomOut");
     CHECK(toolbar && compact && zoomLevel && zoomIn && zoomOut);
 
+    // Windows can clamp requested dimensions to the scaled desktop work area.
+    const auto toolbarMatchesWindow = [&] {
+        const bool roomy = window.width() >= qMax(840, toolbar->sizeHint().width() + 24);
+        return toolbar->isVisible() == roomy && compact->isVisible() != roomy;
+    };
     window.resize(1160, 760);
     QTest::qWait(60);
-    CHECK(toolbar->isVisible() && !compact->isVisible());
+    CHECK(toolbarMatchesWindow());
+    if (available.width() >= 1000) CHECK(toolbar->isVisible());
     window.fit();
     const qreal wideZoom = window.canvas->transform().m11();
     window.resize(360, 280);
@@ -336,7 +342,7 @@ int runSmokeTest() {
 
     window.resize(1160, 760);
     QTest::qWait(60);
-    CHECK(toolbar->isVisible() && !compact->isVisible());
+    CHECK(toolbarMatchesWindow());
     if (!previewDir.isEmpty()) {
         CHECK(writeAtomically(QDir(previewDir).filePath(QStringLiteral("研发项目交付.smap")), structure, &error));
         window.fit();
