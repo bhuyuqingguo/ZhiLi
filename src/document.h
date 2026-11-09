@@ -20,6 +20,7 @@ struct Document {
 
     QByteArray serialize() const;
     bool parse(const QByteArray &bytes, QString *error = nullptr);
+    bool readFile(const QString &path, QString *error = nullptr);
 };
 
 bool writeAtomically(const QString &path, const QByteArray &bytes, QString *error);

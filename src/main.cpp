@@ -1,3 +1,4 @@
+#include "appearance.h"
 #include "document.h"
 #include "layout.h"
 
@@ -9,12 +10,6 @@
 #include <memory>
 
 namespace {
-const QColor ink("#203d36");
-const QColor moss("#286557");
-const QColor paper("#f7f7f1");
-const QColor line("#92afa3");
-const QColor accent("#b97035");
-
 class Canvas : public QGraphicsView {
 public:
     explicit Canvas(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent) {
@@ -26,16 +21,28 @@ public:
 
     std::function<bool(QPoint)> press;
     std::function<bool(QPoint)> doubleClick;
-    std::function<void(QPoint, QPoint)> drop;
+    std::function<void(QPoint)> drop;
+    std::function<void()> zoomChanged;
+    std::function<void()> viewportResized;
+
+    void zoomBy(qreal factor) {
+        const qreal current = transform().m11();
+        const qreal next = qBound(qMin(0.05, current), current * factor, 3.5);
+        scale(next / current, next / current);
+        zoomChanged();
+    }
 
 protected:
     void wheelEvent(QWheelEvent *event) override {
         if (!(event->modifiers() & Qt::ControlModifier)) return QGraphicsView::wheelEvent(event);
-        const qreal factor = event->angleDelta().y() > 0 ? 1.12 : 1 / 1.12;
-        const qreal current = transform().m11();
-        const qreal next = qBound(0.05, current * factor, 3.5);
-        scale(next / current, next / current);
+        const int delta = event->angleDelta().y();
+        if (delta != 0) zoomBy(qPow(1.12, delta / 120.0));
         event->accept();
+    }
+
+    void resizeEvent(QResizeEvent *event) override {
+        QGraphicsView::resizeEvent(event);
+        if (viewportResized) viewportResized();
     }
 
     void mousePressEvent(QMouseEvent *event) override {
@@ -71,7 +78,7 @@ protected:
         if (event->button() == Qt::LeftButton && nodeDrag) {
             nodeDrag = false;
             if ((event->pos() - origin).manhattanLength() >= QApplication::startDragDistance())
-                drop(origin, event->pos());
+                drop(event->pos());
             event->accept();
             return;
         }
@@ -93,10 +100,8 @@ struct NodeItem {
 class Window : public QMainWindow {
 public:
     explicit Window(bool enableRecovery = true) {
-        resize(1160, 760);
-        setMinimumSize(640, 440);
+        setMinimumSize(360, 280);
         scene = new QGraphicsScene(this);
-        scene->setBackgroundBrush(paper);
         canvas = new Canvas(scene, this);
         canvas->setObjectName("mapCanvas");
         setCentralWidget(canvas);
@@ -115,9 +120,9 @@ public:
             startEdit();
             return true;
         };
-        canvas->drop = [this](QPoint origin, QPoint end) {
+        canvas->drop = [this](QPoint end) {
             if (editor) return;
-            const QString source = nodeAt(origin);
+            const QString source = selected;
             const QString target = nodeAt(end);
             if (source.isEmpty() || target.isEmpty() || source == target) return;
             const QRectF bounds = items.value(target).body->sceneBoundingRect();
@@ -126,18 +131,25 @@ public:
             moveNode(source, target, relative < -0.25 ? -1 : (relative > 0.25 ? 1 : 0));
         };
         makeMenus();
-        setStyleSheet(QStringLiteral(
-            "QToolBar {background:#fffdf7;border:0;border-bottom:1px solid #d9e2d9;padding:8px;spacing:5px}"
-            "QToolButton {color:#203d36;padding:6px 10px;border-radius:5px}"
-            "QToolButton:hover,QToolButton:checked {background:#deebe1}"
-            "QStatusBar {background:#fffdf7;color:#38534b}"
-            "QGraphicsView {border:0}"
-            "QPlainTextEdit {background:#fffdf7;color:#203d36;border:2px solid #b97035;border-radius:5px}"));
+        makeZoomControls();
+        canvas->zoomChanged = [this] {
+            fitMode = false;
+            updateZoomLevel();
+        };
+        fitTimer.setSingleShot(true);
+        connect(&fitTimer, &QTimer::timeout, this, [this] {
+            if (fitMode && !editor) fit();
+        });
+        canvas->viewportResized = [this] {
+            if (fitMode) fitTimer.start(0);
+        };
+        applyAppearance();
         recoveryTimer.setSingleShot(true);
         recoveryTimer.setInterval(900);
         connect(&recoveryTimer, &QTimer::timeout, this, [this] { writeRecovery(); });
         resetDocument();
-        statusBar()->showMessage(QStringLiteral("双击编辑  ·  拖到主题中心移入子级，拖到边缘调整顺序  ·  Ctrl+滚轮缩放"));
+        resizeForScreen();
+        statusBar()->showMessage(canvasHint());
         if (enableRecovery) QTimer::singleShot(0, this, [this] { setupRecovery(); });
     }
 
@@ -147,6 +159,13 @@ private:
         QString selected;
     };
 
+    Appearance appearance = Appearance::load();
+    QColor ink, moss, paper, line, accent, branchFill, leafFill;
+    QToolBar *wideToolbar = nullptr;
+    QToolBar *compactToolbar = nullptr;
+    QLabel *zoomLevel = nullptr;
+    QTimer fitTimer;
+    bool fitMode = false;
     QGraphicsScene *scene;
     Canvas *canvas;
     Document doc;
@@ -188,7 +207,9 @@ private:
         saved = doc;
         dirty = false;
         clearRecovery();
+        fitMode = false;
         canvas->resetTransform();
+        updateZoomLevel();
         render();
         canvas->centerOn(0, 0);
     }
@@ -302,6 +323,28 @@ private:
         canvas->ensureVisible(items.value(source).body, 30, 30);
     }
 
+    void navigate(Qt::Key key) {
+        const bool towardParent = key == (doc.mindMap ? Qt::Key_Left : Qt::Key_Up);
+        const bool towardChildren = key == (doc.mindMap ? Qt::Key_Right : Qt::Key_Down);
+        const QString parent = parents.value(selected);
+        QString target;
+        if (towardParent) {
+            target = parent;
+        } else if (towardChildren) {
+            const auto &node = qAsConst(doc.nodes)[selected];
+            if (!node.collapsed && !node.children.isEmpty()) target = node.children.first();
+        } else if (!parent.isEmpty()) {
+            const auto &siblings = qAsConst(doc.nodes)[parent].children;
+            const int step = key == (doc.mindMap ? Qt::Key_Up : Qt::Key_Left) ? -1 : 1;
+            const int index = siblings.indexOf(selected) + step;
+            if (index >= 0 && index < siblings.size()) target = siblings.at(index);
+        }
+        if (items.contains(target)) {
+            selectNode(target);
+            canvas->ensureVisible(items.value(target).body, 25, 25);
+        }
+    }
+
     void toggleCollapse() {
         if (doc.nodes.value(selected).children.isEmpty()) return;
         checkpoint();
@@ -314,7 +357,8 @@ private:
         checkpoint();
         doc.mindMap = classic;
         changed();
-        canvas->ensureVisible(items.value(selected).body, 25, 25);
+        if (fitMode) fit();
+        else canvas->ensureVisible(items.value(selected).body, 25, 25);
     }
 
     bool itemAt(QPoint at, const QGraphicsItem *item) const {
@@ -348,6 +392,7 @@ private:
         editId = selected;
         editor = new QPlainTextEdit;
         editor->setObjectName("topicEditor");
+        editor->setFont(fontFor(appearance.topicFont));
         editor->setPlainText(doc.nodes.value(selected).text);
         editor->setTabChangesFocus(false);
         editor->selectAll();
@@ -355,7 +400,7 @@ private:
         editorProxy->setZValue(5);
         QRectF bounds = items.value(selected).body->sceneBoundingRect();
         bounds.setWidth(qMax(bounds.width(), 230.0));
-        bounds.setHeight(qMax(bounds.height(), 78.0));
+        bounds.setHeight(qMax(bounds.height(), qreal(editor->fontMetrics().height() * 2 + 16)));
         bounds.moveCenter(items.value(selected).body->pos());
         editorProxy->setGeometry(bounds);
         canvas->ensureVisible(editorProxy, 30, 30);
@@ -392,7 +437,7 @@ private:
         }
         statusBar()->showMessage(accept && value.size() > Document::maxText
             ? QStringLiteral("文字超过 10 万字符，本次修改未保存")
-            : QStringLiteral("双击编辑  ·  拖到主题中心移入子级，拖到边缘调整顺序  ·  Ctrl+滚轮缩放"), 5000);
+            : canvasHint(), 5000);
     }
 
     void search(bool prompt) {
@@ -549,13 +594,8 @@ private:
     }
 
     bool loadFrom(const QString &path, QString *error) {
-        QFile file(path);
-        if (!file.open(QIODevice::ReadOnly)) {
-            *error = file.errorString();
-            return false;
-        }
         Document next;
-        if (!next.parse(file.read(Document::maxBytes + 1), error)) return false;
+        if (!next.readFile(path, error)) return false;
         doc = std::move(next);
         filePath = path;
         needsSaveAs = false;
@@ -572,10 +612,93 @@ private:
         if (!loadFrom(path, &error)) QMessageBox::warning(this, QStringLiteral("打开失败"), error);
     }
 
+    QString canvasHint() const {
+        return compactToolbar->isHidden()
+            ? QStringLiteral("双击编辑  ·  拖到主题中心移入子级，拖到边缘调整顺序  ·  Ctrl+滚轮缩放")
+            : QStringLiteral("双击编辑");
+    }
+
+    void applyAppearance() {
+        QApplication::setFont(fontFor(appearance.interfaceFont));
+        const bool contrast = appearance.highContrast;
+        ink = QColor(contrast ? "#141414" : "#203d36");
+        moss = QColor(contrast ? "#122c46" : "#286557");
+        paper = QColor(contrast ? "#ffffff" : "#f7f7f1");
+        line = QColor(contrast ? "#41566c" : "#92afa3");
+        accent = QColor(contrast ? "#a14300" : "#b97035");
+        branchFill = QColor(contrast ? "#e3edf8" : "#e0ede4");
+        leafFill = QColor(contrast ? "#ffffff" : "#fffdf7");
+        scene->setBackgroundBrush(paper);
+        setStyleSheet(QStringLiteral(
+            "QToolBar {background:%1;border:0;border-bottom:1px solid %2;padding:8px;spacing:5px}"
+            "QToolButton {color:%3;padding:6px 10px;border-radius:5px}"
+            "QToolButton:hover,QToolButton:checked {background:%4}"
+            "QToolBar#compactToolbar {padding:4px;spacing:2px}"
+            "QToolBar#compactToolbar QToolButton {padding:4px 5px}"
+            "QStatusBar {background:%1;color:%3}"
+            "QGraphicsView {border:0}"
+            "QPlainTextEdit {background:%1;color:%3;border:2px solid %5;border-radius:5px}")
+            .arg(leafFill.name(), line.name(), ink.name(), branchFill.name(), accent.name()));
+        zoomLevel->setMinimumWidth(zoomLevel->fontMetrics().boundingRect(QStringLiteral("350%")).width() + 6);
+        updateToolbarMode(width());
+        if (!doc.root.isEmpty()) {
+            render();
+            if (fitMode) fit();
+        }
+    }
+
+    void changeAppearance() {
+        if (!editAppearance(this, &appearance)) return;
+        appearance.save();
+        applyAppearance();
+    }
+
+    void resizeForScreen() {
+        QScreen *screen = QGuiApplication::primaryScreen();
+        for (auto *candidate : QGuiApplication::screens()) {
+            if (candidate->geometry().contains(QCursor::pos())) {
+                screen = candidate;
+                break;
+            }
+        }
+        if (!screen) {
+            resize(1160, 760);
+            return;
+        }
+        const QRect work = screen->availableGeometry();
+        const QSize size = QSize(1160, 760).boundedTo(work.size() - QSize(32, 48)).expandedTo(minimumSize());
+        setGeometry(QRect(work.center() - QPoint(size.width() / 2, size.height() / 2), size));
+    }
+
+    void updateZoomLevel() {
+        zoomLevel->setText(QStringLiteral("%1%").arg(qMax(1, qRound(canvas->transform().m11() * 100))));
+    }
+
+    void makeZoomControls() {
+        const auto button = [this](const QString &name, const QString &label, const QString &tip, qreal factor) {
+            auto *control = new QToolButton(statusBar());
+            control->setObjectName(name);
+            control->setText(label);
+            control->setToolTip(tip);
+            control->setAccessibleName(tip);
+            connect(control, &QToolButton::clicked, this, [this, factor] { canvas->zoomBy(factor); });
+            statusBar()->addPermanentWidget(control);
+        };
+        button("zoomOut", QStringLiteral("−"), QStringLiteral("缩小画布"), 1 / 1.25);
+        zoomLevel = new QLabel(statusBar());
+        zoomLevel->setObjectName("zoomLevel");
+        zoomLevel->setMinimumWidth(fontMetrics().boundingRect(QStringLiteral("350%")).width() + 6);
+        zoomLevel->setAlignment(Qt::AlignCenter);
+        statusBar()->addPermanentWidget(zoomLevel);
+        button("zoomIn", QStringLiteral("+"), QStringLiteral("放大画布"), 1.25);
+    }
+
     void fit() {
+        fitMode = true;
         canvas->fitInView(scene->itemsBoundingRect().adjusted(-45, -45, 45, 45), Qt::KeepAspectRatio);
         const qreal scale = canvas->transform().m11();
         if (scale > 1.25) canvas->scale(1.25 / scale, 1.25 / scale);
+        updateZoomLevel();
     }
 
     bool exportTo(const QString &path, const QString &format, QString *error) {
@@ -669,7 +792,15 @@ private:
         auto *find = action(edit, QStringLiteral("查找"), "Ctrl+F", [this] { search(true); });
         action(edit, QStringLiteral("查找下一个"), "F3", [this] { search(false); }, true);
 
+        auto *navigation = edit->addMenu(QStringLiteral("移动选中项"));
+        action(navigation, QStringLiteral("向上"), "Up", [this] { navigate(Qt::Key_Up); }, true);
+        action(navigation, QStringLiteral("向下"), "Down", [this] { navigate(Qt::Key_Down); }, true);
+        action(navigation, QStringLiteral("向左"), "Left", [this] { navigate(Qt::Key_Left); }, true);
+        action(navigation, QStringLiteral("向右"), "Right", [this] { navigate(Qt::Key_Right); }, true);
+
         auto *view = menuBar()->addMenu(QStringLiteral("视图"));
+        action(view, QStringLiteral("外观设置…"), "", [this] { changeAppearance(); });
+        view->addSeparator();
         classicAction = action(view, QStringLiteral("经典导图"), "Ctrl+1", [this] { chooseLayout(true); });
         hierarchyAction = action(view, QStringLiteral("结构图"), "Ctrl+2", [this] { chooseLayout(false); });
         for (auto *item : {classicAction, hierarchyAction}) item->setCheckable(true);
@@ -679,8 +810,17 @@ private:
         group->addAction(hierarchyAction);
         auto *fitAction = action(view, QStringLiteral("适应窗口"), "Ctrl+0", [this] { fit(); });
 
-        auto *bar = addToolBar(QStringLiteral("常用"));
+        action(view, QStringLiteral("放大"), "Ctrl+=", [this] { canvas->zoomBy(1.25); }, true);
+        action(view, QStringLiteral("缩小"), "Ctrl+-", [this] { canvas->zoomBy(1 / 1.25); }, true);
+        action(view, QStringLiteral("实际大小"), "Ctrl+Shift+0", [this] {
+            canvas->zoomBy(1 / canvas->transform().m11());
+        }, true);
+
+        wideToolbar = addToolBar(QStringLiteral("常用"));
+        auto *bar = wideToolbar;
+        bar->setObjectName("wideToolbar");
         bar->setMovable(false);
+        bar->setFloatable(false);
         auto *brand = new QLabel(QStringLiteral("枝理  /  ZHILI"), bar);
         brand->setStyleSheet(QStringLiteral("font-weight:700;color:#286557;padding:0 14px 0 7px"));
         bar->addWidget(brand);
@@ -689,6 +829,35 @@ private:
         spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         bar->addWidget(spacer);
         for (auto *item : {classicAction, hierarchyAction, fitAction}) bar->addAction(item);
+
+        compactToolbar = new QToolBar(QStringLiteral("常用（紧凑）"), this);
+        compactToolbar->setObjectName("compactToolbar");
+        compactToolbar->setMovable(false);
+        compactToolbar->setFloatable(false);
+        addToolBar(Qt::TopToolBarArea, compactToolbar);
+        auto compactButton = [this](QAction *action, const QString &label) {
+            auto *button = new QToolButton(compactToolbar);
+            button->setText(label);
+            button->setAccessibleName(action->text());
+            button->setToolTip(action->text());
+            button->setEnabled(action->isEnabled());
+            connect(button, &QToolButton::clicked, action, &QAction::trigger);
+            connect(action, &QAction::changed, button, [button, action] { button->setEnabled(action->isEnabled()); });
+            compactToolbar->addWidget(button);
+        };
+        compactButton(saveAction, QStringLiteral("保存"));
+        compactButton(child, QStringLiteral("加子"));
+        auto *layouts = new QToolButton(compactToolbar);
+        layouts->setText(QStringLiteral("布局"));
+        layouts->setAccessibleName(QStringLiteral("切换导图布局"));
+        layouts->setPopupMode(QToolButton::InstantPopup);
+        auto *layoutMenu = new QMenu(layouts);
+        layoutMenu->addAction(classicAction);
+        layoutMenu->addAction(hierarchyAction);
+        layouts->setMenu(layoutMenu);
+        compactToolbar->addWidget(layouts);
+        compactButton(fitAction, QStringLiteral("适应"));
+        compactToolbar->hide();
     }
 
     void render() {
@@ -697,6 +866,7 @@ private:
         for (const Node &node : nodes)
             for (const auto &child : node.children) parents.insert(child, node.id);
 
+        const QFont topicFont = fontFor(appearance.topicFont);
         QMap<QString, QSizeF> sizes;
         QVector<QString> visible{doc.root};
         for (int i = 0; i < visible.size(); ++i) {
@@ -720,9 +890,8 @@ private:
             const bool branch = parents.value(id) == doc.root;
             QString display = node.text.left(360);
             if (node.text.size() > display.size()) display += QChar(0x2026);
-            QFont font = QApplication::font();
-            font.setPointSize(root ? 15 : 11);
-            font.setBold(root || branch);
+            QFont font = topicFont;
+            if (root) font.setPointSize(appearance.topicFont.points + 4);
             if (item.label->toPlainText() != display || item.label->textWidth() < 0 || item.label->font() != font) {
                 item.label->setFont(font);
                 item.label->setTextWidth(-1);
@@ -736,7 +905,7 @@ private:
             QPainterPath shape;
             shape.addRoundedRect(QRectF(QPointF(-size.width() / 2, -size.height() / 2), size), 9, 9);
             item.body->setPath(shape);
-            item.body->setBrush(root ? moss : QColor(branch ? "#e0ede4" : "#fffdf7"));
+            item.body->setBrush(root ? moss : (branch ? branchFill : leafFill));
             item.badge->setText(QStringLiteral("+%1").arg(node.children.size()));
             item.badge->setBrush(accent);
             item.badge->setVisible(node.collapsed && !node.children.isEmpty());
@@ -789,8 +958,9 @@ private:
                 path.lineTo(b.x(), middle);
                 path.lineTo(b);
             }
-            if (edges.contains(id)) edges.value(id)->setPath(path);
-            else edges.insert(id, scene->addPath(path, QPen(line, 1.6)));
+            if (!edges.contains(id)) edges.insert(id, scene->addPath(path));
+            edges.value(id)->setPath(path);
+            edges.value(id)->setPen(QPen(line, 1.6));
         }
         scene->setSceneRect(scene->itemsBoundingRect().adjusted(-100, -100, 100, 100));
         classicAction->setChecked(doc.mindMap);
@@ -798,7 +968,21 @@ private:
         updateTitle();
     }
 
+    void updateToolbarMode(int width) {
+        if (!wideToolbar || !compactToolbar) return;
+        const bool compact = width < qMax(840, wideToolbar->sizeHint().width() + 24);
+        const QString priorHint = canvasHint();
+        wideToolbar->setVisible(!compact);
+        compactToolbar->setVisible(compact);
+        if (statusBar()->currentMessage() == priorHint) statusBar()->showMessage(canvasHint());
+    }
+
 protected:
+    void resizeEvent(QResizeEvent *event) override {
+        QMainWindow::resizeEvent(event);
+        updateToolbarMode(event->size().width());
+    }
+
     void closeEvent(QCloseEvent *event) override {
         if (confirmLeave()) {
             clearRecovery();
@@ -818,10 +1002,16 @@ protected:
 #endif
 
 int main(int argc, char *argv[]) {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
     QApplication app(argc, argv);
     app.setApplicationName("ZhiLi");
     app.setApplicationDisplayName(QStringLiteral("枝理"));
     app.setOrganizationName("ZhiLi");
+    registerEmbeddedFonts();
 #ifdef ZHILI_TEST
     return runSmokeTest();
 #else

@@ -5,10 +5,29 @@ int runSmokeTest() {
     QStandardPaths::setTestModeEnabled(true);
     QTemporaryDir temp;
     CHECK(temp.isValid());
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, temp.path());
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, temp.path());
+    const QStringList embedded = embeddedFontFamilies();
+    CHECK(embedded.size() == 2);
+    for (const auto &family : embedded) {
+        const QRawFont raw = QRawFont::fromFont(fontFor({family, 12, false}));
+        CHECK(raw.isValid() && raw.familyName() == family && raw.supportsCharacter(QChar(0x679D)));
+    }
     Window window(false);
     window.show();
     window.canvas->setFocus();
     QTest::qWait(60);
+    QScreen *screen = QApplication::primaryScreen();
+    CHECK(screen);
+    const QSize available = screen->availableGeometry().size();
+    CHECK(window.width() <= qMax(available.width(), window.minimumWidth()));
+    CHECK(window.height() <= qMax(available.height(), window.minimumHeight()));
+    const qreal scale = window.devicePixelRatioF();
+    bool scaleSpecified = false;
+    const qreal expectedScale = qEnvironmentVariable("ZHILI_EXPECT_SCALE").toDouble(&scaleSpecified);
+    qInfo() << "Display:" << available << "logical pixels, device pixel ratio" << scale;
+    if (scaleSpecified) CHECK(qAbs(scale - expectedScale) < 0.01);
     const QString root = window.doc.root;
     const QPoint center = window.canvas->mapFromScene(QPointF(0, 0));
     QTest::mouseDClick(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, center);
@@ -44,9 +63,9 @@ int runSmokeTest() {
     window.editor->setPlainText(QStringLiteral("技术验证"));
     window.finishEdit();
     const QString child = add(first, QStringLiteral("梳理需求与验收指标"));
-    add(first, QStringLiteral("明确节点与责任分工"));
-    add(second, QStringLiteral("运行环境与输入法"));
-    add(second, QStringLiteral("数据安全与离线验证"));
+    const QString sibling = add(first, QStringLiteral("明确节点与责任分工"));
+    const QString secondMatch = add(second, QStringLiteral("运行环境与输入法"));
+    const QString lastSearchMatch = add(second, QStringLiteral("数据安全与离线验证"));
     CHECK(window.doc.nodes.size() == 7);
 
     window.selectNode(first);
@@ -74,6 +93,47 @@ int runSmokeTest() {
     CHECK(window.parents.value(child) == second);
     window.history(true);
 
+    // Reorder by dropping a sibling on the leading edge in the structure view.
+    window.fit();
+    const auto edgeTarget = window.items.value(child).body->sceneBoundingRect();
+    const QPoint beforeChild = window.canvas->mapFromScene(QPointF(
+        edgeTarget.left() + edgeTarget.width() * 0.15, edgeTarget.center().y()));
+    QTest::mousePress(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier,
+                      window.canvas->mapFromScene(window.items.value(sibling).body->pos()));
+    QTest::mouseRelease(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, beforeChild);
+    CHECK(window.doc.nodes.value(first).children == (QStringList{sibling, child}));
+    window.history(true);
+    CHECK(window.doc.nodes.value(first).children == (QStringList{child, sibling}));
+
+    // Search visits matches in tree order, expands a collapsed path, and wraps.
+    window.selectNode(first);
+    window.toggleCollapse();
+    CHECK(!window.items.contains(child));
+    QTimer::singleShot(0, &window, [] {
+        if (auto *dialog = qobject_cast<QInputDialog *>(QApplication::activeModalWidget())) {
+            dialog->setTextValue(QStringLiteral(" 与 "));
+            dialog->accept();
+        }
+    });
+    QTest::keyClick(window.canvas, Qt::Key_F, Qt::ControlModifier);
+    CHECK(window.selected == child && window.items.contains(child));
+    CHECK(!window.doc.nodes.value(first).collapsed);
+    window.activateWindow();
+    window.canvas->setFocus();
+    QTest::qWait(60);
+    QTest::keyClick(window.canvas, Qt::Key_F3);
+    CHECK(window.selected == sibling);
+    QTest::keyClick(window.canvas, Qt::Key_F3);
+    CHECK(window.selected == secondMatch);
+    QTest::keyClick(window.canvas, Qt::Key_F3);
+    CHECK(window.selected == lastSearchMatch);
+    QTest::keyClick(window.canvas, Qt::Key_F3);
+    CHECK(window.selected == child);
+    window.history(true);
+    CHECK(window.doc.nodes.value(first).collapsed && !window.items.contains(child));
+    window.history(true);
+    CHECK(!window.doc.nodes.value(first).collapsed && window.items.contains(child));
+
     const QByteArray structure = window.doc.serialize();
     window.chooseLayout(true);
     CHECK(window.dirty && window.doc.serialize() != structure);
@@ -89,6 +149,23 @@ int runSmokeTest() {
     QString error;
     CHECK(window.loadFrom(path, &error) && window.doc.serialize() == structure);
     const QString legacy = temp.filePath("legacy.smap.json");
+    // Representative original 0.1 output, independent of the current serializer.
+    const QByteArray original = QStringLiteral(R"JSON({
+        "format": "simplemap-json", "version": 1, "root": "root", "layout": "organization",
+        "nodes": [
+            {"id": "root", "text": "旧版项目", "children": ["b", "a"], "collapsed": false},
+            {"id": "a", "text": "另一个分支", "children": [], "collapsed": false},
+            {"id": "b", "text": "已折叠分支", "children": ["child"], "collapsed": true},
+            {"id": "child", "text": "旧版子级", "children": [], "collapsed": false}
+        ]
+    })JSON").toUtf8();
+    CHECK(writeAtomically(legacy, original, &error));
+    CHECK(window.loadFrom(legacy, &error));
+    CHECK(!window.doc.mindMap && window.doc.root == "root");
+    CHECK(window.doc.nodes.value("root").text == QStringLiteral("旧版项目"));
+    CHECK(window.doc.nodes.value("root").children == (QStringList{"b", "a"}));
+    CHECK(window.doc.nodes.value("b").collapsed && !window.items.contains("child"));
+    CHECK(QFile::remove(legacy));
     CHECK(QFile::copy(path, legacy) && window.loadFrom(legacy, &error));
     Document invalid = window.doc;
     invalid.nodes[child].children.append(root);
@@ -138,8 +215,127 @@ int runSmokeTest() {
     }
 
     const QString previewDir = qEnvironmentVariable("ZHILI_PREVIEW_DIR");
+    const auto toolbar = window.findChild<QToolBar *>("wideToolbar");
+    const auto compact = window.findChild<QToolBar *>("compactToolbar");
+    const auto zoomLevel = window.findChild<QLabel *>("zoomLevel");
+    const auto zoomIn = window.findChild<QToolButton *>("zoomIn");
+    const auto zoomOut = window.findChild<QToolButton *>("zoomOut");
+    CHECK(toolbar && compact && zoomLevel && zoomIn && zoomOut);
+
+    window.resize(1160, 760);
+    QTest::qWait(60);
+    CHECK(toolbar->isVisible() && !compact->isVisible());
+    window.fit();
+    const qreal wideZoom = window.canvas->transform().m11();
+    window.resize(360, 280);
+    QTest::qWait(60);
+    CHECK(!toolbar->isVisible() && compact->isVisible());
+    QMenu *compactLayouts = nullptr;
+    for (auto *button : compact->findChildren<QToolButton *>()) {
+        if (button->isVisible() && button->menu() && button->menu()->actions().contains(window.classicAction))
+            compactLayouts = button->menu();
+    }
+    CHECK(compactLayouts && compactLayouts->actions().contains(window.hierarchyAction));
+    CHECK(zoomIn->isVisible() && zoomOut->isVisible() && zoomLevel->isVisible());
+    qInfo() << "Compact window:" << window.size() << "viewport:" << window.canvas->viewport()->size();
+    CHECK(window.canvas->viewport()->width() >= 300 && window.canvas->viewport()->height() >= 120);
+    const qreal narrowZoom = window.canvas->transform().m11();
+    CHECK(narrowZoom < wideZoom);
+    CHECK(zoomLevel->text() == QStringLiteral("%1%").arg(qMax(1, qRound(narrowZoom * 100))));
+    const QRectF visibleScene = window.canvas->mapToScene(window.canvas->viewport()->rect()).boundingRect();
+    CHECK(visibleScene.adjusted(-1, -1, 1, 1).contains(window.scene->itemsBoundingRect()));
+    QTest::mouseClick(zoomIn, Qt::LeftButton);
+    CHECK(window.canvas->transform().m11() > narrowZoom);
+    QTest::mouseClick(zoomOut, Qt::LeftButton);
+    CHECK(qAbs(window.canvas->transform().m11() - narrowZoom) < 0.001);
+    QTest::mouseClick(zoomIn, Qt::LeftButton);
+    window.activateWindow();
+    window.canvas->setFocus();
+    QTest::qWait(60);
+    QTest::keyClick(window.canvas, Qt::Key_0, Qt::ControlModifier);
+    QTest::qWait(60);
+    CHECK(window.fitMode);
+    CHECK(qAbs(window.canvas->transform().m11() - narrowZoom) < 0.02);
+    window.selectNode(root);
+    QTest::keyClick(window.canvas, Qt::Key_Down);
+    CHECK(window.selected == first);
+    QTest::keyClick(window.canvas, Qt::Key_Right);
+    CHECK(window.selected == second);
+    QTest::keyClick(window.canvas, Qt::Key_Up);
+    CHECK(window.selected == root);
+    compactLayouts->actions().first()->trigger();
+    CHECK(window.doc.mindMap && window.classicAction->isChecked());
+    QTest::keyClick(window.canvas, Qt::Key_Right);
+    CHECK(window.selected == first);
+    QTest::keyClick(window.canvas, Qt::Key_Left);
+    CHECK(window.selected == root);
+    compactLayouts->actions().last()->trigger();
+    CHECK(!window.doc.mindMap && window.hierarchyAction->isChecked());
+    QTest::keyClick(window.canvas, Qt::Key_F2);
+    CHECK(window.editor && window.editor->isVisible());
+    const QRect editRect = window.canvas->mapFromScene(window.editorProxy->sceneBoundingRect()).boundingRect();
+    CHECK(window.canvas->viewport()->rect().contains(editRect.center()));
+    window.finishEdit(false);
+
+    bool dialogOperated = false;
+    QTimer::singleShot(0, &window, [&] {
+        auto *dialog = window.findChild<QDialog *>("appearanceDialog");
+        if (!dialog) return;
+        auto *interfaceFamily = dialog->findChild<QComboBox *>("interfaceFamily");
+        auto *interfaceSize = dialog->findChild<QSpinBox *>("interfaceSize");
+        auto *topicFamily = dialog->findChild<QComboBox *>("topicFamily");
+        auto *topicSize = dialog->findChild<QSpinBox *>("topicSize");
+        auto *topicWeight = dialog->findChild<QComboBox *>("topicWeight");
+        auto *theme = dialog->findChild<QComboBox *>("appearanceTheme");
+        if (!interfaceFamily || !interfaceSize || !topicFamily || !topicSize || !topicWeight || !theme) {
+            dialog->reject();
+            return;
+        }
+        interfaceFamily->setCurrentIndex(interfaceFamily->findData(embedded.at(1)));
+        interfaceSize->setValue(22);
+        topicFamily->setCurrentIndex(topicFamily->findData(embedded.at(1)));
+        topicSize->setValue(18);
+        topicWeight->setCurrentIndex(1);
+        theme->setCurrentIndex(1);
+        dialogOperated = true;
+        dialog->accept();
+    });
+    const bool wasDirty = window.dirty;
+    window.changeAppearance();
+    CHECK(dialogOperated);
+    QTest::qWait(60);
+    CHECK(window.dirty == wasDirty && compact->isVisible());
+    int visibleControls = 0;
+    for (auto *button : compact->findChildren<QToolButton *>()) {
+        if (button->accessibleName().isEmpty()) continue;
+        CHECK(button->isVisible() && compact->rect().contains(button->geometry()));
+        ++visibleControls;
+    }
+    CHECK(visibleControls == 4);
+    CHECK(QApplication::font().pointSize() == 22 && QApplication::font().family() == embedded.at(1));
+    const QFont labelFont = window.items.value(child).label->font();
+    CHECK(labelFont.family() == embedded.at(1) && labelFont.pointSize() == 18 && labelFont.bold());
+    CHECK(window.scene->backgroundBrush().color() == Qt::white);
+    const Appearance savedAppearance = Appearance::load();
+    CHECK(savedAppearance.interfaceFont.points == 22 && savedAppearance.topicFont.bold && savedAppearance.highContrast);
     if (!previewDir.isEmpty()) {
         QDir().mkpath(previewDir);
+        CHECK(window.grab().save(QDir(previewDir).filePath("compact-large-type.png")));
+    }
+    window.appearance = Appearance::defaults();
+    window.appearance.save();
+    window.applyAppearance();
+    QTest::qWait(60);
+
+    if (!previewDir.isEmpty()) {
+        QDir().mkpath(previewDir);
+        CHECK(window.grab().save(QDir(previewDir).filePath("compact.png")));
+    }
+
+    window.resize(1160, 760);
+    QTest::qWait(60);
+    CHECK(toolbar->isVisible() && !compact->isVisible());
+    if (!previewDir.isEmpty()) {
         CHECK(writeAtomically(QDir(previewDir).filePath(QStringLiteral("研发项目交付.smap")), structure, &error));
         window.fit();
         QTest::qWait(100);

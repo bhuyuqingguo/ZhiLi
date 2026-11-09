@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=ZhiLi
+Name[zh_CN]=枝理
+Name[zh_TW]=枝理
+Comment=Offline mind-map editor
+Comment[zh_CN]=离线思维导图编辑器
+Exec=/usr/lib/zhili/simplemap
+Terminal=false
+Categories=Office;
