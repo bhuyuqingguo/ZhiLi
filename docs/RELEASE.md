@@ -2,6 +2,8 @@
 
 正式 tag 形如 `v1.0.0`，发布说明放在 `docs/releases/<tag>.md`。测试 tag 形如 `v1.0.0-test.1`，对应预发布。GitHub Actions 并行构建 ARM64 和 Windows x64，运行回归测试并生成 SHA-256。两个平台通过测试且下载包校验一致后才发布。ARM64 使用 Ubuntu 20.04 构建容器，实际兼容性须在目标机验收。
 
+从已发布的同平台便携包生成更新时，可调用[离线增量升级接口](INCREMENTAL_UPDATE.md)。
+
 ## Linux ARM64 免安装包
 
 在原生 ARM64 构建机准备 `build-essential`、`cmake`、`file`、`qtbase5-dev` 和 `libqt5svg5-dev`。构建目录需可写。脚本生成 tar.gz 和 SHA-256，运行端依赖系统 Qt5 和 glibc。

@@ -2,7 +2,7 @@
 
 枝理是一款离线桌面思维导图工具。它从银河麒麟等桌面系统的日常需求出发，把记录思路、整理分支、批量修改和交付图稿集中在一张画布上。导图保存在本机，同一个开放的 `.smap` 文件可以在不同平台继续编辑。
 
-[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.2 发布说明](docs/releases/v1.0.2.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
+[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.3 发布说明](docs/releases/v1.0.3.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
 
 ![枝理 Windows 工作区，工具栏可直接打开、保存、转换文件及切换布局](docs/screenshots/workspace.png)
 
@@ -10,11 +10,13 @@
 
 | 平台 | 下载与启动 |
 | --- | --- |
-| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.2-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
-| Linux ARM64 | 下载 `ZhiLi-v1.0.2-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
+| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.3-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
+| Linux ARM64 | 下载 `ZhiLi-v1.0.3-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
 | macOS | 可用 Qt5 从源码构建 `simplemap.app`，应用包包含枝理图标。当前 GitHub Release 提供 Windows x64 和 Linux ARM64 便携包。 |
 
-安装包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.2-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
+完整包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.3-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
+
+已有原版 `v1.0.2` 便携包，可下载同平台的 `v1.0.2-to-v1.0.3` 增量包、对应校验文件和 `ZhiLi-v1.0.3-update.py`。更新工具校验基线并在新目录重建新版，旧目录可留作回退。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
 
 ## 用一张图上手
 
@@ -23,15 +25,17 @@
 | 要做什么 | 怎么操作 |
 | --- | --- |
 | 录入想法 | 双击或按 **F2** 编辑。**Enter** 加同级，**Tab** 或 **Insert** 加子主题。编辑时 **Enter** 确认、**Shift+Enter** 换行。 |
-| 整理分支 | **Ctrl+单击** 多选，从任一选中项拖动整组。拖到主题中央移入子级，拖到边缘调整顺序，按住 **Ctrl** 拖动则复制。 |
-| 聚焦或查找 | **Ctrl+Shift+J** 聚焦当前分支，**Esc** 返回全图。**Ctrl+F** 查找，**F3** 跳到下一个结果。 |
+| 框选和整理分支 | 点击画布右下角的框选按钮，再从空白处拖动，也可直接按 **Shift** 拖动空白处。**Ctrl+单击** 可逐项增减，从任一选中项拖动整组。 |
+| 聚焦或查找 | **Ctrl+Shift+J** 同时打开全图概览与分支编辑区，单击全图中的主题切换分支，**Esc** 返回原全图视图。**Ctrl+F** 查找，**F3** 跳到下一个结果。 |
 | 缩放和平移 | **Ctrl+滚轮** 缩放，**Ctrl+0** 适应窗口，拖动画布空白处平移。 |
 | 批量统一样式 | 多选后按 **Ctrl+Shift+F**，勾选需要修改的对齐、字体、字号、字重或颜色。 |
 | 保存与分享 | **Ctrl+S** 保存。右键可复制当前分支为透明图片，或只导出该分支。 |
 
+窗口底部会根据编辑、框选、拖动、多选或聚焦状态给出快捷键提示。**F1** 打开离线帮助和快捷键速查，「帮助 → 关于枝理」显示应用版本和运行环境。
+
 ## 界面实拍
 
-以下为 v1.0.2 对应的 Windows 界面。同一张示例图可以直接切换四种布局。连线可选自动搭配、直角、直线和曲线。
+以下为 Windows 界面实拍。同一张示例图可以直接切换四种布局。连线可选自动搭配、直角、直线和曲线。
 
 | 经典双侧 | 向右展开 |
 | --- | --- |
@@ -41,11 +45,11 @@
 
 ### 拖拽、聚焦与窄窗口
 
-整组拖动时，外框和插入线标出落点。松手后自动重排主题与连线，一次撤销即可恢复整组。聚焦当前分支可腾出画布空间，返回全图后继续浏览其他分支。
+整组拖动时，外框和插入线标出落点。松手后自动重排主题与连线，一次撤销即可恢复整组。聚焦后全图概览与分支编辑区同时显示，修改主题后概览同步刷新。分隔线可拖动，窄窗口改用上下排列。
 
 | 整组拖动与吸附 | 聚焦当前分支 |
 | --- | --- |
-| ![两个选中主题拖到目标分支，外框显示吸附位置](docs/screenshots/group-drag.png) | ![画布单独显示当前分支](docs/screenshots/focus-branch.png) |
+| ![两个选中主题拖到目标分支，外框显示吸附位置](docs/screenshots/group-drag.png) | ![左侧全图概览，右侧独立编辑当前分支](docs/screenshots/focus-branch.png) |
 
 ![窄窗口仍可保存、转换、加子主题、切换布局和打开样式](docs/screenshots/compact-toolbar.png)
 

@@ -22,6 +22,35 @@
 #include <memory>
 
 namespace {
+constexpr auto boxShortcut = "Ctrl+Shift+B";
+constexpr auto convertShortcut = "Ctrl+Shift+M";
+constexpr auto pasteStyleShortcut = "Ctrl+Shift+V";
+
+QString shortcutText(const char *keys) {
+    return QKeySequence(QString::fromLatin1(keys)).toString(QKeySequence::NativeText);
+}
+
+QString copyModifierText() {
+    QString modifier = shortcutText("Ctrl+A");
+    modifier.chop(1);
+    if (modifier.endsWith('+')) modifier.chop(1);
+    return modifier;
+}
+
+template<typename CreateMimeData>
+bool writeClipboard(CreateMimeData create) {
+    auto *clipboard = QApplication::clipboard();
+    clipboard->setMimeData(create());
+#ifdef Q_OS_WIN
+    // Qt may exhaust its OLE retries without reporting failure to the caller.
+    if (QGuiApplication::platformName() == QStringLiteral("windows") && !clipboard->ownsClipboard()) {
+        clipboard->setMimeData(create());
+        return clipboard->ownsClipboard();
+    }
+#endif
+    return true;
+}
+
 QString topicTextError(const QString &text) {
     if (text.size() > Document::maxText)
         return QStringLiteral("文字超过 10 万字符，请缩短后再确认");
@@ -57,10 +86,15 @@ public:
     std::function<void(QPoint, bool)> dragOver;
     std::function<void()> dragEnded;
     std::function<void(bool)> topicClicked;
+    std::function<bool(QPoint)> canStartArea;
     std::function<void(QRect)> selectArea;
+    std::function<void(bool)> areaDragChanged;
     std::function<void()> zoomChanged;
     std::function<void()> viewportResized;
     QColor gridColor;
+
+    void setAreaSelection(bool enabled) { areaSelection = enabled; }
+    bool areaSelectionEnabled() const { return areaSelection; }
 
     void showDropPreview(const QPainterPath &marker = {}, const QPainterPath &guide = {}, const QColor &color = {}) {
         const auto area = [this](const QPainterPath &path) {
@@ -161,10 +195,12 @@ protected:
                 event->accept();
                 return;
             }
-            if ((event->modifiers() & Qt::ShiftModifier) && !itemAt(origin)) {
+            if ((areaSelection || (event->modifiers() & Qt::ShiftModifier)) && canStartArea(origin)) {
                 if (!band) band = new QRubberBand(QRubberBand::Rectangle, viewport());
+                setFocus();
                 band->setGeometry(QRect(origin, QSize()));
                 band->show();
+                areaDragChanged(true);
                 event->accept();
                 return;
             }
@@ -208,7 +244,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override {
         if (event->button() == Qt::LeftButton && band && band->isVisible()) {
             band->hide();
-            selectArea(QRect(origin, event->pos()).normalized());
+            areaDragChanged(false);
+            if ((event->pos() - origin).manhattanLength() >= QApplication::startDragDistance())
+                selectArea(QRect(origin, event->pos()).normalized());
             event->accept();
             return;
         }
@@ -242,9 +280,73 @@ private:
     QPoint origin;
     QPoint panPoint;
     QRubberBand *band = nullptr;
+    bool areaSelection = false;
     bool nodeDrag = false;
     bool middlePanning = false;
     bool rightWheelUsed = false;
+};
+
+class OverviewCanvas : public QGraphicsView {
+public:
+    explicit OverviewCanvas(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent) {
+        setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+        setDragMode(ScrollHandDrag);
+        setTransformationAnchor(AnchorUnderMouse);
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
+
+    std::function<void(const QString &)> topicClicked;
+
+    void refresh(bool reset = false) {
+        if (reset) autoFit = true;
+        if (!isVisible() || !autoFit) return;
+        fitInView(scene()->itemsBoundingRect().adjusted(-30, -30, 30, 30), Qt::KeepAspectRatio);
+        const qreal zoom = transform().m11();
+        if (zoom > 1.25) scale(1.25 / zoom, 1.25 / zoom);
+    }
+
+protected:
+    void resizeEvent(QResizeEvent *event) override {
+        QGraphicsView::resizeEvent(event);
+        refresh();
+    }
+
+    void mousePressEvent(QMouseEvent *event) override {
+        if (event->button() == Qt::LeftButton) pressedAt = event->pos();
+        QGraphicsView::mousePressEvent(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override {
+        QGraphicsView::mouseReleaseEvent(event);
+        if (event->button() != Qt::LeftButton) return;
+        if ((event->pos() - pressedAt).manhattanLength() >= QApplication::startDragDistance()) {
+            autoFit = false;
+            return;
+        }
+        for (auto *item : items(event->pos())) {
+            const QString id = item->data(0).toString();
+            if (!id.isEmpty()) {
+                topicClicked(id);
+                return;
+            }
+        }
+    }
+
+    void wheelEvent(QWheelEvent *event) override {
+        const qreal zoom = transform().m11();
+        const int delta = event->angleDelta().y();
+        if (delta) {
+            autoFit = false;
+            const qreal next = qBound(qMin(0.05, zoom), zoom * qPow(1.12, delta / 120.0), 3.5);
+            scale(next / zoom, next / zoom);
+        }
+        event->accept();
+    }
+
+private:
+    QPoint pressedAt;
+    bool autoFit = true;
 };
 
 struct NodeItem {
@@ -356,9 +458,46 @@ public:
         : appearance(std::move(initialAppearance)) {
         setMinimumSize(360, 280);
         scene = new QGraphicsScene(this);
-        canvas = new Canvas(scene, this);
+        focusSplitter = new QSplitter(Qt::Horizontal, this);
+        focusSplitter->setObjectName("focusSplitter");
+        focusSplitter->setChildrenCollapsible(false);
+        focusSplitter->setHandleWidth(6);
+        overviewPane = new QWidget(focusSplitter);
+        auto *overviewLayout = new QVBoxLayout(overviewPane);
+        overviewLayout->setContentsMargins(0, 0, 0, 0);
+        overviewLayout->setSpacing(0);
+        auto *overviewTitle = new QLabel(QStringLiteral("全图概览  ·  单击主题切换分支"), overviewPane);
+        overviewTitle->setObjectName("focusPaneTitle");
+        overviewTitle->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        overviewTitle->setToolTip(overviewTitle->text());
+        overviewLayout->addWidget(overviewTitle);
+        overviewScene = new QGraphicsScene(this);
+        overview = new OverviewCanvas(overviewScene, overviewPane);
+        overview->setObjectName("fullMapOverview");
+        overview->setAccessibleName(QStringLiteral("全图概览"));
+        overview->topicClicked = [this](const QString &id) {
+            if (id != doc.root && id != focusRoot && finishEdit()) focusBranch(id);
+        };
+        overviewLayout->addWidget(overview, 1);
+        auto *branchPane = new QWidget(focusSplitter);
+        auto *branchLayout = new QVBoxLayout(branchPane);
+        branchLayout->setContentsMargins(0, 0, 0, 0);
+        branchLayout->setSpacing(0);
+        focusTitle = new QLabel(branchPane);
+        focusTitle->setObjectName("focusPaneTitle");
+        focusTitle->setTextFormat(Qt::PlainText);
+        focusTitle->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        branchLayout->addWidget(focusTitle);
+        canvas = new Canvas(scene, branchPane);
         canvas->setObjectName("mapCanvas");
-        setCentralWidget(canvas);
+        branchLayout->addWidget(canvas, 1);
+        focusSplitter->addWidget(overviewPane);
+        focusSplitter->addWidget(branchPane);
+        focusSplitter->setStretchFactor(0, 2);
+        focusSplitter->setStretchFactor(1, 3);
+        overviewPane->hide();
+        focusTitle->hide();
+        setCentralWidget(focusSplitter);
         rootRail = scene->addPath(QPainterPath());
         rootRail->setZValue(-1);
         rootRail->setAcceptedMouseButtons(Qt::NoButton);
@@ -398,6 +537,7 @@ public:
             if (toggle) toggleSelection(dragSource);
             else selectNode(dragSource);
         };
+        canvas->canStartArea = [this](QPoint at) { return !editor && nodeAt(at).isEmpty(); };
         canvas->selectArea = [this](QRect rect) {
             if (editor) return;
             const QRectF area = canvas->mapToScene(rect).boundingRect();
@@ -425,8 +565,15 @@ public:
             if (copy) copyDraggedBranches(draggedRoots, target.id, target.side);
             else moveBranches(draggedRoots, target.id, target.side, true);
         };
-        canvas->dragOver = [this](QPoint at, bool copy) { previewDrop(at, copy); };
-        canvas->dragEnded = [this] { canvas->showDropPreview(); };
+        canvas->areaDragChanged = [this](bool active) { setGestureHint(active ? GestureHint::Box : GestureHint::None); };
+        canvas->dragOver = [this](QPoint at, bool copy) {
+            setGestureHint(copy ? GestureHint::Copy : GestureHint::Move);
+            previewDrop(at, copy);
+        };
+        canvas->dragEnded = [this] {
+            canvas->showDropPreview();
+            if (gestureHint != GestureHint::Box) setGestureHint(GestureHint::None);
+        };
         makeMenus();
         canvas->zoomChanged = [this] {
             fitMode = false;
@@ -445,11 +592,14 @@ public:
         connect(&recoveryTimer, &QTimer::timeout, this, [this] { writeRecovery(); });
         resetDocument();
         resizeForScreen();
-        statusBar()->showMessage(canvasHint());
         if (enableRecovery) QTimer::singleShot(0, this, [this] { setupRecovery(); });
     }
 
 private:
+    enum class GestureHint { None, Box, Move, Copy };
+    GestureHint gestureHint = GestureHint::None;
+    QLabel *shortcutHint = nullptr;
+
     struct Revision {
         Document document;
         QString selected;
@@ -470,6 +620,14 @@ private:
     QGraphicsScene *scene;
     QGraphicsPathItem *rootRail;
     Canvas *canvas;
+    QSplitter *focusSplitter;
+    QWidget *overviewPane;
+    QLabel *focusTitle;
+    OverviewCanvas *overview;
+    QGraphicsScene *overviewScene;
+    QGraphicsPathItem *overviewRail = nullptr;
+    QMap<QString, NodeItem> overviewItems;
+    QMap<QString, QGraphicsPathItem *> overviewEdges;
     Document doc;
     Document saved;
     QString selected, filePath, query, lastMatch;
@@ -570,28 +728,40 @@ private:
 
     QString viewRoot() const { return focusRoot.isEmpty() ? doc.root : focusRoot; }
 
-    void focusBranch() {
-        if (selected == viewRoot() || !items.contains(selected)) return;
-        if (focusRoot.isEmpty()) {
+    void focusBranch() { focusBranch(selected); }
+
+    void focusBranch(const QString &id) {
+        if (id == doc.root || id == focusRoot || !doc.nodes.contains(id)) return;
+        const bool entering = focusRoot.isEmpty();
+        if (entering) {
             fullMapFit = fitMode;
             fullMapTransform = canvas->transform();
             fullMapCenter = canvas->mapToScene(canvas->viewport()->rect().center());
         }
-        focusRoot = selected;
+        focusRoot = id;
+        selected = id;
         additionalSelection.clear();
         render();
         fit();
-        statusBar()->showMessage(QStringLiteral("已聚焦当前分支 · Esc 返回全图"), 5000);
+        canvas->setFocus();
+        statusBar()->clearMessage();
     }
 
     void leaveFocus() {
         if (focusRoot.isEmpty()) return;
+        statusBar()->clearMessage();
         QString selection = selected;
         for (QString id = parents.value(selection); !id.isEmpty(); id = parents.value(id))
             if (doc.nodes.value(id).collapsed) selection = id;
         focusRoot.clear();
         selected = selection;
         render();
+        restoreFullMapView();
+    }
+
+    void restoreFullMapView() {
+        focusSplitter->refresh();
+        canvas->parentWidget()->layout()->activate();
         if (fullMapFit) {
             fit();
         } else {
@@ -714,12 +884,19 @@ private:
             statusBar()->showMessage(QStringLiteral("复制失败：%1").arg(error), 6000);
             return;
         }
-        auto *mime = new QMimeData;
-        mime->setData(BranchClipboard::mimeType(), data);
         QStringList outlines;
-        for (const QString &id : roots) outlines.append(BranchClipboard::outline(doc, id));
-        mime->setText(outlines.join('\n'));
-        QApplication::clipboard()->setMimeData(mime);
+        for (const auto &id : roots) outlines.append(BranchClipboard::outline(doc, id));
+        const QString outline = outlines.join('\n');
+        if (!writeClipboard([&] {
+            auto *mime = new QMimeData;
+            mime->setData(BranchClipboard::mimeType(), data);
+            mime->setText(outline);
+            return mime;
+        })) {
+            statusBar()->showMessage(cut ? QStringLiteral("剪贴板正忙，分支已保留。请重试剪切")
+                                        : QStringLiteral("剪贴板正忙，请重试复制"), 5000);
+            return;
+        }
         if (cut) removeSelected();
         statusBar()->showMessage(cut ? QStringLiteral("已剪切分支，可粘贴或撤销")
                                     : QStringLiteral("已复制分支，可在其他主题下粘贴"), 4000);
@@ -1156,9 +1333,12 @@ private:
     void styleNode(const QString &id) {
         if (!items.contains(id)) return;
         const bool active = id == selected || additionalSelection.contains(id);
-        const NodeItem &item = items[id];
+        paintNodeOutline(items.value(id), id == viewRoot(), active);
+    }
+
+    void paintNodeOutline(const NodeItem &item, bool root, bool active) const {
         const QColor border = appearance.highContrast ? line : tint(item.branchColor, 58);
-        const QColor selection = appearance.highContrast ? accent : id == viewRoot() ? QColor("#8acbb0") : moss;
+        const QColor selection = appearance.highContrast ? accent : root ? QColor("#8acbb0") : moss;
         item.body->setPen(QPen(active ? selection : border, active ? 2.6 : 1.1));
     }
 
@@ -1177,6 +1357,7 @@ private:
         styleNode(selected);
         for (const auto &id : oldExtras) styleNode(id);
         for (const auto &id : additionalSelection) styleNode(id);
+        statusBar()->clearMessage();
         updateActionStates();
     }
 
@@ -1191,6 +1372,7 @@ private:
         }
         styleNode(id);
         styleNode(selected);
+        statusBar()->clearMessage();
         updateActionStates();
     }
 
@@ -1234,6 +1416,7 @@ private:
         } else {
             workspaceStats->setText(QStringLiteral("已选 %1 个主题").arg(additionalSelection.size() + 1));
         }
+        updateShortcutHint();
     }
 
     void startEdit() {
@@ -1271,8 +1454,11 @@ private:
         auto *cancel = new QShortcut(QKeySequence("Escape"), editor);
         connect(accept, &QShortcut::activated, this, [this] { finishEdit(); });
         connect(cancel, &QShortcut::activated, this, [this] { finishEdit(false); });
-        connect(editor, &QPlainTextEdit::textChanged, this, [this] { scheduleRecovery(); });
-        statusBar()->showMessage(QStringLiteral("编辑主题  ·  Enter 确认  ·  Shift+Enter 换行  ·  Esc 取消"));
+        connect(editor, &QPlainTextEdit::textChanged, this, [this] {
+            statusBar()->clearMessage();
+            scheduleRecovery();
+        });
+        statusBar()->clearMessage();
     }
 
     bool finishEdit(bool accept = true) {
@@ -1302,7 +1488,7 @@ private:
         } else {
             clearRecovery();
         }
-        statusBar()->showMessage(canvasHint(), 5000);
+        statusBar()->clearMessage();
         updateActionStates();
         return true;
     }
@@ -1545,10 +1731,53 @@ private:
         if (!warnings.isEmpty()) QMessageBox::information(this, QStringLiteral("导入说明"), warnings.join('\n'));
     }
 
-    QString canvasHint() const {
-        return compactToolbar->isHidden()
-            ? QStringLiteral("双击编辑  ·  Ctrl+拖动复制分支  ·  Shift+滚轮横移")
-            : QStringLiteral("双击编辑");
+    void updateShortcutHint() {
+        QString hint, compact;
+        if (editor) {
+            hint = QStringLiteral("Enter 确认  ·  %1 换行  ·  Esc 取消").arg(shortcutText("Shift+Return"));
+            compact = QStringLiteral("Enter 确认 · Esc 取消");
+        } else if (gestureHint == GestureHint::Box) {
+            compact = QStringLiteral("松开左键完成框选");
+            hint = QStringLiteral("%1  ·  %2+单击增减选中项").arg(compact, copyModifierText());
+        } else if (gestureHint == GestureHint::Move || gestureHint == GestureHint::Copy) {
+            const QString copy = copyModifierText();
+            compact = gestureHint == GestureHint::Copy
+                ? QStringLiteral("松开左键完成复制")
+                : QStringLiteral("按住 %1 复制").arg(copy);
+            hint = gestureHint == GestureHint::Copy
+                ? QStringLiteral("%1  ·  松开 %2 改为移动").arg(compact, copy)
+                : QStringLiteral("移动分支  ·  %1  ·  松开左键完成").arg(compact);
+        } else if (!additionalSelection.isEmpty()) {
+            compact = QStringLiteral("%1 批量样式").arg(shortcutText("Ctrl+Shift+F"));
+            hint = QStringLiteral("已选 %1 项  ·  %2  ·  %3")
+                .arg(additionalSelection.size() + 1)
+                .arg(compact, hasCopiedStyle
+                     ? QStringLiteral("%1 粘贴样式").arg(shortcutText(pasteStyleShortcut))
+                     : QStringLiteral("拖动任一项移动整组"));
+        } else if (!focusRoot.isEmpty()) {
+            compact = QStringLiteral("Esc 返回全图");
+            hint = QStringLiteral("全图单击切换分支  ·  Esc 返回全图  ·  %1 导出当前分支").arg(shortcutText("Ctrl+Shift+E"));
+        } else if (canvas->areaSelectionEnabled()) {
+            compact = QStringLiteral("拖动空白处框选");
+            hint = QStringLiteral("空白处拖动框选  ·  中键拖动平移  ·  %1 退出框选").arg(shortcutText(boxShortcut));
+        } else if (selected != viewRoot()) {
+            compact = QStringLiteral("F2 编辑 · Tab 加子主题");
+            hint = QStringLiteral("F2 编辑  ·  Tab 加子主题  ·  %1 聚焦分支").arg(shortcutText("Ctrl+Shift+J"));
+        } else {
+            compact = QStringLiteral("Tab 加子主题 · F1 帮助");
+            hint = QStringLiteral("Tab 加子主题  ·  Shift+拖动框选  ·  %1 格式转换  ·  F1 帮助")
+                .arg(shortcutText(convertShortcut));
+        }
+        const QString visible = compactToolbar->isHidden() ? hint : compact;
+        if (shortcutHint->text() != visible) shortcutHint->setText(visible);
+        if (shortcutHint->toolTip() != hint) shortcutHint->setToolTip(hint);
+    }
+
+    void setGestureHint(GestureHint next) {
+        if (gestureHint == next) return;
+        gestureHint = next;
+        if (next != GestureHint::None) statusBar()->clearMessage();
+        updateShortcutHint();
     }
 
     void applyAppearance() {
@@ -1586,6 +1815,8 @@ private:
             "QStatusBar {background:%7;color:%3;padding:2px 8px}"
             "QStatusBar::item {border:0}"
             "QLabel#workspaceStats {color:%6;padding:0 9px}"
+            "QLabel#focusPaneTitle {background:%7;color:%6;border-bottom:1px solid %2;padding:6px 10px;font-weight:bold}"
+            "QSplitter::handle {background:%2}"
             "QGraphicsView {border:0}"
             "QScrollBar:vertical {background:%7;width:10px;margin:0}"
             "QScrollBar:horizontal {background:%7;height:10px;margin:0}"
@@ -1647,7 +1878,11 @@ private:
         zoomLevel->setText(QStringLiteral("%1%").arg(qMax(1, qRound(canvas->transform().m11() * 100))));
     }
 
-    void makeZoomControls(QAction *fitAction) {
+    void makeZoomControls(QAction *fitAction, QAction *areaAction) {
+        shortcutHint = new QLabel(statusBar());
+        shortcutHint->setObjectName("shortcutHint");
+        shortcutHint->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        statusBar()->addWidget(shortcutHint, 1);
         workspaceStats = new QLabel(statusBar());
         workspaceStats->setObjectName("workspaceStats");
         statusBar()->addPermanentWidget(workspaceStats);
@@ -1656,6 +1891,11 @@ private:
         auto *row = new QHBoxLayout(dock);
         row->setContentsMargins(3, 2, 3, 2);
         row->setSpacing(2);
+        auto *areaButton = new QToolButton(dock);
+        areaButton->setDefaultAction(areaAction);
+        areaButton->setObjectName("areaSelectionButton");
+        areaButton->setAccessibleName(areaAction->text());
+        row->addWidget(areaButton);
         const auto button = [this, dock, row](const QString &name, const QString &label, const QString &tip, qreal factor) {
             auto *control = new QToolButton(dock);
             control->setObjectName(name);
@@ -1889,10 +2129,15 @@ private:
             statusBar()->showMessage(QStringLiteral("无法生成分支图片"), 5000);
             return;
         }
-        auto *data = new QMimeData;
-        data->setImageData(image);
-        data->setData("image/png", png);
-        QApplication::clipboard()->setMimeData(data);
+        if (!writeClipboard([&] {
+            auto *data = new QMimeData;
+            data->setImageData(image);
+            data->setData("image/png", png);
+            return data;
+        })) {
+            statusBar()->showMessage(QStringLiteral("剪贴板正忙，请重试复制图片"), 5000);
+            return;
+        }
         statusBar()->showMessage(QStringLiteral("已复制透明背景的分支图片"), 4000);
     }
 
@@ -1953,13 +2198,45 @@ private:
         return item;
     }
 
+    void showHelp() {
+        QDialog dialog(this);
+        dialog.setObjectName("helpDialog");
+        dialog.setWindowTitle(QStringLiteral("枝理使用帮助"));
+        auto *layout = new QVBoxLayout(&dialog);
+        auto *guide = new QTextBrowser(&dialog);
+        guide->setOpenExternalLinks(true);
+        guide->setSource(QUrl(QStringLiteral("qrc:/help/zh-CN.html")));
+        layout->addWidget(guide);
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+        buttons->button(QDialogButtonBox::Close)->setText(QStringLiteral("关闭"));
+        connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+        layout->addWidget(buttons);
+        dialog.resize(QSize(680, 520).boundedTo(size()));
+        dialog.exec();
+    }
+
+    void showAbout() {
+        QMessageBox dialog(this);
+        dialog.setObjectName("aboutDialog");
+        dialog.setWindowTitle(QStringLiteral("关于枝理"));
+        dialog.setIconPixmap(QApplication::windowIcon().pixmap(56, 56));
+        dialog.setTextFormat(Qt::RichText);
+        dialog.setText(QStringLiteral("<b>枝理 ZhiLi %1</b><br>离线桌面思维导图").arg(QCoreApplication::applicationVersion()));
+        dialog.setInformativeText(QStringLiteral("使用开放的 SMAP 文件格式。<br>Qt %1 · %2<br>"
+            "<a href='https://github.com/bhuyuqingguo/ZhiLi'>项目主页</a>")
+            .arg(QString::fromLatin1(qVersion()), QSysInfo::currentCpuArchitecture()));
+        dialog.setTextInteractionFlags(Qt::TextBrowserInteraction);
+        dialog.addButton(QStringLiteral("关闭"), QMessageBox::AcceptRole);
+        dialog.exec();
+    }
+
     void makeMenus() {
         auto *file = menuBar()->addMenu(QStringLiteral("文件"));
         action(file, QStringLiteral("新建"), "Ctrl+N", [this] { if (confirmLeave()) resetDocument(); });
         action(file, QStringLiteral("从模板新建…"), "Ctrl+Shift+N", [this] { newFromTemplate(); })->setObjectName("newFromTemplateAction");
         auto *openAction = action(file, QStringLiteral("打开"), "Ctrl+O", [this] { openFile(); });
-        action(file, QStringLiteral("导入其他导图…"), "", [this] { importFile(); })->setObjectName("importMindMapAction");
-        auto *convertAction = action(file, QStringLiteral("格式转换…"), "", [this] { convertFile(); });
+        action(file, QStringLiteral("导入其他导图…"), "Ctrl+Shift+O", [this] { importFile(); })->setObjectName("importMindMapAction");
+        auto *convertAction = action(file, QStringLiteral("格式转换…"), convertShortcut, [this] { convertFile(); });
         convertAction->setObjectName("convertFileAction");
         convertAction->setToolTip(QStringLiteral("离线转换导图、Visio、draw.io 和 PowerPoint 文件"));
         auto *saveAction = action(file, QStringLiteral("保存"), "Ctrl+S", [this] { save(); });
@@ -1988,7 +2265,7 @@ private:
         auto *pptx = action(file, QStringLiteral("导出可编辑 PowerPoint…"), "", [this] { exportPowerPoint(); });
         pptx->setObjectName("exportPptxAction");
         pptx->setToolTip(QStringLiteral("导出可编辑形状和文字；图形符号可单独移动。包含折叠分支，大图自动分页，长文字附全文页。"));
-        auto *branchExport = action(file, QStringLiteral("导出当前分支…"), "", [this] { exportBranch(); }, true);
+        auto *branchExport = action(file, QStringLiteral("导出当前分支…"), "Ctrl+Shift+E", [this] { exportBranch(); }, true);
         branchExport->setObjectName("exportBranchAction");
 
         auto *edit = menuBar()->addMenu(QStringLiteral("编辑"));
@@ -2004,13 +2281,13 @@ private:
         auto *editTopic = action(edit, QStringLiteral("编辑主题"), "F2", [this] { startEdit(); }, true);
         auto *topicStyle = action(edit, QStringLiteral("主题样式…"), "Ctrl+Shift+F",
                                   [this] { changeTopicStyles(); }, true);
-        auto *copyStyle = action(edit, QStringLiteral("复制主题样式"), "", [this] {
+        auto *copyStyle = action(edit, QStringLiteral("复制主题样式"), "Ctrl+Shift+C", [this] {
             copiedStyle = doc.nodes.value(selected).style;
             hasCopiedStyle = true;
             updateActionStates();
-            statusBar()->showMessage(QStringLiteral("已复制主题样式，可粘贴到多个主题"), 4000);
+            statusBar()->showMessage(QStringLiteral("已复制主题样式  ·  %1 粘贴").arg(shortcutText(pasteStyleShortcut)), 4000);
         }, true);
-        pasteStyleAction = action(edit, QStringLiteral("粘贴主题样式"), "", [this] { pasteTopicStyle(); }, true);
+        pasteStyleAction = action(edit, QStringLiteral("粘贴主题样式"), pasteStyleShortcut, [this] { pasteTopicStyle(); }, true);
         copyStyle->setObjectName("copyTopicStyleAction");
         pasteStyleAction->setObjectName("pasteTopicStyleAction");
         auto *symbolAction = action(edit, QStringLiteral("设置图形符号…"), "Ctrl+Shift+I", [this] { chooseSymbol(); }, true);
@@ -2023,7 +2300,7 @@ private:
         auto *copy = action(edit, QStringLiteral("复制分支"), "Ctrl+C", [this] { copyBranch(); }, true);
         copy->setObjectName("copyBranchAction");
         copy->setShortcuts({QKeySequence("Ctrl+C"), QKeySequence("Ctrl+Insert")});
-        auto *copyImage = action(edit, QStringLiteral("复制当前分支为图片"), "", [this] { copyBranchImage(); }, true);
+        auto *copyImage = action(edit, QStringLiteral("复制当前分支为图片"), "Ctrl+Alt+I", [this] { copyBranchImage(); }, true);
         copyImage->setObjectName("copyBranchImageAction");
         cutAction = action(edit, QStringLiteral("剪切分支"), "Ctrl+X", [this] { copyBranch(true); }, true);
         cutAction->setObjectName("cutBranchAction");
@@ -2060,7 +2337,7 @@ private:
         moveDownAction = action(reorder, QStringLiteral("后移"), "Ctrl+Shift+Down", [this] { reorderSelected(false); }, true);
 
         auto *view = menuBar()->addMenu(QStringLiteral("视图"));
-        action(view, QStringLiteral("外观设置…"), "", [this] { changeAppearance(); });
+        action(view, QStringLiteral("外观设置…"), "Ctrl+,", [this] { changeAppearance(); });
         focusAction = action(view, QStringLiteral("聚焦当前分支"), "Ctrl+Shift+J", [this] { focusBranch(); }, true);
         leaveFocusAction = action(view, QStringLiteral("返回全图"), "Escape", [this] { leaveFocus(); }, true);
         focusAction->setObjectName("focusBranchAction");
@@ -2095,7 +2372,27 @@ private:
             connectorActions.insert(style, item);
         }
         auto *fitAction = action(view, QStringLiteral("适应窗口"), "Ctrl+0", [this] { fit(); });
+        auto *areaAction = view->addAction(QStringLiteral("框选模式"));
+        areaAction->setObjectName("areaSelectionAction");
+        areaAction->setCheckable(true);
+        canvasActions.append(areaAction);
+        areaAction->setShortcut(QKeySequence(QString::fromLatin1(boxShortcut)));
+        areaAction->setToolTip(QStringLiteral("框选模式 · 在画布空白处拖动"));
+        areaAction->setIcon(toolbarIcon("M4 8V4h4 M16 4h4v4 M20 16v4h-4 M8 20H4v-4 M11 4h2 M11 20h2 M4 11v2 M20 11v2"));
+        connect(areaAction, &QAction::toggled, this, [this](bool enabled) {
+            canvas->setAreaSelection(enabled);
+            statusBar()->clearMessage();
+            updateShortcutHint();
+        });
+        auto *help = menuBar()->addMenu(QStringLiteral("帮助"));
+        auto *guide = help->addAction(QStringLiteral("使用帮助"), this, &Window::showHelp);
+        guide->setObjectName("helpAction");
+        guide->setShortcut(QKeySequence(Qt::Key_F1));
+        help->addAction(QStringLiteral("关于枝理"), this, &Window::showAbout)->setObjectName("aboutAction");
         fitAction->setShortcuts({QKeySequence("Ctrl+0"), QKeySequence("Ctrl+F5")});
+        for (auto *item : {openAction, saveAction, convertAction, child, topicStyle, undo, find,
+                           fitAction, areaAction, leaveFocusAction})
+            item->setToolTip(QStringLiteral("%1 (%2)").arg(item->toolTip(), item->shortcut().toString(QKeySequence::NativeText)));
         action(view, QStringLiteral("居中所选主题"), "Alt+F3", [this] {
             if (items.contains(selected)) canvas->centerOn(items.value(selected).body);
         }, true);
@@ -2110,7 +2407,7 @@ private:
         leaveFocusButton->setDefaultAction(leaveFocusAction);
         leaveFocusButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
         statusBar()->addPermanentWidget(leaveFocusButton);
-        makeZoomControls(fitAction);
+        makeZoomControls(fitAction, areaAction);
 
         auto *context = new QMenu(canvas);
         context->setObjectName("topicContextMenu");
@@ -2209,7 +2506,7 @@ private:
             button->setIcon(action->icon());
             button->setIconSize(QSize(22, 22));
             button->setAccessibleName(action->text());
-            button->setToolTip(action->text());
+            button->setToolTip(action->toolTip());
             button->setEnabled(action->isEnabled());
             connect(button, &QToolButton::clicked, action, &QAction::trigger);
             connect(action, &QAction::changed, button, [button, action] { button->setEnabled(action->isEnabled()); });
@@ -2235,14 +2532,72 @@ private:
         compactToolbar->hide();
     }
 
+    void adjustFocusSplit(bool resetSizes = false) {
+        const auto orientation = width() < 760 ? Qt::Vertical : Qt::Horizontal;
+        if (focusSplitter->orientation() != orientation) {
+            focusSplitter->setOrientation(orientation);
+            resetSizes = true;
+        }
+        if (resetSizes) {
+            const int span = orientation == Qt::Horizontal ? focusSplitter->width() : focusSplitter->height();
+            focusSplitter->setSizes({span * 2 / 5, span * 3 / 5});
+        }
+    }
+
     void render() {
-        if (!doc.nodes.contains(focusRoot)) focusRoot.clear();
-        const QString rootId = viewRoot();
+        const bool lostFocus = !focusRoot.isEmpty() && !doc.nodes.contains(focusRoot);
+        if (lostFocus) focusRoot.clear();
         parents.clear();
         const auto &nodes = qAsConst(doc.nodes);
         for (const Node &node : nodes)
             for (const auto &child : node.children) parents.insert(child, node.id);
 
+        const QString rootId = viewRoot();
+        QSet<QString> highlights = additionalSelection;
+        highlights.insert(selected);
+        renderMap(rootId, scene, rootRail, items, edges, leafRails, highlights);
+        if (!items.contains(selected)) selected = rootId;
+        additionalSelection.remove(selected);
+        for (auto it = additionalSelection.begin(); it != additionalSelection.end();) {
+            if (!items.contains(*it)) it = additionalSelection.erase(it);
+            else ++it;
+        }
+        styleNode(selected);
+
+        if (!focusRoot.isEmpty()) {
+            const bool opening = overviewPane->isHidden();
+            if (opening) {
+                overviewRail = overviewScene->addPath(QPainterPath());
+                overviewRail->setZValue(-1);
+                overviewPane->show();
+                focusTitle->show();
+                adjustFocusSplit(true);
+            }
+            const QString title = QStringLiteral("聚焦分支  ·  %1").arg(nodes[focusRoot].text.section('\n', 0, 0).left(120));
+            focusTitle->setText(title);
+            focusTitle->setToolTip(title);
+            overviewScene->setBackgroundBrush(paper);
+            QMap<QString, qreal> overviewLeafRails;
+            renderMap(doc.root, overviewScene, overviewRail, overviewItems, overviewEdges, overviewLeafRails, {focusRoot});
+            overview->refresh(opening);
+        } else if (!overviewPane->isHidden()) {
+            overviewPane->hide();
+            focusTitle->hide();
+            overviewItems.clear();
+            overviewEdges.clear();
+            overviewScene->clear();
+            overviewRail = nullptr;
+        }
+        updateLayoutActions();
+        updateActionStates();
+        updateTitle();
+        if (lostFocus) restoreFullMapView();
+    }
+
+    void renderMap(const QString &rootId, QGraphicsScene *scene, QGraphicsPathItem *rootRail,
+                   QMap<QString, NodeItem> &items, QMap<QString, QGraphicsPathItem *> &edges,
+                   QMap<QString, qreal> &leafRails, const QSet<QString> &highlights) {
+        const auto &nodes = qAsConst(doc.nodes);
         const QVector<QColor> colors{QColor("#258265"), QColor("#5478ac"), QColor("#a36730"),
                                     QColor("#8a609a"), QColor("#a95765"), QColor("#457a87")};
         QMap<QString, QColor> branchColors;
@@ -2362,12 +2717,6 @@ private:
         Document view = doc;
         view.root = rootId;
         const auto positions = layoutNodes(view, sizes, &leafRails, &layerSizes);
-        if (!positions.contains(selected)) selected = rootId;
-        additionalSelection.remove(selected);
-        for (auto it = additionalSelection.begin(); it != additionalSelection.end();) {
-            if (!positions.contains(*it)) it = additionalSelection.erase(it);
-            else ++it;
-        }
         QPainterPath rail;
         qreal rootRailY = 0;
         const bool automatic = doc.connectorStyle == ConnectorStyle::Automatic;
@@ -2410,7 +2759,7 @@ private:
                                                      -iconSize.height() / 2));
             }
             item.badge->setPos(point + QPointF(size.width() / 2 + 5, -item.badge->boundingRect().height() / 2));
-            styleNode(id);
+            paintNodeOutline(item, id == rootId, highlights.contains(id));
             if (id == rootId) continue;
 
             QPointF a = positions.value(parent);
@@ -2455,15 +2804,11 @@ private:
             edges.value(id)->setPen(QPen(connector, primary ? 2.9 : 1.65, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         }
         scene->setSceneRect(scene->itemsBoundingRect().adjusted(-100, -100, 100, 100));
-        updateLayoutActions();
-        updateActionStates();
-        updateTitle();
     }
 
     void updateToolbarMode(int width) {
         if (!wideToolbar || !compactToolbar) return;
         const bool compact = width < qMax(840, wideToolbar->sizeHint().width() + 24);
-        const QString priorHint = canvasHint();
         if (compact) {
             // Leave room for platform toolbar margins and the layout menu indicator.
             int textWidth = 54;
@@ -2475,12 +2820,13 @@ private:
         wideToolbar->setVisible(!compact);
         compactToolbar->setVisible(compact);
         workspaceStats->setVisible(!compact);
-        if (statusBar()->currentMessage() == priorHint) statusBar()->showMessage(canvasHint());
+        updateShortcutHint();
     }
 
 protected:
     void resizeEvent(QResizeEvent *event) override {
         QMainWindow::resizeEvent(event);
+        if (!focusRoot.isEmpty()) adjustFocusSplit();
         updateToolbarMode(event->size().width());
     }
 
@@ -2512,6 +2858,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName("ZhiLi");
     app.setApplicationDisplayName(QStringLiteral("枝理"));
+    app.setApplicationVersion(QStringLiteral(ZHILI_VERSION));
     app.setOrganizationName("ZhiLi");
     registerEmbeddedFonts();
     QApplication::setWindowIcon(QIcon(":/branding/zhili.svg"));

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(SimpleMap VERSION 1.0.2 LANGUAGES CXX)
+project(SimpleMap VERSION 1.0.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,6 +19,7 @@ add_library(zhili_templates_ui STATIC src/template_dialog.cpp)
 target_link_libraries(zhili_templates_ui PUBLIC zhili_core Qt5::Widgets)
 qt5_add_resources(zhili_branding_resources assets/branding.qrc)
 add_executable(simplemap WIN32 MACOSX_BUNDLE src/main.cpp ${zhili_branding_resources})
+target_compile_definitions(simplemap PRIVATE ZHILI_VERSION="${PROJECT_VERSION}")
 target_link_libraries(simplemap PRIVATE zhili_core zhili_appearance zhili_symbols zhili_templates_ui Qt5::Svg)
 set_target_properties(simplemap PROPERTIES
   MACOSX_BUNDLE_GUI_IDENTIFIER org.zhili.simplemap
@@ -50,7 +51,7 @@ include(CTest)
 if(BUILD_TESTING)
   find_package(Qt5 5.9 REQUIRED COMPONENTS Test)
   add_executable(zhili_smoke src/main.cpp ${zhili_branding_resources})
-  target_compile_definitions(zhili_smoke PRIVATE ZHILI_TEST)
+  target_compile_definitions(zhili_smoke PRIVATE ZHILI_TEST ZHILI_VERSION="${PROJECT_VERSION}")
   target_link_libraries(zhili_smoke PRIVATE zhili_core zhili_appearance zhili_symbols zhili_templates_ui Qt5::Svg Qt5::Test)
   add_executable(zhili_document_test tests/document_test.cpp)
   target_link_libraries(zhili_document_test PRIVATE zhili_core)

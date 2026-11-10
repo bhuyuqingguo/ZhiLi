@@ -2,6 +2,17 @@
 
 int runSmokeTest() {
 #define CHECK(condition) do { if (!(condition)) { qCritical() << __LINE__ << #condition; return 1; } } while (false)
+    // The Windows clipboard is shared with other processes, including remote desktop.
+    const auto waitForClipboard = [](const std::function<void()> &write,
+                                     const std::function<bool(const QMimeData &)> &matches) {
+        for (int attempt = 0; attempt < 4; ++attempt) {
+            write();
+            const auto *mime = QApplication::clipboard()->mimeData();
+            if (mime && matches(*mime)) return true;
+            QTest::qWait(50);
+        }
+        return false;
+    };
     QStandardPaths::setTestModeEnabled(true);
     QTemporaryDir temp;
     CHECK(temp.isValid());
@@ -36,6 +47,7 @@ int runSmokeTest() {
     const QPoint center = window.canvas->mapFromScene(QPointF(0, 0));
     QTest::mouseDClick(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, center);
     CHECK(window.editor);
+    CHECK(window.shortcutHint->text().contains(QStringLiteral("Esc 取消")));
     window.editor->setPlainText(QStringLiteral("研发项目交付"));
     QTest::keyClick(window.editor, Qt::Key_Return, Qt::ShiftModifier);
     CHECK(window.editor && window.editor->toPlainText().contains('\n'));
@@ -93,6 +105,63 @@ int runSmokeTest() {
             QTest::mouseRelease(workspace.canvas->viewport(), Qt::LeftButton, modifiers, point(to));
         };
         const QByteArray original = workspace.doc.serialize();
+        auto *areaButton = workspace.findChild<QToolButton *>("areaSelectionButton");
+        CHECK(areaButton && areaButton->isVisible() && !areaButton->isChecked());
+        CHECK(areaButton->toolTip().contains(shortcutText(boxShortcut)));
+        auto *viewport = workspace.canvas->viewport();
+        const QPoint bandStart(2, 2);
+        const QPoint bandEnd = viewport->rect().bottomRight() - QPoint(2, 2);
+        CHECK(workspace.nodeAt(bandStart).isEmpty());
+        const auto selectArea = [&](Qt::KeyboardModifiers modifiers) {
+            workspace.selectNode(first);
+            QTest::mousePress(viewport, Qt::LeftButton, modifiers, bandStart);
+            const bool hintShown = workspace.shortcutHint->text().contains(QStringLiteral("完成框选"));
+            QTest::mouseRelease(viewport, Qt::LeftButton, modifiers, bandEnd);
+            return hintShown && workspace.shortcutHint->text().contains(QStringLiteral("批量样式")) &&
+                (workspace.additionalSelection.contains(child) || workspace.selected == child);
+        };
+        QTest::keyClick(workspace.canvas, Qt::Key_B, Qt::ControlModifier | Qt::ShiftModifier);
+        CHECK(areaButton->isChecked() && selectArea(Qt::NoModifier));
+        areaButton->click();
+        CHECK(!areaButton->isChecked() && selectArea(Qt::ShiftModifier));
+        CHECK(workspace.doc.serialize() == original && workspace.undoStack.isEmpty());
+        workspace.selectNode(child);
+        QTest::mousePress(viewport, Qt::LeftButton, Qt::NoModifier, point(child));
+        const QPoint dragPoint = point(child) + QPoint(QApplication::startDragDistance() + 2, 0);
+        QMouseEvent preview(QEvent::MouseMove, dragPoint, viewport->mapToGlobal(dragPoint),
+                            Qt::NoButton, Qt::LeftButton, Qt::ControlModifier);
+        QCoreApplication::sendEvent(viewport, &preview);
+        CHECK(workspace.shortcutHint->text().contains(QStringLiteral("完成复制")));
+        QTest::mouseRelease(viewport, Qt::LeftButton, Qt::NoModifier, point(child));
+        CHECK(!workspace.shortcutHint->text().contains(QStringLiteral("完成复制")));
+
+        auto *helpAction = workspace.findChild<QAction *>("helpAction");
+        auto *aboutAction = workspace.findChild<QAction *>("aboutAction");
+        CHECK(helpAction && aboutAction && helpAction->shortcut() == QKeySequence(Qt::Key_F1));
+        bool helpLoaded = false;
+        QTimer::singleShot(0, &workspace, [&] {
+            auto *dialog = workspace.findChild<QDialog *>("helpDialog");
+            if (!dialog) return;
+            auto *guide = dialog->findChild<QTextBrowser *>();
+            helpLoaded = guide && guide->toPlainText().contains(QStringLiteral("快捷键速查"));
+            dialog->reject();
+        });
+        helpAction->trigger();
+        CHECK(helpLoaded);
+        bool versionShown = false;
+        QTimer::singleShot(0, &workspace, [&] {
+            auto *dialog = workspace.findChild<QMessageBox *>("aboutDialog");
+            if (!dialog) return;
+            versionShown = !QCoreApplication::applicationVersion().isEmpty() &&
+                dialog->text().contains(QCoreApplication::applicationVersion());
+            dialog->reject();
+        });
+        aboutAction->trigger();
+        CHECK(versionShown);
+        workspace.activateWindow();
+        workspace.canvas->setFocus();
+        QTest::qWait(40);
+
         workspace.replaceSelection({secondMatch, child, sibling});
         drag(secondMatch, root);
         CHECK(workspace.doc.nodes.value(root).children == (QStringList{first, second, child, sibling, secondMatch}));
@@ -114,21 +183,61 @@ int runSmokeTest() {
         CHECK(workspace.selected == sibling && workspace.additionalSelection.isEmpty());
 
         workspace.selectNode(first);
+        workspace.canvas->zoomBy(1.18);
+        QCoreApplication::processEvents();
+        const QTransform fullTransform = workspace.canvas->transform();
+        const QPointF fullCenter = workspace.canvas->mapToScene(workspace.canvas->viewport()->rect().center());
         workspace.findChild<QAction *>("focusBranchAction")->trigger();
         CHECK(workspace.items.size() == 3 && workspace.items.contains(child) && !workspace.edges.contains(first));
+        CHECK(workspace.overview->isVisible() && workspace.overviewItems.size() == 7);
+        CHECK(workspace.overviewItems.contains(second) && workspace.focusSplitter->count() == 2);
         CHECK(!workspace.dirty && workspace.undoStack.isEmpty() && workspace.doc.serialize() == original);
+        workspace.selectNode(child);
+        workspace.startEdit();
+        CHECK(workspace.editor);
+        workspace.editor->setPlainText(QStringLiteral("局部修改同步到全图"));
+        CHECK(workspace.finishEdit());
+        CHECK(workspace.overviewItems.value(child).label->toPlainText() == QStringLiteral("局部修改同步到全图"));
+        workspace.history(true);
+        CHECK(workspace.doc.serialize() == original);
+        CHECK(workspace.overviewItems.value(child).label->toPlainText() == workspace.doc.nodes.value(child).text);
+        const auto clickOverview = [&](const QString &id) {
+            const QPoint at = workspace.overview->mapFromScene(workspace.overviewItems.value(id).body->pos());
+            QTest::mouseClick(workspace.overview->viewport(), Qt::LeftButton, Qt::NoModifier, at);
+        };
+        clickOverview(second);
+        CHECK(workspace.focusRoot == second && workspace.overviewItems.size() == 7 && !workspace.items.contains(first));
+        clickOverview(first);
+        CHECK(workspace.focusRoot == first && workspace.items.contains(child));
+        const QSize beforeResize = workspace.size();
+        workspace.resize(650, 520);
+        QCoreApplication::processEvents();
+        CHECK(workspace.focusSplitter->orientation() == Qt::Vertical);
+        workspace.resize(beforeResize);
+        QCoreApplication::processEvents();
         QString error;
         const QString fullPath = temp.filePath("full-from-focus.svg");
         CHECK(workspace.exportTo(fullPath, "svg", &error));
         QFile full(fullPath);
         CHECK(full.open(QIODevice::ReadOnly) && full.readAll().contains(QStringLiteral("技术验证").toUtf8()));
         CHECK(workspace.focusRoot == first);
+        CHECK(workspace.shortcutHint->text().contains(QStringLiteral("Esc 返回全图")));
+        workspace.activateWindow();
+        workspace.canvas->setFocus();
+        QTest::qWait(50);
         QTest::keyClick(workspace.canvas, Qt::Key_Escape);
-        CHECK(workspace.focusRoot.isEmpty() && workspace.items.size() == 7);
+        QCoreApplication::processEvents();
+        CHECK(workspace.focusRoot.isEmpty() && workspace.items.size() == 7 && workspace.overviewPane->isHidden());
+        CHECK(workspace.canvas->transform() == fullTransform);
+        const QPointF restoredCenter = workspace.canvas->mapToScene(workspace.canvas->viewport()->rect().center());
+        if (QLineF(restoredCenter, fullCenter).length() >= 4.0 / fullTransform.m11())
+            qInfo() << "Full map center before and after focus:" << fullCenter << restoredCenter;
+        CHECK(QLineF(restoredCenter, fullCenter).length() < 4.0 / fullTransform.m11());
         workspace.focusBranch();
         workspace.query = QStringLiteral("技术验证");
         workspace.search(false);
         CHECK(workspace.focusRoot.isEmpty() && workspace.selected == second);
+        qInfo() << "Split focus: edit sync, branch switching, narrow window, zoom and center restoration passed";
 
         workspace.selectNode(first);
         workspace.findChild<QAction *>("copyTopicStyleAction")->trigger();
@@ -156,7 +265,9 @@ int runSmokeTest() {
         const auto branchSvg = svg.readAll();
         CHECK(branchSvg.contains(QStringLiteral("梳理需求与验收指标").toUtf8()));
         CHECK(!branchSvg.contains(QStringLiteral("技术验证").toUtf8()));
-        workspace.findChild<QAction *>("copyBranchImageAction")->trigger();
+        CHECK(waitForClipboard(
+            [&] { workspace.findChild<QAction *>("copyBranchImageAction")->trigger(); },
+            [](const QMimeData &mime) { return mime.hasImage() && mime.hasFormat("image/png"); }));
         const QImage copiedImage = QApplication::clipboard()->image();
         CHECK(!copiedImage.isNull() && copiedImage.pixelColor(0, 0).alpha() == 0);
         CHECK(workspace.doc.serialize() == beforeExport && workspace.selected == first && workspace.undoStack.size() == 1);
@@ -313,7 +424,11 @@ int runSmokeTest() {
     window.selectNode(child);
     QTest::mouseClick(window.canvas->viewport(), Qt::LeftButton, Qt::ControlModifier, pointFor(sibling));
     CHECK(window.selectedRoots(true) == (QStringList{child, sibling}));
-    window.copyBranch();
+    CHECK(waitForClipboard([&] { window.copyBranch(); }, [&](const QMimeData &mime) {
+        const QString text = mime.text();
+        return mime.data(BranchClipboard::mimeType()).startsWith("zhili-forest") &&
+            text.contains(window.doc.nodes.value(child).text) && text.contains(window.doc.nodes.value(sibling).text);
+    }));
     window.selectNode(second);
     window.pasteBranch();
     const auto copiedChildren = window.doc.nodes.value(second).children;
@@ -327,6 +442,10 @@ int runSmokeTest() {
     window.selectNode(first);
     window.toggleCollapse();
     CHECK(!window.items.contains(child));
+    window.activateWindow();
+    if (QApplication::platformName() == "windows")
+        CHECK(QTest::qWaitForWindowActive(&window, 1000));
+    window.canvas->setFocus();
     QTimer::singleShot(0, &window, [] {
         if (auto *dialog = qobject_cast<QInputDialog *>(QApplication::activeModalWidget())) {
             dialog->setTextValue(QStringLiteral(" 与 "));
@@ -596,9 +715,16 @@ int runSmokeTest() {
         branches.selectNode(source);
         branches.toggleCollapse();
         const QByteArray beforeCopy = branches.doc.serialize();
-        QTest::keyClick(branches.canvas, Qt::Key_C, Qt::ControlModifier);
-        CHECK(QApplication::clipboard()->mimeData()->hasFormat(BranchClipboard::mimeType()));
-        CHECK(QApplication::clipboard()->text().contains(QStringLiteral("子主题")));
+        branches.activateWindow();
+        branches.canvas->setFocus();
+        if (QApplication::platformName() == "windows")
+            CHECK(QTest::qWaitForWindowActive(&branches, 1000));
+        CHECK(waitForClipboard(
+            [&] { QTest::keyClick(branches.canvas, Qt::Key_C, Qt::ControlModifier); },
+            [](const QMimeData &mime) {
+                return mime.hasFormat(BranchClipboard::mimeType()) &&
+                    mime.text().contains(QStringLiteral("子主题"));
+            }));
         CHECK(branches.doc.serialize() == beforeCopy);
         branches.selectNode(branchRoot);
         const int historyBeforePaste = branches.undoStack.size();
@@ -637,17 +763,21 @@ int runSmokeTest() {
         QTest::keyClick(branches.canvas, Qt::Key_Y, Qt::ControlModifier);
         CHECK(branches.doc.serialize() == beforeRootCut);
         branches.selectNode(branchRoot);
-        QApplication::clipboard()->setText(QStringLiteral("计划\n\t需求\n\t开发\n验收"));
+        const QString clipboardOutline = QStringLiteral("计划\n\t需求\n\t开发\n验收");
+        CHECK(waitForClipboard([&] { QApplication::clipboard()->setText(clipboardOutline); },
+                               [&](const QMimeData &mime) { return mime.text() == clipboardOutline; }));
         QTest::keyClick(branches.canvas, Qt::Key_V, Qt::ControlModifier);
         CHECK(branches.doc.nodes.size() == 9);
         CHECK(branches.doc.nodes.value(branches.selected).text == QStringLiteral("计划"));
         CHECK(branches.doc.nodes.value(branches.selected).children.size() == 2);
         branches.history(true);
         CHECK(branches.doc.serialize() == beforeRootCut);
-        auto *malformed = new QMimeData;
-        malformed->setData(BranchClipboard::mimeType(), "not valid JSON");
-        malformed->setText(QStringLiteral("不可静默回退到文本"));
-        QApplication::clipboard()->setMimeData(malformed);
+        CHECK(waitForClipboard([] {
+            auto *malformed = new QMimeData;
+            malformed->setData(BranchClipboard::mimeType(), "not valid JSON");
+            malformed->setText(QStringLiteral("不可静默回退到文本"));
+            QApplication::clipboard()->setMimeData(malformed);
+        }, [](const QMimeData &mime) { return mime.data(BranchClipboard::mimeType()) == "not valid JSON"; }));
         const int historyBeforeFailure = branches.undoStack.size();
         QTest::keyClick(branches.canvas, Qt::Key_V, Qt::ControlModifier);
         CHECK(branches.doc.serialize() == beforeRootCut && branches.undoStack.size() == historyBeforeFailure);
@@ -670,9 +800,11 @@ int runSmokeTest() {
         branches.editor->setPlainText(QStringLiteral("编辑器文本"));
         branches.editor->selectAll();
         CHECK(!branches.findChild<QAction *>("copyBranchAction")->isEnabled());
-        QTest::keyClick(branches.editor, Qt::Key_C, Qt::ControlModifier);
-        CHECK(QApplication::clipboard()->text() == QStringLiteral("编辑器文本"));
-        CHECK(!QApplication::clipboard()->mimeData()->hasFormat(BranchClipboard::mimeType()));
+        CHECK(waitForClipboard(
+            [&] { QTest::keyClick(branches.editor, Qt::Key_C, Qt::ControlModifier); },
+            [](const QMimeData &mime) {
+                return mime.text() == QStringLiteral("编辑器文本") && !mime.hasFormat(BranchClipboard::mimeType());
+            }));
         CHECK(branches.finishEdit(false));
         CHECK(branches.findChild<QAction *>("copyBranchAction")->isEnabled());
         CHECK(branches.doc.serialize() == beforeRootCut);
@@ -696,7 +828,9 @@ int runSmokeTest() {
         CHECK(symbols.saveTo(symbolPath));
         CHECK(symbols.loadFrom(symbolPath, &error));
         CHECK(symbols.doc.nodes.value(symbolRoot).symbolId == symbolId);
-        symbols.copyBranch();
+        const QByteArray copiedSymbol = BranchClipboard::encode(symbols.doc, {symbolRoot}, &error);
+        CHECK(!copiedSymbol.isEmpty() && waitForClipboard([&] { symbols.copyBranch(); },
+            [&](const QMimeData &mime) { return mime.data(BranchClipboard::mimeType()) == copiedSymbol; }));
         Window destination(false);
         destination.pasteBranch();
         CHECK(destination.doc.nodes.value(destination.selected).symbolId == symbolId);
