@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "多类型科研平台架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "平台目录层",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "空中平台分类资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "水面与水下平台资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "地面与专用平台资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "实验组织层",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "研究计划与场次",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "人员和资源安排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "实验记录与评审",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "数据服务层",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "样例与元数据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "质量检查与标注",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "查询和导出服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "通用支撑层",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "设备与接口资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "通信连接抽象",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "文档与知识管理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "治理与验证",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "权限和资料边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "格式与版本约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "平台适配验证",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

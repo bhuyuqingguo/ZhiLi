@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "年度活动组合",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "年度目标",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "确定重点主题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "识别主要受众",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "定义预期成效",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "活动组合",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "安排常规交流活动",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "规划专题学习活动",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "预留临时需求窗口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "资源平衡",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "估算组织工作量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "协调场地和共享设备",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "避免关键时间冲突",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "推进节奏",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "按季度确认具体议程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "提前启动重点活动准备",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "设置阶段检查点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "效果回顾",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "比较参与和反馈情况",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "检查目标覆盖度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "调整下一阶段活动组合",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

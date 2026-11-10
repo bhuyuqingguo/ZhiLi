@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "服务连续性桌面演练",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "演练定义",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "选择一般服务中断情景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "明确讨论范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "约定演练与实际业务边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "角色准备",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "确定主持和记录人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "识别业务与支持角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "准备联络和职责说明",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "情景讨论",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "逐步引入信息变化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "讨论沟通与决策责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "记录流程缺口与假设",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "恢复验证",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "讨论服务恢复条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "核对用户沟通内容",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "确认交接和记录要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "改进跟踪",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "归纳机制性问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "指定改进负责人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "安排修订后复核",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

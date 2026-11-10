@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "可扩展组件架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "核心平台",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "稳定业务模型",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "公共服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "扩展注册与发现",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "扩展点",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "内容处理扩展",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "视图与展示扩展",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "导入导出扩展",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "组件契约",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "声明与版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "输入输出要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "依赖和能力边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "生命周期",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "加载与初始化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "运行与状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "停止与资源清理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "质量与兼容",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "契约测试",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "失败隔离",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "升级与弃用说明",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

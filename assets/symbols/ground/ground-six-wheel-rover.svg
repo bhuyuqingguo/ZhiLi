@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>六轮巡视车 · Six-wheel rover</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#6a6334" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M10 30 L19 24 43 24 54 30 54 42 10 42Z" fill="#f5f1dc"/><circle cx="15" cy="47" r="5" fill="#f5f1dc"/><circle cx="32" cy="47" r="5" fill="#f5f1dc"/><circle cx="49" cy="47" r="5" fill="#f5f1dc"/><line x1="32" y1="24" x2="32" y2="13"/><rect x="27" y="8" width="13" height="7" rx="2" fill="#f5f1dc"/></g></g>
+</svg>

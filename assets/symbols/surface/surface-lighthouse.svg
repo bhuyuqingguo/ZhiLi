@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>岸基灯塔 · Lighthouse</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#196c83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M24 25 L40 25 46 55 18 55Z" fill="#e3f4f8"/><rect x="23" y="14" width="18" height="11" rx="2" fill="#e3f4f8"/><path d="M21 14 L32 6 43 14Z" fill="#e3f4f8"/><line x1="25" y1="35" x2="41" y2="35"/><line x1="23" y1="45" x2="43" y2="45"/><line x1="8" y1="19" x2="17" y2="19"/><line x1="47" y1="19" x2="56" y2="19"/></g></g>
+</svg>

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "例会运行机制",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "会议定位",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "界定必须同步的信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "明确参会角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "约定频率与时长",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "议题入口",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "设置议题提交时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "要求背景和待决问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "区分通报与讨论事项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "会中节奏",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "回顾上期行动项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "按优先级推进议题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "控制跑题与超时",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "会后输出",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "记录决策与依据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "明确行动人和期限",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "同步缺席相关人员",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "机制优化",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "检查行动闭环率",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "收集会议价值反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "调整频率和参与范围",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "业务交流走访",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "交流目的",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确希望了解的实践",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "列出可分享的经验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确认双方参与角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "会前协作",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "交换议题和问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "确认资料分享边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "约定访问时间与行程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "交流过程",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "介绍业务与组织背景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "围绕案例深入讨论",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "记录共识和待补充信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "成果整理",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "归纳可借鉴做法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "说明适用条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "列出后续合作事项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "回访跟进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "发送经确认的纪要",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "补充承诺提供的资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "复查行动项进度",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "科研平台体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "平台定位",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "服务领域与对象",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "研究方向与目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "平台范围与边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "科研活动",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "课题策划与协作",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "实验与资料整理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "成果交流与转化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "共享资源",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "设备与场地",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "数据与文献",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "方法与专业知识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "服务机制",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "资源申请与安排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "使用培训与支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "成果和贡献记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "治理评价",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "责任与运行规则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "资源利用评价",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "平台改进与演进",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

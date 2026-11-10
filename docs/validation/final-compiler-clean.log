@@ -1,0 +1,15 @@
+[  9%] Built target zhili_appearance
+[ 30%] Built target zhili_core
+[ 42%] Built target zhili_templates_ui
+[ 47%] Built target zhili_symbols
+[ 57%] Built target zhili_layout_test
+[ 57%] Built target zhili_document_test
+[ 61%] Built target zhili_clipboard_test
+[ 66%] Built target zhili_symbol_document_test
+[ 71%] Built target zhili_pptx_test
+[ 76%] Built target zhili_importer_test
+[ 80%] Built target zhili_templates_test
+[ 85%] Built target zhili_template_dialog_test
+[ 90%] Built target zhili_symbols_test
+[ 95%] Built target simplemap
+[100%] Built target zhili_smoke

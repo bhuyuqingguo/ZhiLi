@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>四轮无人车 · Four-wheel rover</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#6a6334" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="12" y="26" width="40" height="17" rx="2" fill="#f5f1dc"/><circle cx="19" cy="46" r="5" fill="#f5f1dc"/><circle cx="45" cy="46" r="5" fill="#f5f1dc"/><rect x="25" y="17" width="15" height="9" rx="2" fill="#f5f1dc"/><line x1="32" y1="17" x2="32" y2="10"/></g></g>
+</svg>

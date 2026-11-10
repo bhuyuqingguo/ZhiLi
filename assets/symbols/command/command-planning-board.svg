@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>方案规划板 · Planning board</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="9" y="9" width="46" height="36" rx="2" fill="#f0eafa"/><line x1="18" y1="45" x2="13" y2="56"/><line x1="46" y1="45" x2="51" y2="56"/><path d="M17 18 L29 18 29 29 45 29 M40 24 L45 29 40 34" fill="none"/><rect x="14" y="32" width="10" height="7" rx="2" fill="none"/></g></g>
+</svg>

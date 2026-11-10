@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "可观察性视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "观察目标",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "用户能否完成任务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "业务结果是否正确",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "运行是否稳定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "信号与记录",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "关键状态与事件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "性能和容量信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "错误与诊断信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "信息组织",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "统一标识和时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "上下文与关联",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "采样和保留边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "使用方式",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "问题定位",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "趋势和差异分析",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "变更结果验证",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "治理与质量",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "信息准确性检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "敏感内容最小化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "噪声与维护成本控制",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

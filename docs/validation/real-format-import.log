@@ -1,0 +1,5 @@
+/workspace/shared/format-research/public-real-inspection-only.mmap true 96 "" ("已转换为枝理的可编辑副本，仅保留受支持的主题文字和层级；原文件未修改。原有样式、布局及其他专有内容不保证保留，请检查后另存为 .smap。", "检测到以下内容未转换：任务、标签或图标、关系线、边界或概要、图片和附件、备注。")
+"Mind Mapping"
+/workspace/shared/format-research/public-inspection-only.emmx true 3 "" ("已转换为枝理的可编辑副本，仅保留受支持的主题文字和层级；原文件未修改。原有样式、布局及其他专有内容不保证保留，请检查后另存为 .smap。", "MindMaster XML 导入仅保留主题文字和层级；备注、图片、附件、链接、关系线、标签、任务及其他图形未转换。")
+"测试"
+/workspace/shared/format-research/official-organic-compounds.emmx false 0 "此 .emmx 使用暂不支持的二进制页面。请在 MindMaster / EdrawMind 中导出为 MindManager (.mmap) 后导入；导出可能需要付费版。" ()

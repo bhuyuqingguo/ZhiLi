@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "应用架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "用户入口",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "内部工作台",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "外部服务入口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "管理维护入口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "业务应用",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "业务受理应用",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "协同处理应用",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "结果展示应用",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "共享服务",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "统一资料服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "通知与协作服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "搜索与报表服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "集成与数据",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "系统接口目录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "信息交换约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "共享数据责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "应用治理",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "应用边界与负责人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "版本与兼容管理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "重复功能整合",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

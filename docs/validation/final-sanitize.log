@@ -1,0 +1,285 @@
+Internal ctest changing into directory: /workspace/shared/ZhiLi-integration/build-sanitize
+UpdateCTestConfiguration  from :/workspace/shared/ZhiLi-integration/build-sanitize/DartConfiguration.tcl
+Parse Config file:/workspace/shared/ZhiLi-integration/build-sanitize/DartConfiguration.tcl
+UpdateCTestConfiguration  from :/workspace/shared/ZhiLi-integration/build-sanitize/DartConfiguration.tcl
+Parse Config file:/workspace/shared/ZhiLi-integration/build-sanitize/DartConfiguration.tcl
+Test project /workspace/shared/ZhiLi-integration/build-sanitize
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+      Start  1: zhili_symbols
+
+1: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_symbols_test
+1: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+1: Environment variables: 
+1:  QT_QPA_PLATFORM=offscreen
+1:  QT_FONT_DPI=96
+1: Test timeout computed to be: 30
+1: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+1: 128 unique SVGs rendered at 24/32/64/128 px; 8 categories; search and picker flows passed.
+ 1/14 Test  #1: zhili_symbols ......................   Passed    0.46 sec
+test 2
+      Start  2: zhili_document
+
+2: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_document_test
+2: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+2: Test timeout computed to be: 1500
+ 2/14 Test  #2: zhili_document .....................   Passed    0.06 sec
+test 3
+      Start  3: zhili_layout
+
+3: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_layout_test
+3: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+3: Test timeout computed to be: 1500
+3: Layout contracts passed: both layouts, deterministic positions, collapse, large labels, 3000 nodes and depth 512
+ 3/14 Test  #3: zhili_layout .......................   Passed    0.91 sec
+test 4
+      Start  4: zhili_clipboard
+
+4: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_clipboard_test
+4: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+4: Test timeout computed to be: 1500
+4: ZhiLi clipboard tests passed
+ 4/14 Test  #4: zhili_clipboard ....................   Passed   13.43 sec
+test 5
+      Start  5: zhili_symbol_document
+
+5: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_symbol_document_test
+5: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+5: Test timeout computed to be: 1500
+5: Symbol persistence passed: legacy, unknown ID, clipboard, disk, invalid input
+ 5/14 Test  #5: zhili_symbol_document ..............   Passed    0.02 sec
+test 6
+      Start  6: zhili_pptx
+
+6: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_pptx_test
+6: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+6: Test timeout computed to be: 1500
+6: ZhiLi editable PPTX tests passed
+ 6/14 Test  #6: zhili_pptx .........................   Passed    0.49 sec
+test 7
+      Start  7: zhili_importer
+
+7: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_importer_test
+7: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+7: Test timeout computed to be: 1500
+7: Importer synthetic tests passed
+ 7/14 Test  #7: zhili_importer .....................   Passed    3.01 sec
+test 8
+      Start  8: zhili_templates
+
+8: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_templates_test
+8: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+8: Test timeout computed to be: 1500
+8: Validated 80 templates and 1684 nodes in both layouts
+ 8/14 Test  #8: zhili_templates ....................   Passed    0.63 sec
+test 9
+      Start  9: zhili_template_dialog
+
+9: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_template_dialog_test
+9: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+9: Environment variables: 
+9:  QT_QPA_PLATFORM=offscreen
+9:  QT_FONT_DPI=96
+9: Test timeout computed to be: 30
+9: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+9: This plugin does not support propagateSizeHints()
+9: This plugin does not support propagateSizeHints()
+9: This plugin does not support propagateSizeHints()
+ 9/14 Test  #9: zhili_template_dialog ..............   Passed    0.15 sec
+test 10
+      Start 10: zhili_template_dialog_large_type
+
+10: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_template_dialog_test
+10: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+10: Environment variables: 
+10:  QT_QPA_PLATFORM=offscreen
+10:  QT_FONT_DPI=96
+10:  QT_SCALE_FACTOR=2
+10:  ZHILI_TEMPLATE_FONT_POINTS=22
+10: Test timeout computed to be: 30
+10: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+10: This plugin does not support propagateSizeHints()
+10: This plugin does not support propagateSizeHints()
+10: This plugin does not support propagateSizeHints()
+10/14 Test #10: zhili_template_dialog_large_type ...   Passed    0.14 sec
+test 11
+      Start 11: zhili_smoke_1x
+
+11: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_smoke
+11: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+11: Environment variables: 
+11:  QT_QPA_PLATFORM=offscreen
+11:  QT_FORCE_STDERR_LOGGING=1
+11:  QT_FONT_DPI=96
+11:  QT_SCALE_FACTOR=1
+11:  ZHILI_EXPECT_SCALE=1
+11: Test timeout computed to be: 30
+11: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+11: Smoke platform: "offscreen"
+11: Display: QSize(800, 600) logical pixels, device pixel ratio 1
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: Maximum-length topic render: 78 ms QRectF(0,0 248x241695) QRectF(-137.25,-120855 294.875x241710)
+11: Maximum-length topic render: 615 ms QRectF(0,0 136x1.50004e+06) QRectF(-81.25,-750026 182.875x1.50005e+06)
+11: This plugin does not support raise()
+11: This plugin does not support grabbing the keyboard
+11: Symbol UI checks
+11: Symbol picker cancelled
+11: Symbol picker applied
+11: Template UI checks
+11: This plugin does not support propagateSizeHints()
+11: Template picker cancelled
+11: This plugin does not support propagateSizeHints()
+11: Template picker applied
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: Template replacement cancelled
+11: This plugin does not support propagateSizeHints()
+11: Compact window: QSize(360, 280) viewport: QSize(346, 153)
+11: This plugin does not support propagateSizeHints()
+11: 100 nodes: open+render 19 ms, layout switch 6 ms
+11: 500 nodes: open+render 98 ms, layout switch 44 ms
+11: 1000 nodes: open+render 124 ms, layout switch 78 ms
+11: 3000 nodes: open+render 464 ms, layout switch 244 ms
+11: 3000 nodes with 1000 symbols: render 103 ms
+11: ZhiLi smoke test passed
+11/14 Test #11: zhili_smoke_1x .....................   Passed   10.74 sec
+test 12
+      Start 12: zhili_smoke_1.25x
+
+12: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_smoke
+12: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+12: Environment variables: 
+12:  QT_QPA_PLATFORM=offscreen
+12:  QT_FORCE_STDERR_LOGGING=1
+12:  QT_FONT_DPI=96
+12:  QT_SCALE_FACTOR=1.25
+12:  ZHILI_EXPECT_SCALE=1.25
+12: Test timeout computed to be: 30
+12: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+12: Smoke platform: "offscreen"
+12: Display: QSize(640, 480) logical pixels, device pixel ratio 1.25
+12: This plugin does not support propagateSizeHints()
+12: This plugin does not support propagateSizeHints()
+12: This plugin does not support propagateSizeHints()
+12: Maximum-length topic render: 84 ms QRectF(0,0 248x241695) QRectF(-137.25,-120855 294.875x241710)
+12: Maximum-length topic render: 668 ms QRectF(0,0 136x1.50004e+06) QRectF(-81.25,-750026 182.875x1.50005e+06)
+12: This plugin does not support raise()
+12: This plugin does not support grabbing the keyboard
+12: Symbol UI checks
+12: Symbol picker cancelled
+12: Symbol picker applied
+12: Template UI checks
+12: This plugin does not support propagateSizeHints()
+12: Template picker cancelled
+12: This plugin does not support propagateSizeHints()
+12: Template picker applied
+12: This plugin does not support propagateSizeHints()
+12: This plugin does not support propagateSizeHints()
+12: Template replacement cancelled
+12: This plugin does not support propagateSizeHints()
+12: Compact window: QSize(360, 280) viewport: QSize(346, 153)
+12: This plugin does not support propagateSizeHints()
+12: 100 nodes: open+render 17 ms, layout switch 5 ms
+12: 500 nodes: open+render 73 ms, layout switch 29 ms
+12: 1000 nodes: open+render 121 ms, layout switch 80 ms
+12: 3000 nodes: open+render 447 ms, layout switch 190 ms
+12: 3000 nodes with 1000 symbols: render 101 ms
+12: ZhiLi smoke test passed
+12/14 Test #12: zhili_smoke_1.25x ..................   Passed   10.74 sec
+test 13
+      Start 13: zhili_smoke_1.5x
+
+13: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_smoke
+13: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+13: Environment variables: 
+13:  QT_QPA_PLATFORM=offscreen
+13:  QT_FORCE_STDERR_LOGGING=1
+13:  QT_FONT_DPI=96
+13:  QT_SCALE_FACTOR=1.5
+13:  ZHILI_EXPECT_SCALE=1.5
+13: Test timeout computed to be: 30
+13: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+13: Smoke platform: "offscreen"
+13: Display: QSize(533, 400) logical pixels, device pixel ratio 1.5
+13: This plugin does not support propagateSizeHints()
+13: This plugin does not support propagateSizeHints()
+13: This plugin does not support propagateSizeHints()
+13: Maximum-length topic render: 77 ms QRectF(0,0 248x241695) QRectF(-137.25,-120855 294.875x241710)
+13: Maximum-length topic render: 695 ms QRectF(0,0 136x1.50004e+06) QRectF(-81.25,-750026 182.875x1.50005e+06)
+13: This plugin does not support raise()
+13: This plugin does not support grabbing the keyboard
+13: Symbol UI checks
+13: Symbol picker cancelled
+13: Symbol picker applied
+13: Template UI checks
+13: This plugin does not support propagateSizeHints()
+13: Template picker cancelled
+13: This plugin does not support propagateSizeHints()
+13: Template picker applied
+13: This plugin does not support propagateSizeHints()
+13: This plugin does not support propagateSizeHints()
+13: Template replacement cancelled
+13: This plugin does not support propagateSizeHints()
+13: Compact window: QSize(360, 280) viewport: QSize(346, 153)
+13: This plugin does not support propagateSizeHints()
+13: 100 nodes: open+render 28 ms, layout switch 10 ms
+13: 500 nodes: open+render 87 ms, layout switch 41 ms
+13: 1000 nodes: open+render 163 ms, layout switch 107 ms
+13: 3000 nodes: open+render 563 ms, layout switch 266 ms
+13: 3000 nodes with 1000 symbols: render 127 ms
+13: ZhiLi smoke test passed
+13/14 Test #13: zhili_smoke_1.5x ...................   Passed   11.89 sec
+test 14
+      Start 14: zhili_smoke_2x
+
+14: Test command: /workspace/shared/ZhiLi-integration/build-sanitize/zhili_smoke
+14: Working Directory: /workspace/shared/ZhiLi-integration/build-sanitize
+14: Environment variables: 
+14:  QT_QPA_PLATFORM=offscreen
+14:  QT_FORCE_STDERR_LOGGING=1
+14:  QT_FONT_DPI=96
+14:  QT_SCALE_FACTOR=2
+14:  ZHILI_EXPECT_SCALE=2
+14: Test timeout computed to be: 30
+14: QStandardPaths: wrong permissions on runtime directory /home/agent/.local/run, 0755 instead of 0700
+14: Smoke platform: "offscreen"
+14: Display: QSize(400, 300) logical pixels, device pixel ratio 2
+14: This plugin does not support propagateSizeHints()
+14: This plugin does not support propagateSizeHints()
+14: This plugin does not support propagateSizeHints()
+14: Maximum-length topic render: 75 ms QRectF(0,0 248x241695) QRectF(-137.25,-120855 294.875x241710)
+14: Maximum-length topic render: 686 ms QRectF(0,0 136x1.50004e+06) QRectF(-81.25,-750026 182.875x1.50005e+06)
+14: This plugin does not support raise()
+14: This plugin does not support grabbing the keyboard
+14: Symbol UI checks
+14: Symbol picker cancelled
+14: Symbol picker applied
+14: Template UI checks
+14: This plugin does not support propagateSizeHints()
+14: Template picker cancelled
+14: This plugin does not support propagateSizeHints()
+14: Template picker applied
+14: This plugin does not support propagateSizeHints()
+14: This plugin does not support propagateSizeHints()
+14: Template replacement cancelled
+14: This plugin does not support propagateSizeHints()
+14: Compact window: QSize(360, 280) viewport: QSize(346, 153)
+14: This plugin does not support propagateSizeHints()
+14: 100 nodes: open+render 26 ms, layout switch 9 ms
+14: 500 nodes: open+render 97 ms, layout switch 45 ms
+14: 1000 nodes: open+render 126 ms, layout switch 62 ms
+14: 3000 nodes: open+render 415 ms, layout switch 227 ms
+14: 3000 nodes with 1000 symbols: render 125 ms
+14: ZhiLi smoke test passed
+14/14 Test #14: zhili_smoke_2x .....................   Passed   10.80 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Total Test time (real) =  63.49 sec

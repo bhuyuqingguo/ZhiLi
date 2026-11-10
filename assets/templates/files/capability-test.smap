@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "测试验证能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "验证策划",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "拆解需求与风险",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "设计覆盖与样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "定义通过条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "环境准备",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "明确环境和版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "准备可复现数据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "检查依赖和权限",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "测试执行",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "按步骤收集结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "记录失败与中断",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "保存复现证据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "结果分析",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "区分缺陷和环境问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "说明覆盖与未测范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "评估结果可信度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "回归与复用",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "维护回归集",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "跟踪问题关闭",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "沉淀方法和工具",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

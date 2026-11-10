@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "能力价值映射",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "目标结果",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "期望改善的体验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "期望提升的质量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "期望降低的重复工作",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "关键能力",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "直接影响结果的能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "必要的支撑能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "可复用的基础能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "作用路径",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "能力提供的输出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "输出被使用的环节",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "影响结果的前提",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "证据与指标",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "可观察的过程变化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "结果评价方法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "不应混淆的外部因素",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "改进决策",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "高价值能力优先级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "低价值重复建设",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "下一轮验证事项",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "能力分解树",
+      "children": [
+        "n2",
+        "n8",
+        "n12",
+        "n16"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "需求理解能力",
+      "children": [
+        "n3",
+        "n4",
+        "n7"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "识别服务对象",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "收集与澄清需求",
+      "children": [
+        "n5",
+        "n6"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "记录事实与疑问",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "核对目标和约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "确认范围和优先级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "方案形成能力",
+      "children": [
+        "n9",
+        "n10",
+        "n11"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "提出候选方案",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "比较约束与价值",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "明确验证方法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "组织实施能力",
+      "children": [
+        "n13",
+        "n14",
+        "n15"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "分配任务与资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "协调执行依赖",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "处理变更与反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "效果评价能力",
+      "children": [
+        "n17",
+        "n18",
+        "n19"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "收集结果证据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "比较目标与结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "形成改进建议",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

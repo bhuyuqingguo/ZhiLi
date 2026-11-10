@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>四旋翼平台 · Quadcopter</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#226384" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><line x1="32" y1="32" x2="16" y2="16"/><line x1="32" y1="32" x2="48" y2="16"/><line x1="32" y1="32" x2="16" y2="48"/><line x1="32" y1="32" x2="48" y2="48"/><circle cx="16" cy="16" r="6" fill="#e5f3fa"/><line x1="12" y1="16" x2="20" y2="16"/><line x1="16" y1="12" x2="16" y2="20"/><circle cx="48" cy="16" r="6" fill="#e5f3fa"/><line x1="44" y1="16" x2="52" y2="16"/><line x1="48" y1="12" x2="48" y2="20"/><circle cx="16" cy="48" r="6" fill="#e5f3fa"/><line x1="12" y1="48" x2="20" y2="48"/><line x1="16" y1="44" x2="16" y2="52"/><circle cx="48" cy="48" r="6" fill="#e5f3fa"/><line x1="44" y1="48" x2="52" y2="48"/><line x1="48" y1="44" x2="48" y2="52"/><rect x="26" y="25" width="12" height="15" rx="4" fill="#e5f3fa"/></g></g>
+</svg>

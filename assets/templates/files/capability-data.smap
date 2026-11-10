@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "数据管理能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "数据理解",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "识别数据来源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "明确语义与口径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "维护数据目录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "数据质量",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "制定质量规则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "发现异常和缺失",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "跟踪修正与原因",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "数据共享",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "定义交换约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "管理访问和用途边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "维护版本与兼容",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "数据使用",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "支持查询与分析",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "解释结果与限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "收集使用反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "数据治理",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "明确责任人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "管理生命周期",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "定期评估与改进",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

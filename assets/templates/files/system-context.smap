@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "系统上下文",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "目标系统",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "核心职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "服务范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "不承担的职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "使用者与渠道",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "内部业务用户",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "外部服务用户",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "管理维护人员",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "外部系统",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "上游信息来源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "下游服务对象",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "公共支撑服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "信息交换",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "输入数据及来源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "输出数据及接收方",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "交换频率和质量约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "环境约束",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "运行场所与资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "适用规范与权限边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "可用性与连续性要求",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

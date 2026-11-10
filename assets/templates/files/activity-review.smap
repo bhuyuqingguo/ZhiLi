@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "方案评审会",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "评审输入",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "说明背景和约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "提供方案与对比依据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "收集已知问题和假设",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "评审组织",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "明确评审角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "设定评审维度与顺序",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "提前发送材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "评审讨论",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "检查目标覆盖程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "核对实现和验证路径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "记录问题与不同意见",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "结论处理",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "区分通过和待修改项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "指定整改负责人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "约定复核时间与条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "记录归档",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "整理决策依据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "维护问题状态",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "保存版本与确认记录",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,15 +1,44 @@
 #include "appearance.h"
+#include "clipboard.h"
 #include "document.h"
 #include "layout.h"
+#include "symbols.h"
+#include "symbolpicker.h"
+#include "templates.h"
+#include "template_dialog.h"
+#include "pptx.h"
+#include "importer.h"
 
 #include <QtWidgets>
 #include <QtSvg/QSvgGenerator>
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
 #include <QPdfWriter>
 #include <QtMath>
 #include <functional>
 #include <memory>
 
 namespace {
+QString topicTextError(const QString &text) {
+    if (text.size() > Document::maxText)
+        return QStringLiteral("文字超过 10 万字符，请缩短后再确认");
+    for (int i = 0; i < text.size(); ++i) {
+        if (text.at(i).isHighSurrogate()) {
+            if (++i == text.size() || !text.at(i).isLowSurrogate())
+                return QStringLiteral("文字包含无效字符，请重新输入或粘贴该段文字");
+        } else if (text.at(i).isLowSurrogate()) {
+            return QStringLiteral("文字包含无效字符，请重新输入或粘贴该段文字");
+        }
+    }
+    return {};
+}
+
+QRect boundedWindowGeometry(const QRect &requested, const QRect &available, const QSize &minimum) {
+    const QSize size = requested.size().expandedTo(minimum).boundedTo(available.size());
+    return QRect(QPoint(qBound(available.left(), requested.left(), available.right() - size.width() + 1),
+                        qBound(available.top(), requested.top(), available.bottom() - size.height() + 1)), size);
+}
+
 class Canvas : public QGraphicsView {
 public:
     explicit Canvas(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent) {
@@ -94,6 +123,8 @@ struct NodeItem {
     QGraphicsPathItem *body;
     QGraphicsTextItem *label;
     QGraphicsSimpleTextItem *badge;
+    QGraphicsPathItem *symbolPad = nullptr;
+    QGraphicsSvgItem *symbol = nullptr;
 };
 }
 
@@ -108,14 +139,14 @@ public:
         canvas->press = [this](QPoint at) {
             if (editor && itemAt(at, editorProxy)) return false;
             const QString id = nodeAt(at);
-            finishEdit();
+            if (!finishEdit()) return false;
             if (!id.isEmpty()) selectNode(id);
             return !id.isEmpty();
         };
         canvas->doubleClick = [this](QPoint at) {
             const QString id = nodeAt(at);
             if (id.isEmpty()) return false;
-            finishEdit();
+            if (!finishEdit()) return true;
             selectNode(id);
             startEdit();
             return true;
@@ -175,10 +206,19 @@ private:
     QVector<Revision> undoStack, redoStack;
     QMap<QString, NodeItem> items;
     QMap<QString, QGraphicsPathItem *> edges;
+    QMap<QString, QSvgRenderer *> symbolRenderers;
     QMap<QString, QString> parents;
     QVector<QAction *> canvasActions;
     QAction *classicAction = nullptr;
     QAction *hierarchyAction = nullptr;
+    QAction *siblingAction = nullptr;
+    QAction *removeAction = nullptr;
+    QAction *cutAction = nullptr;
+    QAction *collapseAction = nullptr;
+    QAction *undoAction = nullptr;
+    QAction *redoAction = nullptr;
+    QAction *moveUpAction = nullptr;
+    QAction *moveDownAction = nullptr;
     QPlainTextEdit *editor = nullptr;
     QGraphicsProxyWidget *editorProxy = nullptr;
     QString editId;
@@ -289,6 +329,66 @@ private:
         changed();
     }
 
+    void copyBranch(bool cut = false) {
+        if (cut && selected == doc.root) {
+            statusBar()->showMessage(QStringLiteral("中心主题不能剪切，可使用复制"), 4000);
+            return;
+        }
+        QString error;
+        const QByteArray data = BranchClipboard::encode(doc, selected, &error);
+        if (data.isEmpty()) {
+            statusBar()->showMessage(QStringLiteral("复制失败：%1").arg(error), 6000);
+            return;
+        }
+        auto *mime = new QMimeData;
+        mime->setData(BranchClipboard::mimeType(), data);
+        mime->setText(BranchClipboard::outline(doc, selected));
+        QApplication::clipboard()->setMimeData(mime);
+        if (cut) removeSelected();
+        statusBar()->showMessage(cut ? QStringLiteral("已剪切分支，可粘贴或撤销")
+                                    : QStringLiteral("已复制分支，可在其他主题下粘贴"), 4000);
+    }
+
+    void pasteBranch() {
+        const QMimeData *mime = QApplication::clipboard()->mimeData();
+        if (!mime || (!mime->hasFormat(BranchClipboard::mimeType()) && !mime->hasText())) {
+            statusBar()->showMessage(QStringLiteral("剪贴板中没有分支或文本大纲"), 4000);
+            return;
+        }
+        Document next = doc;
+        QStringList inserted;
+        QString error;
+        const bool pasted = mime->hasFormat(BranchClipboard::mimeType())
+            ? BranchClipboard::paste(&next, selected, mime->data(BranchClipboard::mimeType()), &inserted, &error)
+            : BranchClipboard::pasteOutline(&next, selected, mime->text(), &inserted, &error);
+        if (!pasted || inserted.isEmpty()) {
+            statusBar()->showMessage(QStringLiteral("粘贴失败：%1").arg(error), 6000);
+            return;
+        }
+        checkpoint();
+        doc = std::move(next);
+        selected = inserted.first();
+        changed();
+        canvas->ensureVisible(items.value(selected).body, 30, 30);
+        statusBar()->showMessage(QStringLiteral("已粘贴 %1 个分支").arg(inserted.size()), 4000);
+    }
+
+    void setSelectedSymbol(const QString &id) {
+        if (!doc.nodes.contains(selected) || doc.nodes.value(selected).symbolId == id) return;
+        if (!id.isEmpty() && !SymbolLibrary::find(id)) {
+            statusBar()->showMessage(QStringLiteral("无法找到所选图形符号"), 4000);
+            return;
+        }
+        checkpoint();
+        doc.nodes[selected].symbolId = id;
+        changed();
+    }
+
+    void chooseSymbol() {
+        SymbolPickerDialog picker(this, doc.nodes.value(selected).symbolId);
+        if (picker.exec() == QDialog::Accepted) setSelectedSymbol(picker.selectedSymbolId());
+    }
+
     void moveNode(const QString &source, const QString &target, int side) {
         if (source == doc.root || source == target) return;
         const QString oldParent = parents.value(source);
@@ -322,6 +422,15 @@ private:
         selected = source;
         changed();
         canvas->ensureVisible(items.value(source).body, 30, 30);
+    }
+
+    void reorderSelected(bool earlier) {
+        const QString parent = parents.value(selected);
+        if (parent.isEmpty()) return;
+        const QStringList siblings = doc.nodes.value(parent).children;
+        const int target = siblings.indexOf(selected) + (earlier ? -1 : 1);
+        if (target >= 0 && target < siblings.size())
+            moveNode(selected, siblings.at(target), earlier ? -1 : 1);
     }
 
     void navigate(Qt::Key key) {
@@ -386,10 +495,29 @@ private:
         selected = id;
         styleNode(old);
         styleNode(selected);
+        updateActionStates();
+    }
+
+    void updateActionStates() {
+        for (auto *action : canvasActions) action->setEnabled(!editor);
+        const bool branch = !editor && selected != doc.root && doc.nodes.contains(selected);
+        for (auto *action : {siblingAction, removeAction, cutAction})
+            if (action) action->setEnabled(branch);
+        if (collapseAction) collapseAction->setEnabled(!editor && !doc.nodes.value(selected).children.isEmpty());
+        if (undoAction) undoAction->setEnabled(!editor && !undoStack.isEmpty());
+        if (redoAction) redoAction->setEnabled(!editor && !redoStack.isEmpty());
+        const QStringList siblings = doc.nodes.value(parents.value(selected)).children;
+        const int index = siblings.indexOf(selected);
+        if (moveUpAction) moveUpAction->setEnabled(branch && index > 0);
+        if (moveDownAction) moveDownAction->setEnabled(branch && index >= 0 && index + 1 < siblings.size());
     }
 
     void startEdit() {
         if (editor || !items.contains(selected)) return;
+        // A large map can be fitted far below readable text size. Editing should
+        // stay usable, without creating an editor as tall as a long topic.
+        if (canvas->transform().m11() < 0.65)
+            canvas->zoomBy(1 / canvas->transform().m11());
         editId = selected;
         editor = new QPlainTextEdit;
         editor->setObjectName("topicEditor");
@@ -401,11 +529,14 @@ private:
         editorProxy->setZValue(5);
         QRectF bounds = items.value(selected).body->sceneBoundingRect();
         bounds.setWidth(qMax(bounds.width(), 230.0));
-        bounds.setHeight(qMax(bounds.height(), qreal(editor->fontMetrics().height() * 2 + 16)));
+        const qreal minimumHeight = editor->fontMetrics().height() * 2 + 16;
+        const qreal maximumHeight = qMax(minimumHeight, qMin(320.0,
+            canvas->viewport()->height() / canvas->transform().m22() - 60));
+        bounds.setHeight(qBound(minimumHeight, bounds.height(), maximumHeight));
         bounds.moveCenter(items.value(selected).body->pos());
         editorProxy->setGeometry(bounds);
         canvas->ensureVisible(editorProxy, 30, 30);
-        for (auto *action : canvasActions) action->setEnabled(false);
+        updateActionStates();
         editor->setFocus(Qt::OtherFocusReason);
         auto *accept = new QShortcut(QKeySequence("Ctrl+Return"), editor);
         auto *cancel = new QShortcut(QKeySequence("Escape"), editor);
@@ -415,10 +546,16 @@ private:
         statusBar()->showMessage(QStringLiteral("编辑主题  ·  Ctrl+Enter 确认  ·  Esc 取消  ·  Enter 换行"));
     }
 
-    void finishEdit(bool accept = true) {
-        if (!editor) return;
+    bool finishEdit(bool accept = true) {
+        if (!editor) return true;
         if (accept) QApplication::inputMethod()->commit();
         const QString value = editor->toPlainText();
+        const QString validationError = accept ? topicTextError(value) : QString();
+        if (!validationError.isEmpty()) {
+            editor->setFocus();
+            statusBar()->showMessage(validationError + QStringLiteral("；编辑内容仍保留，可按 Esc 取消"));
+            return false;
+        }
         const QString id = editId;
         QGraphicsProxyWidget *proxy = editorProxy;
         editor = nullptr;
@@ -426,8 +563,8 @@ private:
         scene->removeItem(proxy);
         proxy->deleteLater();
         canvas->setFocus();
-        for (auto *action : canvasActions) action->setEnabled(true);
-        if (accept && value.size() <= Document::maxText && value != doc.nodes.value(id).text) {
+        updateActionStates();
+        if (accept && value != doc.nodes.value(id).text) {
             checkpoint();
             doc.nodes[id].text = value;
             changed();
@@ -436,9 +573,9 @@ private:
         } else {
             clearRecovery();
         }
-        statusBar()->showMessage(accept && value.size() > Document::maxText
-            ? QStringLiteral("文字超过 10 万字符，本次修改未保存")
-            : canvasHint(), 5000);
+        statusBar()->showMessage(canvasHint(), 5000);
+        updateActionStates();
+        return true;
     }
 
     void search(bool prompt) {
@@ -532,8 +669,15 @@ private:
     void writeRecovery() {
         if (recoveryPath.isEmpty()) return;
         Document draft = doc;
-        if (editor && editor->toPlainText().size() <= Document::maxText)
-            draft.nodes[editId].text = editor->toPlainText();
+        if (editor) {
+            const QString value = editor->toPlainText();
+            const QString validationError = topicTextError(value);
+            if (!validationError.isEmpty()) {
+                statusBar()->showMessage(QStringLiteral("自动恢复暂停：%1；上次有效快照保持不变").arg(validationError), 8000);
+                return;
+            }
+            draft.nodes[editId].text = value;
+        }
         const QByteArray data = draft.serialize();
         if (!dirty && data == saved.serialize()) {
             clearRecovery();
@@ -553,7 +697,7 @@ private:
     }
 
     bool confirmLeave() {
-        finishEdit();
+        if (!finishEdit()) return false;
         if (!dirty) return true;
         const auto answer = QMessageBox::warning(this, QStringLiteral("未保存的修改"),
             QStringLiteral("关闭当前导图前，是否保存修改？"),
@@ -565,6 +709,7 @@ private:
     bool needsSaveAs = false;
 
     bool save(bool as = false) {
+        if (!finishEdit()) return false;
         QString path = filePath;
         if (as || needsSaveAs || path.isEmpty()) {
             path = QFileDialog::getSaveFileName(this, QStringLiteral("保存导图"),
@@ -605,12 +750,58 @@ private:
         return true;
     }
 
+    void adoptUnsavedDocument(Document document) {
+        doc = std::move(document);
+        filePath.clear();
+        needsSaveAs = true;
+        initializeDocument();
+        // A template/import has no saved counterpart until its first Save As.
+        saved = Document();
+        changed();
+        fit();
+    }
+
+    void newFromTemplate() {
+        const QString id = zhili::chooseBuiltInTemplate(this);
+        if (id.isEmpty()) return;
+        Document next;
+        QString error;
+        if (!zhili::loadBuiltInTemplate(id, &next, &error)) {
+            QMessageBox::warning(this, QStringLiteral("模板无法打开"), error);
+            return;
+        }
+        if (!confirmLeave()) return;
+        adoptUnsavedDocument(std::move(next));
+        statusBar()->showMessage(QStringLiteral("已从模板新建，请保存为自己的 .smap 文件"), 6000);
+    }
+
     void openFile() {
         const QString path = QFileDialog::getOpenFileName(this, QStringLiteral("打开导图"), {},
             QStringLiteral("枝理导图 (*.smap *.smap.json *.json)"));
         if (path.isEmpty() || !confirmLeave()) return;
         QString error;
         if (!loadFrom(path, &error)) QMessageBox::warning(this, QStringLiteral("打开失败"), error);
+    }
+
+    bool importFrom(const QString &path, QStringList *warnings, QString *error) {
+        Document next;
+        if (!importMindMap(path, &next, warnings, error) || !confirmLeave()) return false;
+        adoptUnsavedDocument(std::move(next));
+        return true;
+    }
+
+    void importFile() {
+        const QString path = QFileDialog::getOpenFileName(this, QStringLiteral("导入其他导图"), {},
+            QStringLiteral("其他导图 (*.mmap *.emmx)"));
+        if (path.isEmpty()) return;
+        QStringList warnings;
+        QString error;
+        if (!importFrom(path, &warnings, &error)) {
+            if (!error.isEmpty()) QMessageBox::warning(this, QStringLiteral("导入失败"), error);
+            return;
+        }
+        statusBar()->showMessage(QStringLiteral("已导入主题结构和文字，请另存为 .smap；原文件未修改"), 8000);
+        if (!warnings.isEmpty()) QMessageBox::information(this, QStringLiteral("导入说明"), warnings.join('\n'));
     }
 
     QString canvasHint() const {
@@ -664,6 +855,21 @@ private:
         }
         if (!screen) {
             resize(1160, 760);
+            return;
+        }
+        const QByteArray geometry = QSettings().value("window/geometry").toByteArray();
+        if (!geometry.isEmpty() && restoreGeometry(geometry)) {
+            // Qt restores maximized state and handles a disconnected monitor.
+            // Constrain normal windows as well when desktop geometry shrinks.
+            if (!isMaximized() && !isFullScreen()) {
+                for (auto *candidate : QGuiApplication::screens()) {
+                    if (candidate->availableGeometry().contains(frameGeometry().center())) {
+                        screen = candidate;
+                        break;
+                    }
+                }
+                setGeometry(boundedWindowGeometry(this->geometry(), screen->availableGeometry(), minimumSize()));
+            }
             return;
         }
         const QRect work = screen->availableGeometry();
@@ -763,33 +969,99 @@ private:
         else statusBar()->showMessage(QStringLiteral("已导出  %1").arg(QFileInfo(path).fileName()), 4000);
     }
 
+    bool exportPowerPointTo(const QString &path, QString *error) {
+        QMap<QString, QByteArray> images;
+        QMap<QString, QByteArray> rendered;
+        for (const Node &node : qAsConst(doc.nodes)) {
+            if (node.symbolId.isEmpty()) continue;
+            const SymbolAsset *asset = SymbolLibrary::find(node.symbolId);
+            if (!asset) {
+                if (error) *error = QStringLiteral("导图包含当前版本无法识别的图形符号，请先替换或移除后再导出 PowerPoint。");
+                return false;
+            }
+            if (!rendered.contains(asset->id)) {
+                QSvgRenderer renderer(asset->resourcePath);
+                QImage image(128, 128, QImage::Format_ARGB32_Premultiplied);
+                image.fill(Qt::transparent);
+                QPainter painter(&image);
+                renderer.render(&painter);
+                painter.end();
+                QByteArray png;
+                QBuffer buffer(&png);
+                buffer.open(QIODevice::WriteOnly);
+                if (!renderer.isValid() || !image.save(&buffer, "PNG")) {
+                    if (error) *error = QStringLiteral("无法生成 PowerPoint 图形符号");
+                    return false;
+                }
+                rendered.insert(asset->id, png);
+            }
+            images.insert(node.id, rendered.value(asset->id));
+        }
+        return exportPptx(doc, path, images, error);
+    }
+
+    void exportPowerPoint() {
+        QString path = QFileDialog::getSaveFileName(this, QStringLiteral("导出可编辑 PowerPoint"), {},
+            QStringLiteral("PowerPoint 演示文稿 (*.pptx)"));
+        if (path.isEmpty()) return;
+        if (!path.endsWith(".pptx", Qt::CaseInsensitive)) path += ".pptx";
+        QString error;
+        if (!exportPowerPointTo(path, &error)) QMessageBox::warning(this, QStringLiteral("PowerPoint 导出失败"), error);
+        else statusBar()->showMessage(QStringLiteral("已导出可编辑 PPTX：含折叠分支和图形符号，大图与长文字自动分页"), 10000);
+    }
+
+    QAction *action(QMenu *menu, const QString &name, const char *shortcut,
+                    std::function<void()> run, bool canvasOnly = false) {
+        QAction *item = menu->addAction(name);
+        item->setShortcut(QKeySequence(QString::fromLatin1(shortcut)));
+        connect(item, &QAction::triggered, this, [this, run] {
+            if (finishEdit()) run();
+            else {
+                // Checkable actions may toggle before a rejected edit blocks
+                // their command. Keep the UI tied to the unchanged document.
+                classicAction->setChecked(doc.mindMap);
+                hierarchyAction->setChecked(!doc.mindMap);
+            }
+        });
+        if (canvasOnly) canvasActions.append(item);
+        return item;
+    }
+
     void makeMenus() {
-        auto action = [&](QMenu *menu, const QString &name, const char *shortcut,
-                          std::function<void()> run, bool canvasOnly = false) {
-            QAction *item = menu->addAction(name);
-            item->setShortcut(QKeySequence(QString::fromLatin1(shortcut)));
-            connect(item, &QAction::triggered, this, [this, run] { finishEdit(); run(); });
-            if (canvasOnly) canvasActions.append(item);
-            return item;
-        };
         auto *file = menuBar()->addMenu(QStringLiteral("文件"));
         action(file, QStringLiteral("新建"), "Ctrl+N", [this] { if (confirmLeave()) resetDocument(); });
+        action(file, QStringLiteral("从模板新建…"), "Ctrl+Shift+N", [this] { newFromTemplate(); })->setObjectName("newFromTemplateAction");
         action(file, QStringLiteral("打开"), "Ctrl+O", [this] { openFile(); });
+        action(file, QStringLiteral("导入其他导图…"), "", [this] { importFile(); })->setObjectName("importMindMapAction");
         auto *saveAction = action(file, QStringLiteral("保存"), "Ctrl+S", [this] { save(); });
         action(file, QStringLiteral("另存为"), "Ctrl+Shift+S", [this] { save(true); });
         file->addSeparator();
         for (const QString &format : {QString("png"), QString("svg"), QString("pdf")})
             action(file, QStringLiteral("导出 %1").arg(format.toUpper()), "", [this, format] { exportFile(format); });
+        auto *pptx = action(file, QStringLiteral("导出可编辑 PowerPoint…"), "", [this] { exportPowerPoint(); });
+        pptx->setObjectName("exportPptxAction");
+        pptx->setToolTip(QStringLiteral("导出可编辑形状和文字；图形符号可单独移动。包含折叠分支，大图自动分页，长文字附全文页。"));
 
         auto *edit = menuBar()->addMenu(QStringLiteral("编辑"));
         auto *child = action(edit, QStringLiteral("新增子级"), "Tab", [this] { createNode(true); }, true);
-        action(edit, QStringLiteral("新增同级"), "Return", [this] { createNode(false); }, true);
-        action(edit, QStringLiteral("编辑主题"), "F2", [this] { startEdit(); }, true);
-        action(edit, QStringLiteral("删除分支"), "Delete", [this] { removeSelected(); }, true);
-        action(edit, QStringLiteral("折叠 / 展开"), "Space", [this] { toggleCollapse(); }, true);
+        siblingAction = action(edit, QStringLiteral("新增同级"), "Return", [this] { createNode(false); }, true);
+        auto *editTopic = action(edit, QStringLiteral("编辑主题"), "F2", [this] { startEdit(); }, true);
+        auto *symbolAction = action(edit, QStringLiteral("设置图形符号…"), "Ctrl+Shift+I", [this] { chooseSymbol(); }, true);
+        symbolAction->setObjectName("symbolPickerAction");
+        removeAction = action(edit, QStringLiteral("删除分支"), "Delete", [this] { removeSelected(); }, true);
+        collapseAction = action(edit, QStringLiteral("折叠 / 展开"), "Space", [this] { toggleCollapse(); }, true);
+        edit->addSeparator();
+        auto *copy = action(edit, QStringLiteral("复制分支"), "Ctrl+C", [this] { copyBranch(); }, true);
+        copy->setObjectName("copyBranchAction");
+        cutAction = action(edit, QStringLiteral("剪切分支"), "Ctrl+X", [this] { copyBranch(true); }, true);
+        cutAction->setObjectName("cutBranchAction");
+        auto *paste = action(edit, QStringLiteral("粘贴分支 / 文本大纲"), "Ctrl+V", [this] { pasteBranch(); }, true);
+        paste->setObjectName("pasteBranchAction");
         edit->addSeparator();
         auto *undo = action(edit, QStringLiteral("撤销"), "Ctrl+Z", [this] { history(true); }, true);
-        action(edit, QStringLiteral("重做"), "Ctrl+Y", [this] { history(false); }, true);
+        undoAction = undo;
+        redoAction = action(edit, QStringLiteral("重做"), "Ctrl+Y", [this] { history(false); }, true);
+        redoAction->setShortcuts({QKeySequence("Ctrl+Y"), QKeySequence("Ctrl+Shift+Z")});
         auto *find = action(edit, QStringLiteral("查找"), "Ctrl+F", [this] { search(true); });
         action(edit, QStringLiteral("查找下一个"), "F3", [this] { search(false); }, true);
 
@@ -798,6 +1070,9 @@ private:
         action(navigation, QStringLiteral("向下"), "Down", [this] { navigate(Qt::Key_Down); }, true);
         action(navigation, QStringLiteral("向左"), "Left", [this] { navigate(Qt::Key_Left); }, true);
         action(navigation, QStringLiteral("向右"), "Right", [this] { navigate(Qt::Key_Right); }, true);
+        auto *reorder = edit->addMenu(QStringLiteral("调整分支顺序"));
+        moveUpAction = action(reorder, QStringLiteral("前移"), "Ctrl+Shift+Up", [this] { reorderSelected(true); }, true);
+        moveDownAction = action(reorder, QStringLiteral("后移"), "Ctrl+Shift+Down", [this] { reorderSelected(false); }, true);
 
         auto *view = menuBar()->addMenu(QStringLiteral("视图"));
         action(view, QStringLiteral("外观设置…"), "", [this] { changeAppearance(); });
@@ -810,6 +1085,23 @@ private:
         group->addAction(classicAction);
         group->addAction(hierarchyAction);
         auto *fitAction = action(view, QStringLiteral("适应窗口"), "Ctrl+0", [this] { fit(); });
+
+        auto *context = new QMenu(canvas);
+        context->setObjectName("topicContextMenu");
+        for (auto *item : {editTopic, symbolAction, child, siblingAction}) context->addAction(item);
+        context->addSeparator();
+        for (auto *item : {moveUpAction, moveDownAction}) context->addAction(item);
+        context->addSeparator();
+        for (auto *item : {copy, cutAction, paste}) context->addAction(item);
+        context->addSeparator();
+        for (auto *item : {collapseAction, removeAction, fitAction}) context->addAction(item);
+        canvas->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(canvas, &QWidget::customContextMenuRequested, this, [this, context](const QPoint &at) {
+            if (!finishEdit()) return;
+            const QString id = nodeAt(at);
+            if (!id.isEmpty()) selectNode(id);
+            context->popup(canvas->viewport()->mapToGlobal(at));
+        });
 
         action(view, QStringLiteral("放大"), "Ctrl+=", [this] { canvas->zoomBy(1.25); }, true);
         action(view, QStringLiteral("缩小"), "Ctrl+-", [this] { canvas->zoomBy(1 / 1.25); }, true);
@@ -882,7 +1174,10 @@ private:
             const Node &node = nodes[id];
             if (!node.collapsed) for (const auto &child : node.children) visible.append(child);
             if (!items.contains(id)) {
-                NodeItem item{scene->addPath(QPainterPath()), scene->addText(QString()), scene->addSimpleText(QString())};
+                NodeItem item;
+                item.body = scene->addPath(QPainterPath());
+                item.label = scene->addText(QString());
+                item.badge = scene->addSimpleText(QString());
                 item.body->setZValue(1);
                 item.label->setZValue(2);
                 item.badge->setZValue(3);
@@ -893,11 +1188,35 @@ private:
                 }
                 items.insert(id, item);
             }
-            const NodeItem item = items.value(id);
+            NodeItem &item = items[id];
             const bool root = id == doc.root;
             const bool branch = parents.value(id) == doc.root;
-            QString display = node.text.left(360);
-            if (node.text.size() > display.size()) display += QChar(0x2026);
+            const SymbolAsset *asset = node.symbolId.isEmpty() ? nullptr : SymbolLibrary::find(node.symbolId);
+            if (asset) {
+                if (!symbolRenderers.contains(asset->id))
+                    symbolRenderers.insert(asset->id, new QSvgRenderer(asset->resourcePath, this));
+                if (!item.symbol) {
+                    QPainterPath pad;
+                    pad.addRoundedRect(QRectF(0, 0, 32, 32), 5, 5);
+                    item.symbolPad = scene->addPath(pad, QPen(Qt::NoPen), QBrush(Qt::white));
+                    item.symbolPad->setZValue(2);
+                    item.symbol = new QGraphicsSvgItem(item.symbolPad);
+                    // Keep SVG/PDF exports vector rather than baking view caches.
+                    item.symbol->setCacheMode(QGraphicsItem::NoCache);
+                    for (auto *part : {static_cast<QGraphicsItem *>(item.symbolPad),
+                                       static_cast<QGraphicsItem *>(item.symbol)}) {
+                        part->setData(0, id);
+                        part->setAcceptedMouseButtons(Qt::NoButton);
+                    }
+                }
+                item.symbol->setSharedRenderer(symbolRenderers.value(asset->id));
+                const QSizeF iconSize = item.symbol->boundingRect().size();
+                const qreal scale = 28.0 / qMax(1.0, qMax(iconSize.width(), iconSize.height()));
+                item.symbol->setScale(scale);
+                item.symbol->setPos((32 - iconSize.width() * scale) / 2, (32 - iconSize.height() * scale) / 2);
+            }
+            if (item.symbolPad) item.symbolPad->setVisible(asset != nullptr);
+            const QString &display = node.text;
             QFont font = topicFont;
             if (root) font.setPointSize(appearance.topicFont.points + 4);
             if (item.label->toPlainText() != display || item.label->textWidth() < 0 || item.label->font() != font) {
@@ -905,10 +1224,19 @@ private:
                 item.label->setTextWidth(-1);
                 item.label->setPlainText(display);
                 item.label->setTextWidth(qBound(root ? 136.0 : 78.0, item.label->boundingRect().width(), 248.0));
+                // Qt lays out long multi-paragraph documents lazily. Force the
+                // final block before sizing the node/export scene, otherwise
+                // thousands of lines can be clipped to an unfinished height.
+                QTextDocument *textDocument = item.label->document();
+                textDocument->documentLayout()->blockBoundingRect(textDocument->lastBlock());
+                // Refresh QGraphicsTextItem's cached rectangle synchronously;
+                // its lazy document-size notification otherwise arrives later.
+                item.label->setDocument(textDocument);
             }
             item.label->setDefaultTextColor(root ? Qt::white : ink);
             const QSizeF label = item.label->boundingRect().size();
-            const QSizeF size(label.width() + 24, qMax(root ? 50.0 : 36.0, label.height() + 12));
+            const QSizeF size(label.width() + 24 + (asset ? 42 : 0),
+                              qMax(root ? 50.0 : (asset ? 44.0 : 36.0), label.height() + 12));
             sizes[id] = size;
             QPainterPath shape;
             shape.addRoundedRect(QRectF(QPointF(-size.width() / 2, -size.height() / 2), size), 9, 9);
@@ -924,6 +1252,7 @@ private:
             delete it->body;
             delete it->label;
             delete it->badge;
+            delete it->symbolPad;
             it = items.erase(it);
         }
         for (auto it = edges.begin(); it != edges.end();) {
@@ -941,7 +1270,9 @@ private:
             const QSizeF label = item.label->boundingRect().size();
             const QSizeF size = sizes.value(id);
             item.body->setPos(point);
-            item.label->setPos(point - QPointF(label.width() / 2, label.height() / 2));
+            const bool symbolVisible = item.symbolPad && item.symbolPad->isVisible();
+            item.label->setPos(point - QPointF(label.width() / 2 - (symbolVisible ? 21 : 0), label.height() / 2));
+            if (symbolVisible) item.symbolPad->setPos(point + QPointF(-size.width() / 2 + 12, -16));
             item.badge->setPos(point + QPointF(size.width() / 2 + 5, -item.badge->boundingRect().height() / 2));
             styleNode(id);
             if (id == doc.root) continue;
@@ -973,6 +1304,7 @@ private:
         scene->setSceneRect(scene->itemsBoundingRect().adjusted(-100, -100, 100, 100));
         classicAction->setChecked(doc.mindMap);
         hierarchyAction->setChecked(!doc.mindMap);
+        updateActionStates();
         updateTitle();
     }
 
@@ -1002,6 +1334,7 @@ protected:
     void closeEvent(QCloseEvent *event) override {
         if (confirmLeave()) {
             clearRecovery();
+            QSettings().setValue("window/geometry", saveGeometry());
             event->accept();
         } else {
             event->ignore();

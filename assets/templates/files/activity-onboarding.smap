@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "新成员融入计划",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "入组准备",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "确认角色与工作目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "准备必要资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "安排伙伴和答疑联系人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "基础认识",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "介绍团队与协作方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "说明常用流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "讲解信息安全与合规边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "实践任务",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "选择可完成的小任务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "提供示例和检查标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "安排反馈与复盘",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "协作建立",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "认识相关团队",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "参加关键例会",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "建立问题求助渠道",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "阶段回顾",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "检查角色理解",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "收集流程疑问",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "调整下一阶段学习目标",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

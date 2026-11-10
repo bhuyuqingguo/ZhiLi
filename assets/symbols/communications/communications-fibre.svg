@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>光纤链路 · Fibre link</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#386b69" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="7" y="23" width="13" height="20" rx="2" fill="#e4f3ef"/><rect x="44" y="23" width="13" height="20" rx="2" fill="#e4f3ef"/><path d="M20 28 C29 28 35 38 44 38 M20 38 C29 38 35 28 44 28 M20 33 L44 33" fill="none"/><line x1="10" y1="16" x2="16" y2="16"/><line x1="48" y1="50" x2="54" y2="50"/></g></g>
+</svg>

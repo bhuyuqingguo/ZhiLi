@@ -1,0 +1,175 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "组织职责体系",
+      "children": [
+        "n2",
+        "n6",
+        "n12",
+        "n16",
+        "n20"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "决策与治理",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "目标和原则制定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "重大事项决策",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "阶段评估与调整",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "业务团队",
+      "children": [
+        "n7",
+        "n8",
+        "n11"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "需求管理职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "业务执行职责",
+      "children": [
+        "n9",
+        "n10"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "任务承接与执行",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "问题反馈与交接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "交付确认职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "支撑团队",
+      "children": [
+        "n13",
+        "n14",
+        "n15"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "技术与工具支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "资源与后勤支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "知识与培训支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "协作机制",
+      "children": [
+        "n17",
+        "n18",
+        "n19"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "跨团队协同事项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "信息同步和例会",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "问题协调与升级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "职责维护",
+      "children": [
+        "n21",
+        "n22",
+        "n23"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "岗位变化记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n22",
+      "text": "责任边界复核",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n23",
+      "text": "替补与交接安排",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

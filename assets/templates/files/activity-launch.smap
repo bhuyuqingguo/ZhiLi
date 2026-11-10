@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "产品发布活动",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "发布准备",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "确认发布范围和版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "审核对外描述",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "准备常见问题说明",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "内容与演示",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "设计核心演示流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "准备演示数据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "安排替代展示材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "活动组织",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "确定受众和渠道",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "安排主持与讲解",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "核对时间和技术环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "反馈接收",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "提供问题提交入口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "分配咨询处理责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "区分缺陷和功能建议",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "后续闭环",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "复核发布效果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "同步已知限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "更新文档与改进计划",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

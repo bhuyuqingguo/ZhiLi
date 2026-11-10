@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "开放参观日",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "参观目标",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确访客群体",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "设计重点讲解内容",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "确定可开放区域",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "行程安排",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "设置签到与欢迎环节",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "安排分组和路线",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "预留交流与休息时间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "接待准备",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "准备指引与资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "分配讲解和引导岗位",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "确认访客特殊需求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "现场管理",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "同步人数和进度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "说明拍摄与访问边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "协调设备或路线变更",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "结束跟进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "收集问题和反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "归还借用物品",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "整理后续答复事项",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

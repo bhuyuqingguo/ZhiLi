@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "平台适配能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "需求理解",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "明确研究用途",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "列出使用环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "定义非功能要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "平台资料",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "平台类型与规格",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "可用接口与扩展",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "已知适用限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "集成适配",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "数据与软件兼容",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "安装空间与资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "资料和维护条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "验证准备",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "制定样例和指标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "安排受控实验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "记录条件与限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "评价与选择",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "比较满足程度",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "说明取舍和不确定性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "形成后续验证建议",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>有线网络接口 · Ethernet port</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#386b69" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M12 14 L52 14 52 45 41 45 41 53 23 53 23 45 12 45Z" fill="#e4f3ef"/><rect x="18" y="21" width="28" height="16" rx="2" fill="none"/><line x1="23" y1="21" x2="23" y2="29"/><line x1="29" y1="21" x2="29" y2="29"/><line x1="35" y1="21" x2="35" y2="29"/><line x1="41" y1="21" x2="41" y2="29"/></g></g>
+</svg>

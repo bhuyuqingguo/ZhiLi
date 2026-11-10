@@ -4,6 +4,8 @@
 
 struct Node {
     QString id, text;
+    // Optional built-in symbol identifier. Unknown IDs remain round-trippable.
+    QString symbolId;
     QStringList children;
     bool collapsed = false;
 };

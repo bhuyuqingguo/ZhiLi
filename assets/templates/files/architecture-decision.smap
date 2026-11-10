@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "架构决策记录",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "决策背景",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "待解决的问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "相关约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "必须满足的目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "候选方案",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "方案甲的适用条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "方案乙的适用条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "保持现状的影响",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "比较维度",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "复杂度与维护成本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "质量与扩展性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "兼容和迁移影响",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "决策结论",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "选择与理由",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "接受的代价",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "暂未解决的问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "后续验证",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "需要验证的假设",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "复查触发条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "相关变更与结果",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

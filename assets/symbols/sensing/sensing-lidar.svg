@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>激光测距仪 · Lidar</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#806039" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="20" y="25" width="24" height="25" rx="4" fill="#fcf0df"/><ellipse cx="32" cy="25" rx="12" ry="6" fill="#fcf0df"/><line x1="22" y1="39" x2="42" y2="39"/><path d="M12 21 L6 16 M18 15 L15 8 M46 15 L49 8 M52 21 L58 16" fill="none"/><circle cx="32" cy="42" r="3" fill="none"/></g></g>
+</svg>

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "培训发展能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "学习需求",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "识别岗位任务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "判断能力差距",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "定义学习目标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "课程设计",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "选择内容和顺序",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "设计案例与练习",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "设置评价标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "教学支持",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "组织讲师与材料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "营造可参与环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "响应疑问与反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "效果评价",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "检查知识理解",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "观察实践表现",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "识别学习障碍",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "应用迁移",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "安排岗位实践",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "提供持续指导",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "更新课程和资源",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

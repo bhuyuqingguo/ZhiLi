@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "知识复用能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "知识识别",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "发现重复问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "提取关键经验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "识别适用与失效条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "知识表达",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "形成清晰说明",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "提供样例和步骤",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "标注来源与版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "知识组织",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "分类与索引",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "关键词与关联",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "内容质量检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "知识应用",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "按问题定位资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "结合场景调整",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "记录实际使用结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "知识维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "收集纠错与补充",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "清理过时内容",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "评价复用价值",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

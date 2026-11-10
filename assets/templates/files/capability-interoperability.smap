@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "互操作能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "语义一致",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "共享术语与定义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "统一标识和单位",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "记录概念差异",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "接口兼容",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "明确输入输出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "约定格式和版本",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "描述错误与边界情况",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "流程衔接",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "明确调用与交接时机",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "确定责任与确认方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "处理状态与顺序差异",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "协同验证",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "准备代表性样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "验证正常与异常场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "记录兼容性限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "持续演进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "维护接口变更记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "协调版本过渡",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "复核共享约定",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

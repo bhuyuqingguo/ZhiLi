@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "信息架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "受众与任务",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "主要用户群体",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "高频任务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "关键信息需求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "内容结构",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "一级主题分类",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "内容类型与模板",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "关联与层级关系",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "导航方式",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "全局导航",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "局部和上下文导航",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "路径与当前位置",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "检索与筛选",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "关键词和标签",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "筛选与排序",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "空结果和纠错提示",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "内容治理",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "命名与术语",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "维护和审核责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "过期内容处理",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

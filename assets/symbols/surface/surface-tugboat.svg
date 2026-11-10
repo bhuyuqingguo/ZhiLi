@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>拖带船 · Tugboat</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#196c83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M8 38 L56 38 48 50 19 50Z" fill="#e3f4f8"/><rect x="20" y="25" width="20" height="13" rx="2" fill="#e3f4f8"/><rect x="24" y="16" width="12" height="9" rx="2" fill="#e3f4f8"/><circle cx="16" cy="44" r="4" fill="none"/><circle cx="44" cy="44" r="4" fill="none"/><path d="M43 35 Q49 25 55 31" fill="none"/><path d="M7 56 Q12 52 17 56 T27 56 T37 56 T47 56 T57 56" fill="none"/></g></g>
+</svg>

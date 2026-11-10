@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "集成架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "集成对象",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "目标应用和系统",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "参与方职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "上下游关系",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "交换方式",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "请求与响应接口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "文件导入导出",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "事件与消息交换",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "契约定义",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "数据结构和语义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "版本与兼容要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "错误与重试约定",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "适配与质量",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "格式和标识转换",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "输入校验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "交换记录与诊断",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "集成验证",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "代表性数据样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "中断与重复场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "变更后的回归验证",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

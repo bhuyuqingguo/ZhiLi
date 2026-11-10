@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "测试架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "测试层级",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "模型与规则测试",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "模块集成测试",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "关键用户流程测试",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "测试数据",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "代表性正常样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "边界与异常样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "跨版本兼容样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "运行环境",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "本地快速检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "自动化验证环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "目标平台验收环境",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "结果管理",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "可复现失败信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "覆盖与未测范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "趋势和回归记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "维护策略",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "减少脆弱测试",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "更新过时样例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "平衡速度和可信度",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

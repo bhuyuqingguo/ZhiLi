@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "信息交换视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "信息来源",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "业务活动产生",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "外部授权提供",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "人工采集与校核",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "处理过程",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "格式和完整性检查",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "分类与组织",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "版本和变更记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "共享交换",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "发送与接收角色",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "交换时机与形式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "访问和使用边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "信息使用",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "业务决策参考",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "过程协同支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "结果归档与复用",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "质量责任",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "数据责任人",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "错误反馈路径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "质量检查与改进",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

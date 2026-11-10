@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>任务看板 · Task board</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="7" y="11" width="50" height="43" rx="2" fill="#f0eafa"/><line x1="23" y1="11" x2="23" y2="54"/><line x1="41" y1="11" x2="41" y2="54"/><line x1="7" y1="21" x2="57" y2="21"/><rect x="11" y="27" width="8" height="8" rx="2" fill="#f0eafa"/><rect x="27" y="27" width="10" height="8" rx="2" fill="#f0eafa"/><rect x="27" y="40" width="10" height="8" rx="2" fill="#f0eafa"/><rect x="45" y="27" width="8" height="8" rx="2" fill="#f0eafa"/></g></g>
+</svg>

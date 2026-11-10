@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "研究创新能力",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "问题形成",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "观察现象与需求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "梳理已有研究",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "提出可检验问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "研究设计",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "选择研究方法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "明确样例和指标",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "识别限制与偏差",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "研究实施",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "记录过程和条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "整理数据与资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "检查可重复性",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "研究协作",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "明确分工和贡献",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "共享经授权资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "开展同行讨论",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "成果表达",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "解释发现与边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "记录证据与来源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "提出下一步研究",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

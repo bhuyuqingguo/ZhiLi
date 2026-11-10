@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "能力差距分析",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "目标基线",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "目标场景与任务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "期望表现",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "约束和评价标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "现状证据",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "已有流程与方法",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "人员和工具情况",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "实际表现与限制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "差距识别",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "缺失的能力",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "覆盖不足的场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "不稳定或不可复用环节",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "原因分析",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "知识与技能因素",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "流程与协作因素",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "资源和环境因素",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "改进选择",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "优先级与收益",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "实施责任与资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "验证和复评计划",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>码头接口 · Dock</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#196c83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><rect x="8" y="23" width="48" height="9" rx="2" fill="#e3f4f8"/><line x1="14" y1="32" x2="14" y2="53"/><line x1="50" y1="32" x2="50" y2="53"/><line x1="25" y1="32" x2="25" y2="44"/><line x1="39" y1="32" x2="39" y2="44"/><path d="M7 51 Q12 47 17 51 T27 51 T37 51 T47 51 T57 51" fill="none"/><line x1="19" y1="15" x2="19" y2="23"/><line x1="45" y1="15" x2="45" y2="23"/></g></g>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<title>决策分支 · Decision node</title>
+<desc>Original ZhiLi illustrative symbol. Not a technical specification.</desc>
+<g stroke="#675393" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(2 2) scale(0.9375)"><path d="M32 7 L47 22 32 37 17 22Z" fill="#f0eafa"/><path d="M17 22 L8 22 8 49 20 49 M47 22 L56 22 56 49 44 49" fill="none"/><rect x="20" y="43" width="24" height="13" rx="2" fill="#f0eafa"/><path d="M27 21 Q27 14 34 16 Q40 19 32 24" fill="none"/><circle cx="32" cy="29" r="0.7" fill="none"/></g></g>
+</svg>

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "资源保障体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "人员资源",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "岗位与技能需求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "可用时间与安排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "培训和替补机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "设施资源",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "场所与基础设施",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "使用条件和容量",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "维护与预约安排",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "工具资源",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "通用软件与设备",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "配置和兼容要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "使用支持与更新",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "信息资源",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "业务资料与知识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "访问和使用边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "质量与更新责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "资源协调",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "需求汇总与优先级",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "冲突协调方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "使用效果与改进",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

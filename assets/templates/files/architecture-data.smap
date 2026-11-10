@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "数据架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "概念模型",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "核心业务实体",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "实体关系与标识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "术语和业务口径",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "数据来源",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "业务系统产生",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "授权外部输入",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "人工整理与补充",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "组织与存储",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "主题分类",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "结构与格式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "版本和元数据",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "数据服务",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "查询与检索",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "交换与共享",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "分析与展示",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "数据治理",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "质量规则与责任",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "访问和用途边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "保留归档与退出",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

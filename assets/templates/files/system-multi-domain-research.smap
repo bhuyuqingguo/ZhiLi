@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "多域科研协作视图",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "科研任务管理",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "研究目标与范围",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "活动计划与评审",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "成果和问题记录",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "空中平台研究",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "平台分类与资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "观测载荷研究",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "数据采集质量评价",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "水面与水下研究",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "水面平台资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "水下平台资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "环境适应性研究",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "地面与支撑研究",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "地面平台资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "实验场地与设备",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "通用通信与数据服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "协作与共享",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "数据格式和语义",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "实验资料归档",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "跨团队结果复核",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "体系全景",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "使命与边界",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "说明服务对象",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "定义期望结果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "列出体系内外边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "参与主体",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "业务使用方",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "管理与协调方",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "外部合作方",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "主要活动",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "需求接收与确认",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "协同处理与交付",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "效果评价与改进",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "信息与资源",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "输入输出信息",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "共享数据与知识",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "设施与人员资源",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "约束与演进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "适用政策和标准",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "资源与时间约束",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "阶段性演进目标",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

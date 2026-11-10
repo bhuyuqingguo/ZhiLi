@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "mindmap",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "创新实践营",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "主题与规则",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "发布问题清单",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "明确时间和资源边界",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "说明原创与数据使用要求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "团队组织",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "完成技能与兴趣匹配",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "明确团队内部职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "约定沟通和记录方式",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "实践支持",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "安排导师答疑",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "提供通用工具和资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "设置阶段检查点",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "成果展示",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "说明用户问题",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "演示可验证成果",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "展示限制与下一步计划",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "后续推进",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "整理反馈和改进项",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "确认继续验证的方向",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "归档材料与使用许可",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

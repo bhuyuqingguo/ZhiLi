@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "园区服务体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "服务对象",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "入驻团队",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "访客与活动参与者",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "设施管理人员",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "空间服务",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "办公与共享空间",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "会议与活动场所",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "导览和无障碍设施",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "设施服务",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "公共设备维护",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "环境与基础保障",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "问题报修与反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "组织协作",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "服务台与管理职责",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "外部服务商对接",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "信息通知与协调",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "服务优化",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "使用需求收集",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "服务质量评价",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "空间和资源优化",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

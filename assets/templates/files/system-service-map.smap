@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "服务体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "服务对象",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "主要使用者群体",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "典型使用场景",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "差异化服务需求",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "核心服务",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "咨询与信息服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "申请与处理服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "持续支持服务",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "服务渠道",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "线下服务窗口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "线上业务入口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "统一咨询渠道",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "交付保障",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "责任与处理时限",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "资源与知识支持",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "异常转接与反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "质量管理",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "服务体验评价",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "问题分析与改进",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "服务目录更新",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

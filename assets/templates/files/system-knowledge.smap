@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "知识管理体系",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "知识来源",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "项目经验与复盘",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "业务问题与解答",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "经授权的外部资料",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "知识组织",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "主题与分类",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "索引与关键词",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "版本与适用条件",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "知识共享",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "目标读者与渠道",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "内容审核与发布",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "分享与答疑机制",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "知识应用",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "按场景查找",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "复用清单和示例",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "收集应用反馈",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "知识维护",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "责任人与更新周期",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "过时内容处理",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "价值和覆盖评估",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}

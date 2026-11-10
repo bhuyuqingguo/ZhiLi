@@ -1,0 +1,160 @@
+{
+  "format": "simplemap-json",
+  "version": 1,
+  "layout": "organization",
+  "root": "n1",
+  "nodes": [
+    {
+      "id": "n1",
+      "text": "逻辑组件架构",
+      "children": [
+        "n2",
+        "n6",
+        "n10",
+        "n14",
+        "n18"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n2",
+      "text": "交互组件",
+      "children": [
+        "n3",
+        "n4",
+        "n5"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n3",
+      "text": "输入与校验",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n4",
+      "text": "视图与导航",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n5",
+      "text": "用户偏好",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n6",
+      "text": "业务组件",
+      "children": [
+        "n7",
+        "n8",
+        "n9"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n7",
+      "text": "领域规则",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n8",
+      "text": "业务流程",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n9",
+      "text": "结果组织",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n10",
+      "text": "数据组件",
+      "children": [
+        "n11",
+        "n12",
+        "n13"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n11",
+      "text": "数据模型",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n12",
+      "text": "持久化接口",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n13",
+      "text": "查询与索引",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n14",
+      "text": "集成组件",
+      "children": [
+        "n15",
+        "n16",
+        "n17"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n15",
+      "text": "外部接口适配",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n16",
+      "text": "消息与文件交换",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n17",
+      "text": "格式与版本转换",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n18",
+      "text": "公共组件",
+      "children": [
+        "n19",
+        "n20",
+        "n21"
+      ],
+      "collapsed": false
+    },
+    {
+      "id": "n19",
+      "text": "日志与诊断",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n20",
+      "text": "配置与本地化",
+      "children": [],
+      "collapsed": false
+    },
+    {
+      "id": "n21",
+      "text": "错误与状态管理",
+      "children": [],
+      "collapsed": false
+    }
+  ]
+}
