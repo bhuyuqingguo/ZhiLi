@@ -55,7 +55,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $root 'examples') -Recurse -Destination $bundle
     $env:Path = $previousPath
     $env:QT_QPA_PLATFORM = 'windows'
-    $proc = Start-Process -FilePath $exe -WorkingDirectory $bundle -PassThru
+    $proc = Start-Process -FilePath $exe -WorkingDirectory $bundle -WindowStyle Hidden -PassThru
     try {
         if ($proc.WaitForExit(3000)) { throw "Portable app exited during startup (exit $($proc.ExitCode))." }
     } finally {
@@ -76,11 +76,31 @@ try {
     New-Item -ItemType Directory -Force -Path $out | Out-Null
     $name = 'ZhiLi-Windows-x64.zip'
     $archive = Join-Path $out $name
-    Compress-Archive -LiteralPath $bundle -DestinationPath $archive -Force
+    # Use the legacy Chinese code page for entry names on Chinese Windows.
+    [Text.Encoding]::RegisterProvider([Text.CodePagesEncodingProvider]::Instance)
+    $encoding = [Text.Encoding]::GetEncoding(936, [Text.EncoderFallback]::ExceptionFallback,
+                                              [Text.DecoderFallback]::ExceptionFallback)
+    if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
+    [IO.Compression.ZipFile]::CreateFromDirectory($bundle, $archive,
+        [IO.Compression.CompressionLevel]::Optimal, $true, $encoding)
+    $zip = [IO.Compression.ZipFile]::Open($archive, [IO.Compression.ZipArchiveMode]::Read, $encoding)
+    try {
+        foreach ($file in Get-ChildItem -LiteralPath $bundle -Recurse -File) {
+            $entry = [IO.Path]::GetRelativePath($stage, $file.FullName).Replace('\', '/')
+            if (!$zip.GetEntry($entry)) { throw "ZIP entry did not round-trip: $entry" }
+        }
+    } finally { $zip.Dispose() }
     $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
     "$hash  $name" | Set-Content -LiteralPath "$archive.sha256" -Encoding ascii
     Write-Output $archive
 } finally {
     $env:Path = $previousPath
-    if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+    if (Test-Path -LiteralPath $stage) {
+        $resolvedStage = (Resolve-Path -LiteralPath $stage).Path
+        $resolvedBuild = (Resolve-Path -LiteralPath $build).Path + [IO.Path]::DirectorySeparatorChar
+        if (!$resolvedStage.StartsWith($resolvedBuild, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Staging directory is outside the build directory: $resolvedStage"
+        }
+        Remove-Item -LiteralPath $resolvedStage -Recurse -Force
+    }
 }

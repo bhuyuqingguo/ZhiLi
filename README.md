@@ -1,29 +1,25 @@
 # 枝理 ZhiLi
 
-枝理是一款纯离线的桌面思维导图编辑器。同一棵树可在经典左右导图和自上而下结构图之间切换。导图保存在本机，可以导出 PNG、SVG、PDF 或可编辑 PowerPoint。
+枝理是一款纯离线的桌面思维导图编辑器。同一棵树可在经典双侧、向右展开、向左展开和纵向结构图之间切换。导图保存在本机，可以导出 PNG、SVG、PDF 或可编辑 PowerPoint。
 
-当前源码候选版新增 80 个可编辑模板、128 个分类图形符号、分支复制剪切粘贴、外部导图结构导入和 PowerPoint 分页导出。源码中的新功能不代表现有 Releases 下载包已经更新；请核对包对应的提交与测试记录。
-
-## 当前候选版状态
-
-本分支同步离线工作增强源码与本文档，运行代码来自已交付的 `af95f98704183ed4b18c12b539cfd54137cae7a8` 候选版。旧的 Releases 下载包不会因源码上传自动更新。
+## 版本与验收
 
 - **已实现**：80 个模板、128 个双风格图形符号、四种导图布局、多选与主题样式批量编辑、分支剪贴板、缩进大纲粘贴、同级排序、窗口尺寸记忆、结构导入与可编辑 PowerPoint 分页导出。
-- **已有验证**：该候选版在 Linux x86_64 / Qt 5.15.15 的 14 项 Release 回归与 14 项 AddressSanitizer / UndefinedBehaviorSanitizer 回归通过，覆盖 100%、125%、150%、200% Qt 模拟缩放。LeakSanitizer 未启用，不宣称完成泄漏检查。
-- **尚需验收**：Windows、银河麒麟 V10 SP1 / 飞腾 D2000 真机、中文输入法、混合 DPI，以及 Microsoft PowerPoint / WPS 的实际兼容性。源码上传、平台 CI 与 Release 发布分别进行；下载前请核对具体 Release 的提交和资产说明。
+- **发布验证**：Windows x64 和 Linux ARM64 的 CI 构建、回归测试及下载包校验通过后发布。测试包含 100%、125%、150%、200% Qt 模拟缩放。
+- **尚需验收**：银河麒麟 V10 SP1 / 飞腾 D2000 真机、实际中文输入法、混合 DPI，以及 Microsoft PowerPoint / WPS 的实际兼容性。
 - **尚未实现**：原生 Visio `.vsdx` 交换、完整跨软件往返、任意图片和附件、浮动主题、关系线／概要／边界及完整任务管理。
 
 具体真机检查步骤见 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)。
 
 ## 下载和启动
 
-在 [GitHub Releases](https://github.com/bhuyuqingguo/ZhiLi/releases) 选择带 `-test` 的测试版。下载对应平台的应用压缩包。Release 中的 Source code 和 Qt 源码压缩包用于查阅或重新构建。
+在 [GitHub Releases](https://github.com/bhuyuqingguo/ZhiLi/releases) 下载对应平台的应用压缩包。带 `-test` 的版本为预发布版。Release 中的 Source code 和 Qt 源码压缩包用于查阅或重新构建。
 
 ### Windows 10 / 11 x64
 
 1. 下载 `ZhiLi-Windows-x64.zip`，右键选择「全部解压缩」。
 2. 进入解压目录的 `ZhiLi` 文件夹，双击 `simplemap.exe`。请保留同目录 DLL 和 `platforms` 文件夹。
-3. 软件是未签名的测试版，若单位电脑限制运行新程序，请让本机管理员按单位流程处理。可以先在 PowerShell 中执行 `Get-FileHash -Algorithm SHA256 .\ZhiLi-Windows-x64.zip`，与同名 `.sha256` 校验文件比对。
+3. 软件未做代码签名。若单位电脑限制运行新程序，请让本机管理员按单位流程处理。可以在 PowerShell 中执行 `Get-FileHash -Algorithm SHA256 .\ZhiLi-Windows-x64.zip`，与同名 `.sha256` 校验文件比对。
 
 ### 银河麒麟桌面 V10 SP1 / 飞腾 D2000 ARM64
 
