@@ -10,9 +10,11 @@ int runSmokeTest() {
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, temp.path());
     qInfo() << "Smoke platform:" << QApplication::platformName();
     const QStringList embedded = embeddedFontFamilies();
-    CHECK(embedded.size() == 2);
+    CHECK(embedded.size() == 4);
     for (const auto &family : embedded) {
         const QRawFont raw = QRawFont::fromFont(fontFor({family, 12, false}));
+        if (!raw.isValid() || raw.familyName() != family || !raw.supportsCharacter(QChar(0x679D)))
+            qCritical() << family << raw.familyName() << raw.isValid() << raw.supportsCharacter(QChar(0x679D));
         CHECK(raw.isValid() && raw.familyName() == family && raw.supportsCharacter(QChar(0x679D)));
     }
     Window window(false);
@@ -71,6 +73,98 @@ int runSmokeTest() {
     const QString secondMatch = add(second, QStringLiteral("运行环境与输入法"));
     const QString lastSearchMatch = add(second, QStringLiteral("数据安全与离线验证"));
     CHECK(window.doc.nodes.size() == 7);
+
+    {
+        Window workspace(false);
+        workspace.doc = window.doc;
+        workspace.doc.nodes[first].style.alignment = TextAlignment::Left;
+        workspace.doc.nodes[first].style.points = 16;
+        workspace.initializeDocument();
+        workspace.show();
+        workspace.activateWindow();
+        workspace.canvas->setFocus();
+        QTest::qWait(40);
+        workspace.fit();
+        auto point = [&](const QString &id) {
+            return workspace.canvas->mapFromScene(workspace.items.value(id).body->pos());
+        };
+        auto drag = [&](const QString &from, const QString &to, Qt::KeyboardModifiers modifiers = Qt::NoModifier) {
+            QTest::mousePress(workspace.canvas->viewport(), Qt::LeftButton, modifiers, point(from));
+            QTest::mouseRelease(workspace.canvas->viewport(), Qt::LeftButton, modifiers, point(to));
+        };
+        const QByteArray original = workspace.doc.serialize();
+        workspace.replaceSelection({secondMatch, child, sibling});
+        drag(secondMatch, root);
+        CHECK(workspace.doc.nodes.value(root).children == (QStringList{first, second, child, sibling, secondMatch}));
+        CHECK(workspace.additionalSelection.size() == 2 && workspace.undoStack.size() == 1);
+        workspace.history(true);
+        CHECK(workspace.doc.serialize() == original);
+
+        workspace.replaceSelection({first, child, secondMatch});
+        drag(child, sibling);
+        CHECK(workspace.doc.serialize() == original && workspace.undoStack.isEmpty());
+        drag(child, second, Qt::ControlModifier);
+        CHECK(workspace.doc.nodes.size() == 11 && workspace.additionalSelection.size() == 1);
+        const auto copies = workspace.doc.nodes.value(second).children.mid(2);
+        CHECK(copies.size() == 2 && workspace.doc.nodes.value(copies.first()).children.size() == 2);
+        workspace.history(true);
+        CHECK(workspace.doc.serialize() == original);
+        workspace.replaceSelection({child, sibling});
+        QTest::mouseClick(workspace.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, point(sibling));
+        CHECK(workspace.selected == sibling && workspace.additionalSelection.isEmpty());
+
+        workspace.selectNode(first);
+        workspace.findChild<QAction *>("focusBranchAction")->trigger();
+        CHECK(workspace.items.size() == 3 && workspace.items.contains(child) && !workspace.edges.contains(first));
+        CHECK(!workspace.dirty && workspace.undoStack.isEmpty() && workspace.doc.serialize() == original);
+        QString error;
+        const QString fullPath = temp.filePath("full-from-focus.svg");
+        CHECK(workspace.exportTo(fullPath, "svg", &error));
+        QFile full(fullPath);
+        CHECK(full.open(QIODevice::ReadOnly) && full.readAll().contains(QStringLiteral("技术验证").toUtf8()));
+        CHECK(workspace.focusRoot == first);
+        QTest::keyClick(workspace.canvas, Qt::Key_Escape);
+        CHECK(workspace.focusRoot.isEmpty() && workspace.items.size() == 7);
+        workspace.focusBranch();
+        workspace.query = QStringLiteral("技术验证");
+        workspace.search(false);
+        CHECK(workspace.focusRoot.isEmpty() && workspace.selected == second);
+
+        workspace.selectNode(first);
+        workspace.findChild<QAction *>("copyTopicStyleAction")->trigger();
+        workspace.replaceSelection({secondMatch, sibling});
+        workspace.findChild<QAction *>("pasteTopicStyleAction")->trigger();
+        CHECK(workspace.doc.nodes.value(secondMatch).style == workspace.doc.nodes.value(first).style);
+        CHECK(workspace.doc.nodes.value(sibling).style == workspace.doc.nodes.value(first).style);
+        CHECK(workspace.undoStack.size() == 1);
+        workspace.history(true);
+        CHECK(workspace.doc.serialize() == original);
+
+        workspace.selectNode(first);
+        workspace.toggleCollapse();
+        const QByteArray beforeExport = workspace.doc.serialize();
+        const QString nativePath = temp.filePath("selected-branch.smap");
+        const QString svgPath = temp.filePath("selected-branch.svg");
+        CHECK(workspace.exportBranchTo(first, nativePath, "smap", &error));
+        QFile native(nativePath);
+        Document detached;
+        CHECK(native.open(QIODevice::ReadOnly) && detached.parse(native.readAll(), &error));
+        CHECK(detached.root == first && detached.nodes.size() == 3 && detached.nodes.value(first).collapsed);
+        CHECK(workspace.exportBranchTo(first, svgPath, "svg", &error));
+        QFile svg(svgPath);
+        CHECK(svg.open(QIODevice::ReadOnly));
+        const auto branchSvg = svg.readAll();
+        CHECK(branchSvg.contains(QStringLiteral("梳理需求与验收指标").toUtf8()));
+        CHECK(!branchSvg.contains(QStringLiteral("技术验证").toUtf8()));
+        workspace.findChild<QAction *>("copyBranchImageAction")->trigger();
+        const QImage copiedImage = QApplication::clipboard()->image();
+        CHECK(!copiedImage.isNull() && copiedImage.pixelColor(0, 0).alpha() == 0);
+        CHECK(workspace.doc.serialize() == beforeExport && workspace.selected == first && workspace.undoStack.size() == 1);
+        workspace.hide();
+        window.activateWindow();
+        window.canvas->setFocus();
+        QTest::qWait(30);
+    }
 
     {
         Window routing(false);
@@ -796,6 +890,10 @@ int runSmokeTest() {
     const auto zoomIn = window.findChild<QToolButton *>("zoomIn");
     const auto zoomOut = window.findChild<QToolButton *>("zoomOut");
     CHECK(toolbar && compact && zoomLevel && zoomIn && zoomOut);
+    const auto convert = toolbar->findChild<QToolButton *>("workspaceConvert");
+    const auto convertAction = window.findChild<QAction *>("convertFileAction");
+    CHECK(!QApplication::windowIcon().pixmap(24, 24).isNull());
+    CHECK(convert && convertAction && convert->defaultAction() == convertAction && !convert->icon().isNull());
 
     // Windows can clamp requested dimensions to the scaled desktop work area.
     const auto toolbarMatchesWindow = [&] {
@@ -858,7 +956,7 @@ int runSmokeTest() {
     CHECK(window.canvas->viewport()->rect().contains(editRect.center()));
     window.finishEdit(false);
 
-    bool dialogOperated = false;
+    bool dialogOperated = false, appearanceChecked = true;
     QTimer::singleShot(0, &window, [&] {
         auto *dialog = window.findChild<QDialog *>("appearanceDialog");
         if (!dialog) return;
@@ -872,6 +970,19 @@ int runSmokeTest() {
             dialog->reject();
             return;
         }
+        const QFontDatabase database;
+        const auto chinese = database.families(QFontDatabase::SimplifiedChinese)
+            + database.families(QFontDatabase::TraditionalChinese);
+        for (const auto *list : {interfaceFamily, topicFamily}) {
+            for (int i = 0; i < embedded.size(); ++i) {
+                if (list->itemData(i + 1).toString() != embedded.at(i)) appearanceChecked = false;
+            }
+            bool nonChineseSeen = false;
+            for (int i = embedded.size() + 1; i < list->count(); ++i) {
+                if (!chinese.contains(list->itemData(i).toString())) nonChineseSeen = true;
+                else if (nonChineseSeen) appearanceChecked = false;
+            }
+        }
         interfaceFamily->setCurrentIndex(interfaceFamily->findData(embedded.at(1)));
         interfaceSize->setValue(22);
         topicFamily->setCurrentIndex(topicFamily->findData(embedded.at(1)));
@@ -883,7 +994,7 @@ int runSmokeTest() {
     });
     const bool wasDirty = window.dirty;
     window.changeAppearance();
-    CHECK(dialogOperated);
+    CHECK(dialogOperated && appearanceChecked);
     QTest::qWait(60);
     CHECK(window.dirty == wasDirty && compact->isVisible());
     int visibleControls = 0;
@@ -892,7 +1003,7 @@ int runSmokeTest() {
         CHECK(button->isVisible() && compact->rect().contains(button->geometry()));
         ++visibleControls;
     }
-    CHECK(visibleControls == 4);
+    CHECK(visibleControls == 5);
     CHECK(QApplication::font().pointSize() == 22 && QApplication::font().family() == embedded.at(1));
     const QFont labelFont = window.items.value(child).label->font();
     CHECK(labelFont.family() == embedded.at(1) && labelFont.pointSize() == 18 && labelFont.bold());

@@ -7,7 +7,7 @@ find_package(Qt5 5.9 REQUIRED COMPONENTS Widgets Svg)
 
 qt5_add_resources(zhili_template_resources assets/templates.qrc)
 add_library(zhili_core STATIC src/document.cpp src/layout.cpp src/clipboard.cpp
-  src/pptx.cpp src/importer.cpp src/templates.cpp ${zhili_template_resources})
+  src/pptx.cpp src/importer.cpp src/emmx_binary.cpp src/mindnode_next.cpp src/exchange.cpp src/templates.cpp ${zhili_template_resources})
 target_link_libraries(zhili_core PUBLIC Qt5::Core)
 qt5_add_resources(zhili_font_resources assets/fonts.qrc)
 add_library(zhili_appearance STATIC src/appearance.cpp ${zhili_font_resources})
@@ -17,12 +17,26 @@ add_library(zhili_symbols STATIC src/symbols.cpp src/symbolpicker.cpp ${zhili_sy
 target_link_libraries(zhili_symbols PUBLIC Qt5::Widgets Qt5::Svg)
 add_library(zhili_templates_ui STATIC src/template_dialog.cpp)
 target_link_libraries(zhili_templates_ui PUBLIC zhili_core Qt5::Widgets)
-add_executable(simplemap WIN32 MACOSX_BUNDLE src/main.cpp)
+qt5_add_resources(zhili_branding_resources assets/branding.qrc)
+add_executable(simplemap WIN32 MACOSX_BUNDLE src/main.cpp ${zhili_branding_resources})
 target_link_libraries(simplemap PRIVATE zhili_core zhili_appearance zhili_symbols zhili_templates_ui Qt5::Svg)
 set_target_properties(simplemap PROPERTIES
   MACOSX_BUNDLE_GUI_IDENTIFIER org.zhili.simplemap
   MACOSX_BUNDLE_BUNDLE_NAME ZhiLi
   MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+if(WIN32)
+  enable_language(RC)
+  configure_file(assets/branding/zhili.ico zhili.ico COPYONLY)
+  configure_file(packaging/windows-icon.rc zhili-icon.rc COPYONLY)
+  target_sources(simplemap PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/zhili-icon.rc")
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/zhili-icon.rc" PROPERTIES
+    OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/zhili.ico")
+elseif(APPLE)
+  set(zhili_mac_icon assets/branding/zhili.icns)
+  set_source_files_properties("${zhili_mac_icon}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  target_sources(simplemap PRIVATE "${zhili_mac_icon}")
+  set_target_properties(simplemap PROPERTIES MACOSX_BUNDLE_ICON_FILE zhili.icns)
+endif()
 
 if(MSVC)
   target_compile_options(zhili_core PRIVATE /utf-8)
@@ -35,7 +49,7 @@ endif()
 include(CTest)
 if(BUILD_TESTING)
   find_package(Qt5 5.9 REQUIRED COMPONENTS Test)
-  add_executable(zhili_smoke src/main.cpp)
+  add_executable(zhili_smoke src/main.cpp ${zhili_branding_resources})
   target_compile_definitions(zhili_smoke PRIVATE ZHILI_TEST)
   target_link_libraries(zhili_smoke PRIVATE zhili_core zhili_appearance zhili_symbols zhili_templates_ui Qt5::Svg Qt5::Test)
   add_executable(zhili_document_test tests/document_test.cpp)
@@ -97,7 +111,13 @@ if(BUILD_TESTING)
 endif()
 
 install(TARGETS simplemap RUNTIME DESTINATION bin BUNDLE DESTINATION .)
+if(UNIX AND NOT APPLE)
+  install(FILES assets/branding/zhili.svg DESTINATION share/icons/hicolor/scalable/apps
+    RENAME org.zhili.simplemap.svg)
+  install(FILES packaging/org.zhili.simplemap.desktop DESTINATION share/applications)
+endif()
 install(FILES assets/fonts/OFL-SourceHanSans.txt assets/fonts/OFL-SourceHanSerif.txt
+  assets/fonts/OFL-LXGWWenKaiGBLite.txt assets/fonts/OFL-SmileySans.txt
   DESTINATION share/licenses/zhili)
 
 install(FILES assets/symbols/LICENSE.txt DESTINATION share/licenses/zhili RENAME SYMBOLS-CC0.txt)

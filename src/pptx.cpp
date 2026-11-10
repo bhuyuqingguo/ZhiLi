@@ -1,5 +1,6 @@
 #include "pptx.h"
 #include "layout.h"
+#include "package_writer.h"
 
 #include <QtMath>
 #include <functional>
@@ -496,7 +497,7 @@ QByteArray slideXml(const Page &page, int number, int total, const QMap<QString,
     });
 }
 
-struct Part { QString name; QByteArray bytes; };
+using Part = PackagePart;
 
 QByteArray relationships(const QList<QPair<QString, QString>> &items) {
     return xml([&](QXmlStreamWriter &out) {
@@ -583,13 +584,15 @@ void dword(QByteArray *out, quint32 value) {
     word(out, quint16(value)); word(out, quint16(value >> 16));
 }
 
-bool zip(const QVector<Part> &parts, QByteArray *bytes, QString *error) {
+}
+
+bool buildStoredPackage(const QVector<PackagePart> &parts, int byteLimit, QByteArray *bytes) {
     QByteArray directory;
-    for (const Part &part : parts) {
+    for (const PackagePart &part : parts) {
         const QByteArray name = part.name.toUtf8();
         const quint32 crc = crc32(part.bytes), offset = quint32(bytes->size()), size = quint32(part.bytes.size());
-        if (qint64(bytes->size()) + part.bytes.size() + directory.size() + 2 * name.size() + 100 > maxPackageBytes)
-            return fail(error, QStringLiteral("PowerPoint 文件超过 64 MiB 导出上限，请分拆导图"));
+        if (qint64(bytes->size()) + part.bytes.size() + directory.size() + 2 * name.size() + 100 > byteLimit)
+            return false;
         dword(bytes, 0x04034b50); word(bytes, 20); word(bytes, 0x800); word(bytes, 0);
         word(bytes, 0); word(bytes, 0x21); dword(bytes, crc); dword(bytes, size); dword(bytes, size);
         word(bytes, quint16(name.size())); word(bytes, 0); bytes->append(name); bytes->append(part.bytes);
@@ -603,7 +606,6 @@ bool zip(const QVector<Part> &parts, QByteArray *bytes, QString *error) {
     dword(bytes, 0x06054b50); word(bytes, 0); word(bytes, 0); word(bytes, quint16(parts.size())); word(bytes, quint16(parts.size()));
     dword(bytes, quint32(directory.size())); dword(bytes, offset); word(bytes, 0);
     return true;
-}
 }
 
 bool exportPptx(const Document &document, const QString &path, QString *error) {
@@ -712,6 +714,7 @@ bool exportPptx(const Document &document, const QString &path,
         add(QStringLiteral("ppt/slides/_rels/slide%1.xml.rels").arg(i + 1), relationships(rels));
     }
     QByteArray bytes;
-    if (!zip(parts, &bytes, error)) return false;
+    if (!buildStoredPackage(parts, maxPackageBytes, &bytes))
+        return fail(error, QStringLiteral("PowerPoint 文件超过 64 MiB 导出上限，请分拆导图"));
     return writeAtomically(path, bytes, error);
 }

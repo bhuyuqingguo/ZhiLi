@@ -142,8 +142,7 @@ bool paste(Document *document, const QString &parent, const QByteArray &data,
     return insert(document, parent, branch, roots, insertedRoots, error);
 }
 
-bool pasteOutline(Document *document, const QString &parent, const QString &text,
-                  QStringList *insertedRoots, QString *error) {
+bool parseOutline(const QString &text, const QString &title, Document *out, QString *error) {
     // Validate before toUtf8()/JSON, which can hide malformed UTF-16 on Qt 5.12.
     if (!validUnicode(text))
         return reject(error, QStringLiteral("剪贴板文字包含无效字符，请重新复制"));
@@ -157,6 +156,7 @@ bool pasteOutline(Document *document, const QString &parent, const QString &text
     source.root = "clipboard-root";
     Node root;
     root.id = source.root;
+    root.text = title;
     source.nodes.insert(root.id, root);
     QVector<int> indents;
     QStringList ancestors;
@@ -205,10 +205,18 @@ bool pasteOutline(Document *document, const QString &parent, const QString &text
         if (ancestors.size() > level) ancestors[level] = node.id;
         else ancestors.append(node.id);
     }
-    const QStringList roots = source.nodes.value(source.root).children;
-    if (roots.isEmpty()) return reject(error, QStringLiteral("剪贴板中没有可粘贴的主题"));
+    if (source.nodes.value(source.root).children.isEmpty()) return reject(error, QStringLiteral("大纲中没有主题"));
+    *out = std::move(source);
+    return true;
+}
+
+bool pasteOutline(Document *document, const QString &parent, const QString &text,
+                  QStringList *insertedRoots, QString *error) {
+    Document source;
+    if (!parseOutline(text, {}, &source, error)) return false;
     Document checked;
     if (!checked.parse(source.serialize(), error)) return false;
+    const QStringList roots = source.nodes.value(source.root).children;
     return insert(document, parent, source, roots, insertedRoots, error);
 }
 }

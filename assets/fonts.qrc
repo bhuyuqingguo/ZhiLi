@@ -2,7 +2,11 @@
   <qresource prefix="/fonts">
     <file alias="SourceHanSansCN-Regular.otf">fonts/SourceHanSansCN-Regular.otf</file>
     <file alias="SourceHanSerifCN-Regular.otf">fonts/SourceHanSerifCN-Regular.otf</file>
+    <file alias="LXGWWenKaiGBLite-Regular.ttf">fonts/LXGWWenKaiGBLite-Regular.ttf</file>
+    <file alias="SmileySans-Oblique.ttf">fonts/SmileySans-Oblique.ttf</file>
     <file alias="OFL-SourceHanSans.txt">fonts/OFL-SourceHanSans.txt</file>
     <file alias="OFL-SourceHanSerif.txt">fonts/OFL-SourceHanSerif.txt</file>
+    <file alias="OFL-LXGWWenKaiGBLite.txt">fonts/OFL-LXGWWenKaiGBLite.txt</file>
+    <file alias="OFL-SmileySans.txt">fonts/OFL-SmileySans.txt</file>
   </qresource>
 </RCC>

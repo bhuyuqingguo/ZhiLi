@@ -5,12 +5,39 @@
 
 namespace {
 QStringList embeddedFamilies;
+QMap<QString, QString> embeddedLabels;
 
-void addEmbeddedFont(const QString &file) {
+void addEmbeddedFont(const QString &file, const QString &label) {
     const int id = QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/") + file);
-    const QStringList families = QFontDatabase::applicationFontFamilies(id);
-    if (!families.isEmpty()) embeddedFamilies.append(families.first());
-    else qWarning() << "Unable to load bundled font" << file;
+    QStringList families = QFontDatabase::applicationFontFamilies(id);
+    families.removeAll(QString());
+    if (families.isEmpty()) {
+        qWarning() << "Unable to load bundled font" << file;
+        return;
+    }
+    const QString name = families.first();
+    embeddedFamilies.append(name);
+    embeddedLabels.insert(name, label);
+}
+
+void addFontFamilies(QComboBox *combo, const QString &defaultLabel) {
+    const QFontDatabase database;
+    const auto simplified = database.families(QFontDatabase::SimplifiedChinese);
+    const auto traditional = database.families(QFontDatabase::TraditionalChinese);
+    const auto all = database.families();
+    QSet<QString> added;
+    combo->addItem(defaultLabel, QString());
+    for (const auto &name : embeddedFamilies) {
+        combo->addItem(embeddedLabels.value(name), name);
+        added.insert(name);
+    }
+    for (const auto &group : {simplified, traditional, all}) {
+        for (const auto &name : group) {
+            if (added.contains(name)) continue;
+            combo->addItem(name, name);
+            added.insert(name);
+        }
+    }
 }
 
 FontChoice readChoice(QSettings &settings, const QString &group, FontChoice fallback, int minimum, int maximum) {
@@ -53,14 +80,7 @@ FontControls addFontControls(QFormLayout *form, const FontChoice &choice, int mi
     FontControls fields{new QComboBox, new QSpinBox, new QComboBox};
     fields.family->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     fields.family->setMinimumContentsLength(9);
-    fields.family->addItem(QStringLiteral("系统默认字体"), QString());
-    for (const auto &name : embeddedFamilies) {
-        const QString label = name.contains("Serif") ? QStringLiteral("思源宋体（内置）") : QStringLiteral("思源黑体（内置）");
-        fields.family->addItem(label, name);
-    }
-    for (const auto &name : QFontDatabase().families()) {
-        if (!embeddedFamilies.contains(name)) fields.family->addItem(name, name);
-    }
+    addFontFamilies(fields.family, QStringLiteral("系统默认字体"));
     fields.size->setRange(minimum, maximum);
     fields.size->setSuffix(" pt");
     fields.weight->addItems({QStringLiteral("常规"), QStringLiteral("粗体")});
@@ -73,9 +93,12 @@ FontControls addFontControls(QFormLayout *form, const FontChoice &choice, int mi
 }
 
 void registerEmbeddedFonts() {
+    if (!embeddedFamilies.isEmpty()) return;
     Q_INIT_RESOURCE(fonts);
-    addEmbeddedFont("SourceHanSansCN-Regular.otf");
-    addEmbeddedFont("SourceHanSerifCN-Regular.otf");
+    addEmbeddedFont("SourceHanSansCN-Regular.otf", QStringLiteral("思源黑体（内置）"));
+    addEmbeddedFont("SourceHanSerifCN-Regular.otf", QStringLiteral("思源宋体（内置）"));
+    addEmbeddedFont("LXGWWenKaiGBLite-Regular.ttf", QStringLiteral("霞鹜文楷 GB（内置）"));
+    addEmbeddedFont("SmileySans-Oblique.ttf", QStringLiteral("得意黑（内置）"));
 }
 
 QStringList embeddedFontFamilies() {
@@ -241,11 +264,11 @@ bool editTopicStyle(QWidget *parent, const TopicStyle &current, int selectionCou
     const auto *changeAlignment = row(QStringLiteral("文字对齐"), "applyAlignment", alignment);
 
     auto *family = new QComboBox;
-    family->addItem(QStringLiteral("跟随全局字体"));
-    family->addItems(QFontDatabase().families());
+    family->setObjectName("topicStyleFamily");
+    addFontFamilies(family, QStringLiteral("跟随全局字体"));
     if (!current.family.isEmpty()) {
-        if (family->findText(current.family) == -1) family->addItem(current.family);
-        family->setCurrentIndex(family->findText(current.family));
+        if (family->findData(current.family) == -1) family->addItem(current.family, current.family);
+        family->setCurrentIndex(family->findData(current.family));
     }
     family->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     family->setMinimumContentsLength(12);
@@ -300,7 +323,7 @@ bool editTopicStyle(QWidget *parent, const TopicStyle &current, int selectionCou
     dialog.resize(qMin(490, parent->width()), qMin(416, parent->height()));
     if (dialog.exec() != QDialog::Accepted) return false;
     change->style.alignment = static_cast<TextAlignment>(alignment->currentIndex());
-    change->style.family = family->currentIndex() > 0 ? family->currentText() : QString();
+    change->style.family = family->currentData().toString();
     change->style.points = points->value() == 8 ? 0 : points->value();
     change->style.weight = weight->currentIndex() - 1;
     change->style.color = color->text().toLower();

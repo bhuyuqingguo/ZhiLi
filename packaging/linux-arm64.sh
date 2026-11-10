@@ -21,6 +21,10 @@ stage="$work/package"
 install -D -m 755 "$build_dir/simplemap" "$stage/usr/lib/zhili/simplemap"
 install -D -m 644 "$source_dir/packaging/org.zhili.simplemap.desktop" \
     "$stage/usr/share/applications/org.zhili.simplemap.desktop"
+sed -i 's|^Exec=simplemap$|Exec=/usr/lib/zhili/simplemap|' \
+    "$stage/usr/share/applications/org.zhili.simplemap.desktop"
+install -D -m 644 "$source_dir/assets/branding/zhili.svg" \
+    "$stage/usr/share/icons/hicolor/scalable/apps/org.zhili.simplemap.svg"
 
 for notice in "$source_dir"/assets/fonts/OFL-*.txt; do
     install -D -m 644 "$notice" "$stage/usr/share/doc/zhili/${notice##*/}"

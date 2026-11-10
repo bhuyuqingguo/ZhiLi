@@ -1,4 +1,4 @@
-#include "../src/document.h"
+#include "../src/branch_export.h"
 
 namespace {
 QByteArray encode(const QJsonObject &object) {
@@ -78,6 +78,37 @@ int main() {
     CHECK(rejects(legacy.left(legacy.size() / 2)));
     CHECK(rejects(chain(Document::maxDepth + 1)));
     CHECK(fallback.parse(chain(Document::maxDepth), &error));
+
+    Document source;
+    CHECK(source.parse(saved, &error));
+    source.mindMap = true;
+    source.branchDirection = BranchDirection::Left;
+    source.connectorStyle = ConnectorStyle::Curved;
+    source.nodes["root"].children = QStringList{"first"};
+    auto &first = source.nodes["first"];
+    first.children = QStringList{"second", "third"};
+    first.collapsed = true;
+    first.rootLane = BranchDirection::Right;
+    first.symbolId = "future-symbol";
+    first.style.alignment = TextAlignment::Right;
+    first.style.color = "#315426";
+    Node third;
+    third.id = "third";
+    third.text = QStringLiteral("隐藏的分支");
+    source.nodes.insert(third.id, third);
+    const QByteArray sourceSnapshot = source.serialize();
+
+    const Document branch = extractBranch(source, "first");
+    CHECK(branch.root == "first" && branch.nodes.size() == 3 && !branch.nodes.contains("root"));
+    CHECK(branch.mindMap && branch.branchDirection == BranchDirection::Left && branch.connectorStyle == ConnectorStyle::Curved);
+    const auto &branchRoot = branch.nodes.value(branch.root);
+    CHECK(branchRoot.collapsed && branchRoot.rootLane == BranchDirection::Both);
+    CHECK(branchRoot.symbolId == first.symbolId && branchRoot.style == first.style && branchRoot.children == first.children);
+    CHECK(branch.nodes.value("third").text == third.text);
+    Document reopened;
+    CHECK(reopened.parse(branch.serialize(), &error) && reopened.serialize() == branch.serialize());
+    CHECK(extractBranch(source, source.root).serialize() == sourceSnapshot);
+    CHECK(extractBranch(source, "missing").root.isEmpty() && source.serialize() == sourceSnapshot);
 
     QTemporaryDir temporary;
     CHECK(temporary.isValid());

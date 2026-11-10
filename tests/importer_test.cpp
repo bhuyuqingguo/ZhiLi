@@ -1,4 +1,7 @@
 #include "../src/importer.h"
+#include "../src/emmx_binary.h"
+#include "../src/exchange.h"
+#include "../src/pptx.h"
 
 namespace {
 // All fixtures are synthetic and built in memory. No vendor/customer files.
@@ -82,6 +85,17 @@ QByteArray emmx(const QByteArray &shapes) {
 bool write(const QString &path, const QByteArray &bytes) {
     QFile file(path);
     return file.open(QIODevice::WriteOnly) && file.write(bytes) == bytes.size() && file.flush();
+}
+
+QByteArray protoBytes(int tag, const QByteArray &data) {
+    QByteArray bytes(1, char(tag * 8 + 2));
+    int size = data.size();
+    while (size >= 128) {
+        bytes.append(char((size & 127) | 128));
+        size >>= 7;
+    }
+    bytes.append(char(size));
+    return bytes + data;
 }
 }
 
@@ -234,8 +248,190 @@ int main(int argc, char **argv) {
     CHECK(error.contains(QStringLiteral("二进制")));
     CHECK(rejects(zip({Part("document.xml", "<Document/>"), Part("page/a.xml", "<Page/>"), Part("page/b.xml", "<Page/>")}), emmxPath));
     CHECK(error.contains(QStringLiteral("多页")));
+    const QByteArray binaryMap = QByteArray::fromHex(
+        "01016e030165021b050601040104526f6f74000000000e026768000168021c0865000167021c08650000");
+    CHECK(readBinaryEmmxPage(binaryMap, &reopened, &error));
+    CHECK(reopened.nodes.value(reopened.root).text == "Root");
+    CHECK(reopened.nodes.value(reopened.root).children == (QStringList{"103", "104"}));
+    CHECK(!readBinaryEmmxPage(binaryMap.left(binaryMap.size() - 5), &reopened, &error));
+
+    const QString meisterPath = dir.filePath("test.mind");
+    CHECK(write(meisterPath, zip({Part("map.json", "{\"root\":{\"title\":\"计划\",\"children\":["
+        "{\"title\":\"第一项\"},{\"title\":\"第二项\",\"children\":[]}]}}", 8)})));
+    CHECK(importMindMap(meisterPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 3 && reopened.nodes.value(reopened.root).text == QStringLiteral("计划"));
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("第一项"));
+    CHECK(rejects(zip({Part("map.json", "{\"root\":{\"title\":4}}")}), meisterPath));
+
+    const QString mindomoPath = dir.filePath("test.pmom");
+    CHECK(write(mindomoPath, zip({Part("nodes.json", "[{\"id\":\"child2\",\"title\":\"乙\",\"parentId\":\"root\",\"index\":2},"
+        "{\"id\":\"root\",\"title\":\"计划\",\"style\":{\"expanded\":false}},"
+        "{\"id\":\"child1\",\"title\":\"甲\",\"parentId\":\"root\",\"index\":1},"
+        "{\"id\":\"hidden\",\"title\":\"模板\",\"isTemplate\":1}]"), Part("attachments/payload.bin", "ignored")})));
+    CHECK(importMindMap(mindomoPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 3 && reopened.nodes.value(reopened.root).collapsed);
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("甲"));
+
+    const QByteArray docId(16, 'd'), rootId(16, 'r'), childId(16, 'c');
+    const auto span = [](const QByteArray &label) { return protoBytes(1, protoBytes(4, protoBytes(1, label))); };
+    const QByteArray rootNode = protoBytes(1, rootId) + protoBytes(2, protoBytes(11, span("Ro") + span("ot\nLabel")));
+    const QByteArray childNode = protoBytes(1, childId) + protoBytes(2, protoBytes(11, span("孩子")));
+    const QByteArray relations = protoBytes(1, docId)
+        + protoBytes(2, protoBytes(1, rootId) + protoBytes(2, docId))
+        + protoBytes(2, protoBytes(1, childId) + protoBytes(2, rootId));
+    const QByteArray nextDoc = protoBytes(2, rootNode) + protoBytes(2, childNode) + protoBytes(3, relations);
+    const QByteArray nextFile = protoBytes(1, protoBytes(1, docId) + protoBytes(2, protoBytes(1, nextDoc)));
+    const QString nextPath = dir.filePath("next.mindnode");
+    CHECK(write(nextPath, zip({Part("Metadata.json", "{\"fileFormatVersion\":1,\"minFileFormatVersionForReading\":1}"),
+                               Part("Contents.data", nextFile)})));
+    CHECK(importMindMap(nextPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 2 && reopened.nodes.value(reopened.root).text == "Root\nLabel");
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("孩子"));
     CHECK(rejects(zip({Part("page/a.xml", "<Page/>" )}), emmxPath));
     CHECK(rejects(zip({Part("document.xml", "<Document/>"), Part("page/a.xml", "<!DOCTYPE Page [<!ENTITY x 'x'>]><Page/>")}), emmxPath));
+
+    const QString opmlPath = dir.filePath("迁移.大纲.OPML"), mmPath = dir.filePath("freeplane.mm");
+    const QByteArray outline = "<?xml version='1.0' encoding='UTF-8'?>"
+        "<opml version='2.0' xmlns:ext='urn:extension'><head><title> 项目 &amp; 🌿 </title></head><body>"
+        "<outline text='甲&#10;第二行'><outline text='叶子'/></outline>"
+        "<ext:outline text='扩展'><outline text='忽略'/></ext:outline>"
+        "<outline text='&lt;b&gt;乙&lt;/b&gt;' type='include' url='https://example.org/map.opml'/></body></opml>";
+    CHECK(write(opmlPath, outline));
+    CHECK(importMindMap(opmlPath, &reopened, &omissionWarnings, &error));
+    const Node opmlRoot = reopened.nodes.value(reopened.root);
+    CHECK(reopened.nodes.size() == 4 && opmlRoot.text == QStringLiteral("项目 & 🌿") && opmlRoot.children.size() == 2);
+    const Node firstEntry = reopened.nodes.value(opmlRoot.children[0]);
+    CHECK(firstEntry.text == QStringLiteral("甲\n第二行") && firstEntry.children.size() == 1);
+    CHECK(reopened.nodes.value(firstEntry.children[0]).text == QStringLiteral("叶子"));
+    CHECK(reopened.nodes.value(opmlRoot.children[1]).text == QStringLiteral("<b>乙</b>"));
+    CHECK(omissionWarnings.join('\n').contains(QStringLiteral("链接")));
+    for (const QByteArray &version : {QByteArray("1.0"), QByteArray("1.1")}) {
+        CHECK(write(opmlPath, "<opml version='" + version + "'><body><outline text=''/></body></opml>"));
+        CHECK(importMindMap(opmlPath, &reopened, nullptr, &error));
+        CHECK(reopened.nodes.size() == 2 && reopened.nodes.value(reopened.root).text == QStringLiteral("迁移.大纲"));
+    }
+    CHECK(rejects(outline.left(outline.size() - 1), opmlPath));
+    CHECK(rejects("<!DOCTYPE opml SYSTEM 'file:///private'><opml version='2.0'><body><outline text='x'/></body></opml>", opmlPath));
+    CHECK(rejects("<opml version='2.0'><body><outline/></body></opml>", opmlPath));
+    CHECK(rejects("<opml version='2.0'><body><outline text='x'/></body><body/></opml>", opmlPath));
+    CHECK(rejects("<opml version='2.0'><body/></opml>", opmlPath));
+
+    const QByteArray freeplane = "<map version='freeplane 1.12.15'>"
+        "<node TEXT='中心 🌿' ID='ID_1'><hook><node TEXT='忽略的样式'/></hook>"
+        "<node ID='ID_2'><richcontent TYPE='NODE'><html><head><title>忽略的页头</title></head><body>"
+        "\n  <p>甲 <b>&amp; 乙</b></p>\n  <p>第三行<br/>第四行</p>\n</body></html></richcontent>"
+        "<richcontent TYPE='NOTE'><html><body>忽略的备注</body></html></richcontent><node TEXT='叶子'/></node>"
+        "<node TEXT='第二分支'/></node></map>";
+    CHECK(write(mmPath, freeplane));
+    CHECK(importMindMap(mmPath, &reopened, &omissionWarnings, &error));
+    const Node mmRoot = reopened.nodes.value(reopened.root);
+    CHECK(reopened.nodes.size() == 4 && mmRoot.text == QStringLiteral("中心 🌿") && mmRoot.children.size() == 2);
+    const Node richTopic = reopened.nodes.value(mmRoot.children[0]);
+    CHECK(richTopic.text == QStringLiteral("甲 & 乙\n第三行\n第四行") && richTopic.children.size() == 1);
+    CHECK(reopened.nodes.value(richTopic.children[0]).text == QStringLiteral("叶子"));
+    CHECK(reopened.nodes.value(mmRoot.children[1]).text == QStringLiteral("第二分支"));
+    CHECK(omissionWarnings.join('\n').contains(QStringLiteral("备注")));
+    CHECK(write(mmPath, "<map version='1.0.1'><node TEXT='FreeMind'><node TEXT='下一级'/></node></map>"));
+    CHECK(importMindMap(mmPath, &reopened, nullptr, &error) && reopened.nodes.size() == 2);
+    CHECK(write(mmPath, "<map version='freeplane 1.5.6'><node TEXT='&lt;html&gt;&lt;head/&gt;&lt;body&gt;"
+                        "&lt;b&gt;富文本&lt;/b&gt;&lt;br&gt;第二行 &amp;#160; &lt;/body&gt;&lt;/html&gt;'/></map>"));
+    CHECK(importMindMap(mmPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.value(reopened.root).text == QStringLiteral("富文本\n第二行"));
+    CHECK(rejects(freeplane.left(freeplane.size() - 10), mmPath));
+    CHECK(rejects("<!DOCTYPE map [<!ENTITY x SYSTEM 'file:///private'>]><map><node TEXT='&x;'/></map>", mmPath));
+    CHECK(rejects("<map><node TEXT='one'/><node TEXT='two'/></map>", mmPath));
+    CHECK(rejects("<map><node TEXT='locked' ENCRYPTED_CONTENT='secret'/></map>", mmPath));
+    CHECK(rejects("<map><node TEXT='" + QByteArray(Document::maxText + 1, 'x') + "'/></map>", mmPath));
+    changed = "<node TEXT='leaf'/>";
+    for (int i = 0; i < Document::maxDepth; ++i) changed = "<node TEXT='x'>" + changed + "</node>";
+    CHECK(write(mmPath, "<map>" + changed + "</map>"));
+    CHECK(importMindMap(mmPath, &reopened, nullptr, &error) && reopened.nodes.size() == Document::maxDepth + 1);
+    CHECK(rejects("<map><node TEXT='too deep'>" + changed + "</node></map>", mmPath));
+
+    const QByteArray graph = "<mxGraphModel><root><mxCell id='0'/><mxCell id='1' parent='0'/>"
+        "<object id='r' label='中心 &amp; 计划'><mxCell vertex='1' parent='1'/></object>"
+        "<mxCell id='b' vertex='1' value='&lt;b&gt;第二行&lt;/b&gt;&lt;br&gt;更多' style='html=1;' parent='1'/>"
+        "<mxCell id='a' vertex='1' value='三' parent='1'/>"
+        "<mxCell id='e1' edge='1' source='r' target='b'/>"
+        "<mxCell id='e2' edge='1' source='r' target='a'/>"
+        "<mxCell id='e3' edge='1' source='a' target='r'/></root></mxGraphModel>";
+    const QString drawioPath = dir.filePath("graph.drawio");
+    CHECK(write(drawioPath, graph));
+    CHECK(importMindMap(drawioPath, &reopened, &omissionWarnings, &error));
+    CHECK(reopened.nodes.size() == 3 && reopened.nodes.value(reopened.root).text == QStringLiteral("中心 & 计划"));
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("第二行\n更多"));
+    CHECK(omissionWarnings.join('\n').contains(QStringLiteral("1 条连线")));
+    const QByteArray compressed = qCompress(QUrl::toPercentEncoding(QString::fromUtf8(graph)), 9);
+    const QByteArray encoded = compressed.mid(6, compressed.size() - 10).toBase64();
+    const QByteArray multiple = "<mxfile><diagram name='一'>" + graph
+        + "</diagram><diagram name='二'>" + encoded + "</diagram></mxfile>";
+    CHECK(write(drawioPath, multiple));
+    CHECK(importMindMap(drawioPath, &reopened, &omissionWarnings, &error));
+    CHECK(reopened.nodes.size() == 9 && reopened.nodes.value(reopened.root).children.size() == 2);
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.last()).text == QStringLiteral("二"));
+    CHECK(rejects("<mxfile><diagram>broken</diagram></mxfile>", drawioPath));
+    CHECK(rejects("<!DOCTYPE mxGraphModel>" + graph, drawioPath));
+
+    const QString xmindPath = dir.filePath("sample.xmind");
+    CHECK(write(xmindPath, zip({Part("content.json",
+        "[{\"rootTopic\":{\"title\":\"计划\",\"children\":{\"attached\":[{\"title\":\"任务\"}]}}},"
+        "{\"rootTopic\":{\"title\":\"记录\"}}]", 8)})));
+    CHECK(importMindMap(xmindPath, &reopened, &omissionWarnings, &error));
+    CHECK(reopened.nodes.size() == 4 && reopened.nodes.value(reopened.root).children.size() == 2);
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.last()).text == QStringLiteral("记录"));
+    CHECK(write(xmindPath, zip({Part("content.xml",
+        "<xmap-content xmlns='urn:xmind:xmap:xmlns:content:2.0'><sheet><title>旧工作表</title>"
+        "<topic id='r'><title>旧导图</title><children><topics type='attached'>"
+        "<topic id='c'><title>下一级</title></topic></topics></children></topic></sheet></xmap-content>", 8)})));
+    CHECK(importMindMap(xmindPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 2 && reopened.nodes.value(reopened.root).text == QStringLiteral("旧导图"));
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("下一级"));
+
+    const QString markdownPath = dir.filePath("outline.md"), plainPath = dir.filePath("outline.txt");
+    const QString mermaidPath = dir.filePath("diagram.mmd");
+    CHECK(write(markdownPath, "\xef\xbb\xbf# 计划\r\n## 研究\r\n- 甲\r\n  1. 甲的子项\r\n- 乙\r\n\n"
+                             "```cpp\n# ignored\n```\n## 验证\n"));
+    CHECK(importMindMap(markdownPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 6 && reopened.nodes.value(reopened.root).text == QStringLiteral("计划"));
+    const auto research = reopened.nodes.value(reopened.nodes.value(reopened.root).children.first());
+    CHECK(research.children.size() == 2 && reopened.nodes.value(research.children.first()).children.size() == 1);
+    CHECK(write(plainPath, "中心\n\t下级\n\t\t细节\n\t第二项\n"));
+    CHECK(importMindMap(plainPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 4 && reopened.nodes.value(reopened.root).text == QStringLiteral("中心"));
+    CHECK(rejects(QByteArray("\xff", 1), plainPath));
+    const QByteArray mermaid = "mindmap\n  root((中心))\n    next[后续工作]\n      note(\"细节\")\n"
+        "      ::icon(fa fa-book)\n    other{{另一项}}\n";
+    CHECK(write(mermaidPath, mermaid));
+    CHECK(importMindMap(mermaidPath, &reopened, nullptr, &error));
+    CHECK(reopened.nodes.size() == 4 && reopened.nodes.value(reopened.root).text == QStringLiteral("中心"));
+    CHECK(reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("后续工作"));
+    CHECK(write(markdownPath, "# 标题\n```mermaid\n" + mermaid + "```\n"));
+    CHECK(importMindMap(markdownPath, &reopened, nullptr, &error) && reopened.nodes.size() == 4);
+    CHECK(rejects("flowchart LR\n A --> B\n", mermaidPath));
+
+    Document exportSource = doc;
+    exportSource.nodes[exportSource.root].collapsed = true;
+    const auto roundTrip = [&](const QString &format, const QString &output) {
+        return exportExchange(exportSource, output, format, &error) &&
+            importMindMap(output, &reopened, nullptr, &error) &&
+            reopened.nodes.size() == doc.nodes.size() &&
+            reopened.nodes.value(reopened.root).text == root.text &&
+            reopened.nodes.value(reopened.nodes.value(reopened.root).children.first()).text == QStringLiteral("第二分支");
+    };
+    for (const auto &format : {QString("drawio"), QString("vsdx"), QString("opml"), QString("mm"), QString("canvas")}) {
+        const bool matched = roundTrip(format, dir.filePath("converted." + format));
+        if (!matched) qCritical() << format << error << reopened.serialize();
+        CHECK(matched);
+        if (format == "mm") CHECK(reopened.nodes.value(reopened.root).collapsed);
+    }
+    const QString pptxPath = dir.filePath("presentation.pptx");
+    CHECK(exportPptx(exportSource, pptxPath, &error));
+    CHECK(importMindMap(pptxPath, &reopened, &omissionWarnings, &error));
+    bool linked = false;
+    for (const auto &node : qAsConst(reopened.nodes))
+        if (node.text == QStringLiteral("第二分支") && !node.children.isEmpty())
+            linked = reopened.nodes.value(node.children.first()).text == QStringLiteral("细节");
+    CHECK(linked);
 
     // Deterministic corruption smoke test, useful under ASan/UBSan too.
     quint32 random = 0xace12345u;
@@ -253,6 +449,12 @@ int main(int argc, char **argv) {
         QDir output(QString::fromLocal8Bit(argv[1])); CHECK(QDir().mkpath(output.absolutePath()));
         CHECK(write(output.filePath("synthetic.mmap"), basicZip));
         CHECK(write(output.filePath("synthetic-legacy.emmx"), emmxZip));
+        CHECK(write(output.filePath("synthetic.opml"), outline));
+        CHECK(write(output.filePath("synthetic.mm"), freeplane));
+        CHECK(write(output.filePath("synthetic-multipage.drawio"), multiple));
+        for (const auto &format : {QString("drawio"), QString("vsdx"), QString("opml"), QString("mm")})
+            CHECK(roundTrip(format, output.filePath("converted." + format)));
+        CHECK(exportPptx(exportSource, output.filePath("converted.pptx"), &error));
     }
     qInfo() << "Importer synthetic tests passed";
     return 0;

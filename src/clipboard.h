@@ -9,6 +9,7 @@ const char *mimeType();
 QByteArray encode(const Document &document, const QString &root, QString *error = nullptr);
 QByteArray encode(const Document &document, const QStringList &roots, QString *error = nullptr);
 QString outline(const Document &document, const QString &root);
+bool parseOutline(const QString &text, const QString &title, Document *out, QString *error = nullptr);
 
 // A successful paste appends new children to parent and expands it. Every copied
 // node receives a fresh ID. Failure leaves document and insertedRoots unchanged.

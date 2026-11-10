@@ -2,7 +2,7 @@
 
 #include "document.h"
 
-// One-way, local conversion of supported .mmap and legacy XML .emmx files.
+// Local conversion of supported mind-map, drawing and presentation files.
 // Only topic hierarchy, order and plain text are imported. Success returns
 // explicit limitations in warnings. Failure leaves out and warnings unchanged.
 // The caller must treat the result as unsaved, never save over the source file.
