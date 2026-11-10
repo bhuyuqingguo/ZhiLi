@@ -74,7 +74,16 @@ try {
     Copy-Item -LiteralPath (Join-Path $root 'packaging/QT-NOTICE.txt') -Destination $licenses
     $out = Join-Path $build 'dist'
     New-Item -ItemType Directory -Force -Path $out | Out-Null
-    $name = 'ZhiLi-Windows-x64.zip'
+    $version = $env:ZHILI_RELEASE_VERSION
+    if (!$version) {
+        $entry = Select-String -LiteralPath (Join-Path $build 'CMakeCache.txt') -Pattern '^CMAKE_PROJECT_VERSION:STATIC=(.+)$'
+        if ($entry) { $version = $entry.Matches[0].Groups[1].Value }
+    }
+    if ($version -notmatch '^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$') {
+        throw 'Cannot determine a valid ZhiLi release version.'
+    }
+    $version = 'v' + ($version -replace '^v', '')
+    $name = "ZhiLi-$version-Windows-x64.zip"
     $archive = Join-Path $out $name
     # Use the legacy Chinese code page for entry names on Chinese Windows.
     [Text.Encoding]::RegisterProvider([Text.CodePagesEncodingProvider]::Instance)

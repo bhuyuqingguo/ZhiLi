@@ -1,122 +1,83 @@
 # 枝理 ZhiLi
 
-枝理是一款纯离线的桌面思维导图编辑器。同一棵树可在经典双侧、向右展开、向左展开和纵向结构图之间切换。导图保存在本机，可以导出 PNG、SVG、PDF 或可编辑 PowerPoint。
+枝理是一款离线桌面思维导图工具。它从银河麒麟等桌面系统的日常需求出发，把记录思路、整理分支、批量修改和交付图稿集中在一张画布上。导图保存在本机，同一个开放的 `.smap` 文件可以在不同平台继续编辑。
 
-## 版本与验收
+[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.2 发布说明](docs/releases/v1.0.2.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
 
-- **已实现**：80 个模板、128 个双风格图形符号、四种导图布局、多选与主题样式批量编辑、分支剪贴板、缩进大纲粘贴、同级排序、窗口尺寸记忆、结构导入与可编辑 PowerPoint 分页导出。
-- **发布验证**：Windows x64 和 Linux ARM64 的 CI 构建、回归测试及下载包校验通过后发布。测试包含 100%、125%、150%、200% Qt 模拟缩放。
-- **尚需验收**：银河麒麟 V10 SP1 / 飞腾 D2000 真机、实际中文输入法、混合 DPI，以及 Microsoft PowerPoint / WPS 的实际兼容性。
-- **尚未实现**：原生 Visio `.vsdx` 交换、完整跨软件往返、任意图片和附件、浮动主题、关系线／概要／边界及完整任务管理。
+![枝理 Windows 工作区，工具栏可直接打开、保存、转换文件及切换布局](docs/screenshots/workspace.png)
 
-具体真机检查步骤见 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)。
+## 下载与启动
 
-## 下载和启动
+| 平台 | 下载与启动 |
+| --- | --- |
+| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.2-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
+| Linux ARM64 | 下载 `ZhiLi-v1.0.2-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
+| macOS | 可用 Qt5 从源码构建 `simplemap.app`，应用包包含枝理图标。当前 GitHub Release 提供 Windows x64 和 Linux ARM64 便携包。 |
 
-在 [GitHub Releases](https://github.com/bhuyuqingguo/ZhiLi/releases) 下载对应平台的应用压缩包。带 `-test` 的版本为预发布版。Release 中的 Source code 和 Qt 源码压缩包用于查阅或重新构建。
+安装包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.2-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
 
-### Windows 10 / 11 x64
+## 用一张图上手
 
-1. 下载 `ZhiLi-Windows-x64.zip`，右键选择「全部解压缩」。
-2. 进入解压目录的 `ZhiLi` 文件夹，双击 `simplemap.exe`。请保留同目录 DLL 和 `platforms` 文件夹。
-3. 软件未做代码签名。若单位电脑限制运行新程序，请让本机管理员按单位流程处理。可以在 PowerShell 中执行 `Get-FileHash -Algorithm SHA256 .\ZhiLi-Windows-x64.zip`，与同名 `.sha256` 校验文件比对。
+解压后打开 `examples/研发项目交付.smap`，也可以从空白或模板开始。工具栏常驻打开、保存、格式转换和布局切换。窄窗口下，常用操作会收进紧凑工具栏。
 
-### 银河麒麟桌面 V10 SP1 / 飞腾 D2000 ARM64
+| 要做什么 | 怎么操作 |
+| --- | --- |
+| 录入想法 | 双击或按 **F2** 编辑。**Enter** 加同级，**Tab** 或 **Insert** 加子主题。编辑时 **Enter** 确认、**Shift+Enter** 换行。 |
+| 整理分支 | **Ctrl+单击** 多选，从任一选中项拖动整组。拖到主题中央移入子级，拖到边缘调整顺序，按住 **Ctrl** 拖动则复制。 |
+| 聚焦或查找 | **Ctrl+Shift+J** 聚焦当前分支，**Esc** 返回全图。**Ctrl+F** 查找，**F3** 跳到下一个结果。 |
+| 缩放和平移 | **Ctrl+滚轮** 缩放，**Ctrl+0** 适应窗口，拖动画布空白处平移。 |
+| 批量统一样式 | 多选后按 **Ctrl+Shift+F**，勾选需要修改的对齐、字体、字号、字重或颜色。 |
+| 保存与分享 | **Ctrl+S** 保存。右键可复制当前分支为透明图片，或只导出该分支。 |
 
-测试包在 Ubuntu 20.04 ARM64 基线上编译，运行需要 glibc 2.31 或兼容版本，以及系统的 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。依赖齐备时，枝理可解压运行，无需安装或管理员权限。银河麒麟 D2000 仍需真机验收。
+## 界面实拍
 
-下载 `ZhiLi-Linux-ARM64-Portable.tar.gz` 和对应的 `.sha256` 文件，在下载目录打开终端，执行：
+以下为 v1.0.2 对应的 Windows 界面。同一张示例图可以直接切换四种布局。连线可选自动搭配、直角、直线和曲线。
 
-```sh
-uname -m
-sha256sum -c ZhiLi-Linux-ARM64-Portable.tar.gz.sha256
-tar -xzf ZhiLi-Linux-ARM64-Portable.tar.gz
-cd ZhiLi
-./ZhiLi
-```
+| 经典双侧 | 向右展开 |
+| --- | --- |
+| ![经典双侧导图布局](docs/screenshots/layout-classic.png) | ![从左到右展开的导图布局](docs/screenshots/layout-right.png) |
+| **向左展开** | **纵向结构图** |
+| ![从右到左展开的导图布局](docs/screenshots/layout-left.png) | ![从上到下展开的结构图](docs/screenshots/layout-hierarchy.png) |
 
-`uname -m` 应显示 `aarch64`。若双击没有反应，从终端运行，或用 `ldd ./ZhiLi | grep 'not found'` 查看缺少的库。需要补齐依赖时，请使用本机麒麟软件源或单位批准的同架构离线包。若程序目录所在介质禁止执行，把整个 `ZhiLi` 文件夹复制到个人目录再启动。 [麒麟 V10 SP1 组件版本说明](https://kylinos.cn/upload/product/20230509/466b4da07a7220fc1442901e42b560a7.pdf)
+### 拖拽、聚焦与窄窗口
 
-## 第一次使用
+整组拖动时，外框和插入线标出落点。松手后自动重排主题与连线，一次撤销即可恢复整组。聚焦当前分支可腾出画布空间，返回全图后继续浏览其他分支。
 
-1. 在「文件 → 打开」里选取解压目录中 `examples/研发项目交付.smap`，或新建空白导图。
-2. 按 **Insert / Ctrl+Enter / Tab** 添加子主题，按 **Enter** 添加同级主题（选中中心主题时添加主分支）。**Shift+Enter** 在前面插入同级主题，**Ctrl+Shift+Insert** 插入父主题。
-3. 双击主题或按 **F2** 原位编辑。编辑时 **Enter / Ctrl+Enter** 确认，**Shift+Enter** 换行，**Esc** 取消。使用中文输入法时先确认输入法候选，再确认节点编辑。
-4. 拖到主题中央可移为子级，拖到边缘可在同层排序，按住 **Ctrl** 拖动可复制分支。**Ctrl+单击**、**Shift+方向键** 或在空白处 **Shift+拖动** 可多选。按 **Space** 折叠或展开，按 **Delete** 删除选中分支，**Ctrl+Shift+Delete** 移除当前主题并保留子级。
-5. 用工具栏或 **Ctrl+1 / Ctrl+2 / Ctrl+3 / Ctrl+4** 切换经典双侧、结构图、向右展开和向左展开。**Ctrl+0 / Ctrl+F5** 适应窗口，**Ctrl+滚轮 / 右键+滚轮** 缩放，**Shift+滚轮** 横向滚动。可拖动空白或用中键拖动平移画布。
-6. 用 **Ctrl+F** 查找，**F3** 跳到下一个匹配。结果位于折叠分支内时，枝理会展开路径，该操作可撤销。
-7. 用 **Ctrl+S** 保存，**Ctrl+Shift+S** 另存为。导出位于「文件」菜单。
+| 整组拖动与吸附 | 聚焦当前分支 |
+| --- | --- |
+| ![两个选中主题拖到目标分支，外框显示吸附位置](docs/screenshots/group-drag.png) | ![画布单独显示当前分支](docs/screenshots/focus-branch.png) |
 
-多选后，从任一选中主题拖动即可整组移动，按住 **Ctrl** 则复制整组。组内分支按原树顺序插入，选中父主题时其子树只处理一次。整次操作可以一起撤销。
+![窄窗口仍可保存、转换、加子主题、切换布局和打开样式](docs/screenshots/compact-toolbar.png)
 
-用「视图 → 聚焦当前分支」或 **Ctrl+Shift+J** 单独查看和编辑一个分支，按 **Esc** 返回全图。聚焦保留分支的折叠状态，切换视图无需保存。
+### 中文排版
 
-用工具栏的「线型」或「视图 → 连线线型」选择自动搭配、直角、直线或曲线。线型随导图保存并支持撤销。连线优先通过层间留白，必要时用短引线避开主题。拖动靠近目标时会吸附，主题外框表示移入子级，插入线和虚线对齐参考线表示在同级插入。松手后自动重新排布。
+节点文字默认居中。批量样式只应用勾选的项目，也可以从一个主题复制样式，再粘贴给其他主题。枝理内置思源黑体、思源宋体、霞鹜文楷 GB 轻便版和得意黑，系统字体列表优先显示中文字体。 [字体及许可](assets/fonts/README.md)
 
-主题文字默认居中。选中一个或多个主题，在工具栏、右键菜单或 **Ctrl+Shift+F** 打开「主题样式」，勾选要统一的对齐、字体、字号、字重或颜色。也可以把这些参数应用到所选子树。已有样式可通过右键「复制主题样式」，再多选并「粘贴主题样式」。每次应用可整体撤销，样式随 `.smap` 保存。
+| 批量主题样式 | 中文字体优先 |
+| --- | --- |
+| ![勾选批量修改对齐方式与字号](docs/screenshots/batch-style.png) | ![字体列表先列出内置中文字体和系统中文字体](docs/screenshots/chinese-fonts.png) |
 
-选择主题后可用 **Ctrl+C / Ctrl+X / Ctrl+V** 复制、剪切、粘贴分支，包含折叠后代与图形符号。**Ctrl+Alt+V** 粘贴到同一级。外部文本按 Tab 或一致的空格缩进粘贴为主题层级。原生分支剪贴板保留完整多行文字；复制到纯文本应用时，节点内部换行会合并为空格。编辑文字时，这些快捷键仍操作文字。
+### 离线转换
 
-右键主题可打开常用操作。**Ctrl+Shift+↑ / ↓** 调整同级顺序，**Ctrl+Shift+Z** 也可重做。新增、移动、删除与折叠会重新自动布局。窗口关闭后记住尺寸和最大化状态，仍需在实际多屏配置下验收。
+点击「格式转换」，直接选取原文件，再选目标格式和保存位置。要先检查结果，可用「文件 → 导入其他导图」打开为可编辑副本。
 
-## 模板与图形符号
+| 选择原文件 | 转为开放的枝理导图 |
+| --- | --- |
+| ![在枝理中直接选择 draw.io 源文件](docs/screenshots/conversion-source.png) | ![另存为枝理 SMAP 导图](docs/screenshots/conversion-target.png) |
 
-在「视图 → 外观设置 → 图标风格」切换简约 2D 或立体拟物。两套素材都在透明背景上以矢量图形绘制。
+## 导入、转换与交付
 
-- **文件 → 从模板新建**（Ctrl+Shift+N）：活动组织、体系视图、能力视图、架构视图各 20 个模板。可按分类和关键词查找，查看导图或可读节点大纲。创建后得到可编辑副本，首次保存需要选择自己的文件名。取消选择不会替换当前导图。
-- **编辑 → 设置图形符号**（Ctrl+Shift+I）：128 个原创离线符号，分为空中、水面、地面、水下、感知、协同、通信、保障 8 类。支持搜索、添加、替换、移除和撤销；可从右键菜单进入。
-- 模板和素材均编入程序，不依赖 Python、网络或安装目录写权限。模板是通用参考结构，符号是通用示意，不代表装备参数或正式建模标准。
-- 旧版枝理会忽略新增符号字段，再次保存可能丢掉符号。保留符号的跨平台往返请使用同一候选版本。
+- **读入导图**支持 Xmind、MindManager、MindMaster / EdrawMind、MindNode、MindMeister、Mindomo、FreeMind / Freeplane、OPML 等。MindMaster 的二进制 `.emmx` 以已验证的 10.7 和 10.9 文件为准。
+- **读入图形和演示稿**支持 draw.io、Visio `.vsdx`、PowerPoint `.pptx`，也可读取 Markdown、缩进文本、Mermaid mindmap 和 JSON Canvas。
+- **转换输出**支持枝理、draw.io、Visio、可编辑 PowerPoint、FreeMind、OPML、JSON Canvas、纯文本及 PNG、SVG、PDF。跨软件转换以文字、层级、顺序和可映射的连接为主。专有样式、图片、附件、动画和原坐标的保留范围见兼容清单。
+- **导出当前分支**可生成透明 PNG、SVG、PDF、可编辑 PowerPoint 或独立 `.smap`。用「复制当前分支为图片」可直接粘贴到白板或演示稿。
+- **开放文件**使用版本化 UTF-8 JSON，布局和节点样式随文件保存。异常退出后可在下次启动时恢复本地快照。 [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [SMAP 文件规范](docs/SMAP_FORMAT.md)
 
-完整目录见 [模板说明](assets/templates/README.md) 和 [素材说明](assets/symbols/README.md)。
-
-## 与其他软件交换
-
-**在枝理中直接转换文件**
-
-点击主工具栏的「格式转换」（窄窗口中显示为「转换」），选择源文件、目标格式和保存位置。全程离线，源文件和当前打开的导图保持原样。若要先查看或修改转换结果，可用「文件 → 导入其他导图」打开为可编辑副本。
-
-- 可读取枝理 `.smap`、MindManager `.mmap`、MindMaster `.emmx`（旧版单页 XML 和已验证的 10.7/10.9 二进制结构）、MindNode `.mindnode`、MindMeister `.mind`、Mindomo `.mom` / `.pmom`、Xmind `.xmind`、FreeMind / Freeplane `.mm`、OPML `.opml`、draw.io `.drawio` 或其 XML、Visio `.vsdx`、PowerPoint `.pptx`。
-- 也可读取 UTF-8 Markdown、缩进纯文本、Mermaid 思维导图和 JSON Canvas。可生成枝理、draw.io、Visio、可编辑 PowerPoint、FreeMind、OPML、JSON Canvas、纯文本，以及 PNG、SVG 和 PDF。
-- 转换通过枝理的树形模型。导图保留主题文字、层级与顺序。图形和幻灯片可读取页面、文字及能映射到树的连接。输出按枝理重新排版，循环、多父级、原坐标、图片、模具、SmartArt、动画和专有样式等内容请核对转换提示。
-
-详见[格式兼容清单](docs/FORMAT_COMPATIBILITY.md)和[开放 SMAP v1 文件规范](docs/SMAP_FORMAT.md)。
-
-**导出当前分支**
-
-在主题右键菜单中选择「导出当前分支」，可保存为 PNG、SVG、PDF、可编辑 PowerPoint 或独立枝理导图。图片和演示文稿包含折叠后代，独立 `.smap` 保留折叠状态。也可用「复制当前分支为图片」，将透明背景的图片粘贴到白板或演示稿。
-
-**导出可编辑 PowerPoint**
-
-使用「文件 → 导出可编辑 PowerPoint」。主题、文字和连线是原生可编辑对象，图形符号作为可单独移动的 PNG 图片保留。导出包含所有折叠分支；大图分为总览与分支页，布局方向可能为可读性调整。长主题在图中显示明确标注的摘要，完整文字进入续页。
-
-上限为 500 页或 64 MiB，超过时拒绝生成并保留原有目标文件。字体不嵌入，接收机器的字体会影响排版；符号图片不是可拆分的矢量图形。候选版已做文件结构和 LibreOffice 渲染检查，Microsoft PowerPoint/WPS 真机兼容仍需按版本验收。
-
-**Visio 与 draw.io**
-
-可生成含独立形状和连线的 `.vsdx` 或 `.drawio` 文件，含折叠主题的完整结构。Visio 输出为单页，超大导图可分拆后转换。目标应用打开及重排效果仍需按版本验收。
-
-方向键可移动选择。经典图的左右键切换父子、上下键切换同级。结构图的上下键切换父子、左右键切换同级。macOS 的 Qt Ctrl 快捷键显示为 ⌘。
-
-## 字体、字号和分辨率
-
-打开「视图 → 外观设置」，可分别调整界面和导图节点的字体、字号、常规或粗体，以及浅色或高对比配色。内置思源黑体、思源宋体、霞鹜文楷 GB 轻便版和得意黑，默认思源黑体。字体列表先列内置字族，系统字体按简体中文、繁体中文、其他顺序排列。批量主题样式使用相同顺序。界面字号 9–22 pt，导图字号 9–32 pt，中心主题比节点设定字号大 4 pt。设置保存在本机。
-
-小窗口切换到紧凑工具栏，空间不足时用图标显示按钮，悬停可查看名称。布局和适应窗口仍可从工具栏或视图菜单使用。设置「适应窗口」后，画布会跟随窗口大小重新计算缩放；手动缩放后会保留该比例。内置字体来源及许可随源码和测试包提供。 [字体说明](https://github.com/bhuyuqingguo/ZhiLi/blob/main/assets/fonts/README.md)
-
-## 文件、导出与恢复
-
-- 原生文件为 `.smap`，内部使用版本化 JSON。可读取早期原型的 `.smap.json`。四种布局共享同一份节点数据，保存时记录布局和主题样式。
-- PNG 适合直接插图，SVG 适合缩放和后期编辑，PDF 按单页 A4 导出。大图可先折叠分支，或使用矢量格式。SVG 在其他机器查看时，文字效果取决于当地字体。
-- 如果发生异常退出，下次启动会在存在恢复快照时询问是否恢复。恢复内容通过另存为保存，原文件保留。卸载便携版时，退出程序并删除解压目录；已保存导图和个人设置位于各自的保存位置。
-
-## 反馈测试结果
-
-如果遇到问题，请在 [Issues](https://github.com/bhuyuqingguo/ZhiLi/issues) 写明测试 tag、操作系统和补丁版本、CPU 架构、屏幕分辨率及缩放比例、输入法、复现步骤和错误信息。提交导图样例前请去掉涉密或个人内容。真机重点检查中文候选确认、低分辨率与高 DPI、保存重开、跨平台往返和异常恢复。
+枝理自带 80 个离线模板和 128 个透明矢量符号。可通过「文件 → 从模板新建」按用途搜索，从「视图 → 外观设置」切换简约 2D 和立体拟物风格。 [模板目录](assets/templates/README.md) · [符号目录](assets/symbols/README.md)
 
 ## 从源码构建
 
-依赖 C++11、CMake 3.13+ 与 Qt5 Widgets、Svg。启用测试还需 Qt Test。在 Windows 上使用与编译器架构匹配的 Qt5 SDK，可用 `-DCMAKE_PREFIX_PATH` 指向 Qt SDK。Qt 5.9+ 是源代码最低版本，便携包的工具链见发布说明。
+需要 C++11 编译器、CMake 3.13+、Qt 5.9+ 的 Widgets 和 Svg。运行自动化测试还需要 Qt Test。Windows 可用 `-DCMAKE_PREFIX_PATH` 指向与编译器和架构匹配的 Qt5 SDK。
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -125,4 +86,4 @@ cd build
 ctest -C Release --output-on-failure
 ```
 
-[1.0 设计与验收](https://github.com/bhuyuqingguo/ZhiLi/blob/main/docs/V1_DESIGN.md) · [候选包构建](docs/RELEASE.md) · [Windows / 麒麟真机验收清单](docs/TARGET_ACCEPTANCE.md)
+反馈时请附应用版本、操作系统、CPU 架构、缩放比例、输入法和复现步骤。若附导图样例，请先移除敏感信息。 [发布构建说明](docs/RELEASE.md) · [提交 Issue](https://github.com/bhuyuqingguo/ZhiLi/issues)

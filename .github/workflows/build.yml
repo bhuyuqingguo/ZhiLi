@@ -18,8 +18,10 @@ jobs:
         with:
           persist-credentials: false
       - name: Build against Qt 5.12 and glibc 2.31
+        env:
+          ZHILI_RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: |
-          docker run --rm --platform linux/arm64 -v "$PWD:/src" -w /src ubuntu:20.04 bash -ec '
+          docker run --rm --platform linux/arm64 -e ZHILI_RELEASE_VERSION -v "$PWD:/src" -w /src ubuntu:20.04 bash -ec '
             apt-get update
             DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends               build-essential cmake file qtbase5-dev libqt5svg5-dev
             bash packaging/linux-arm64-portable.sh
@@ -59,6 +61,8 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
       - name: Build, test and package Windows x64
+        env:
+          ZHILI_RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         shell: pwsh
         run: ./packaging/windows-x64.ps1 -QtPrefix build-qt/5.15.2/msvc2019_64
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

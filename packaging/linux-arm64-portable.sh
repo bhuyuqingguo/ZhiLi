@@ -34,6 +34,11 @@ fi
 
 out="$build/dist"
 mkdir -p "$out"
-archive=ZhiLi-Linux-ARM64-Portable.tar.gz
+version=${ZHILI_RELEASE_VERSION:-$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' "$build/CMakeCache.txt")}
+if [[ ! $version =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$ ]]; then
+    echo 'Cannot determine a valid ZhiLi release version.' >&2
+    exit 1
+fi
+archive="ZhiLi-v${version#v}-Linux-ARM64-Portable.tar.gz"
 tar -C "$work" -czf "$out/$archive" ZhiLi
 (cd "$out" && sha256sum "$archive" > "$archive.sha256")
