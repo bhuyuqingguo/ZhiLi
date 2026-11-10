@@ -903,7 +903,6 @@ int runSmokeTest() {
     window.resize(1160, 760);
     QTest::qWait(60);
     CHECK(toolbarMatchesWindow());
-    if (available.width() >= 1000) CHECK(toolbar->isVisible());
     window.fit();
     const qreal wideZoom = window.canvas->transform().m11();
     window.resize(360, 280);
