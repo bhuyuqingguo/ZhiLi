@@ -86,7 +86,7 @@ if(BUILD_TESTING)
     set(zhili_test_platform windows)
   endif()
   set_tests_properties(zhili_symbols zhili_template_dialog PROPERTIES
-    ENVIRONMENT "QT_QPA_PLATFORM=${zhili_test_platform};QT_FONT_DPI=96" TIMEOUT 30)
+    ENVIRONMENT "QT_QPA_PLATFORM=${zhili_test_platform};QT_FORCE_STDERR_LOGGING=1;QT_FONT_DPI=96" TIMEOUT 30)
   set_tests_properties(zhili_template_dialog_large_type PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=${zhili_test_platform};QT_FONT_DPI=96;QT_SCALE_FACTOR=2;ZHILI_TEMPLATE_FONT_POINTS=22" TIMEOUT 30)
   foreach(scale IN ITEMS 1 1.25 1.5 2)
