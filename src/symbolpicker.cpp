@@ -23,11 +23,12 @@
 
 namespace {
 // Render directly so portable builds do not need the optional qsvgicon plugin.
-QIcon symbolIcon(const SymbolAsset &asset) {
+QIcon symbolIcon(const SymbolAsset &asset, bool dimensional) {
     static QMap<QString, QIcon> cache;
-    const auto existing = cache.constFind(asset.id);
+    const QString key = dimensional ? asset.id + "/dimensional" : asset.id;
+    const auto existing = cache.constFind(key);
     if (existing != cache.constEnd()) return existing.value();
-    QSvgRenderer renderer(asset.resourcePath);
+    QSvgRenderer renderer(SymbolLibrary::svg(asset, dimensional));
     QIcon icon;
     for (int pixels : {32, 64, 128, 192}) {
         QPixmap pixmap(pixels, pixels);
@@ -37,13 +38,13 @@ QIcon symbolIcon(const SymbolAsset &asset) {
         painter.end();
         icon.addPixmap(pixmap);
     }
-    cache.insert(asset.id, icon);
+    cache.insert(key, icon);
     return icon;
 }
 }
 
-SymbolPickerDialog::SymbolPickerDialog(QWidget *parent, const QString &initialId)
-    : QDialog(parent), currentId_(initialId), selectedId_(initialId) {
+SymbolPickerDialog::SymbolPickerDialog(QWidget *parent, const QString &initialId, bool dimensional)
+    : QDialog(parent), dimensional_(dimensional), currentId_(initialId), selectedId_(initialId) {
     setObjectName(QStringLiteral("symbolPickerDialog"));
     setWindowTitle(QStringLiteral("素材库 · 离线矢量符号"));
     auto *layout = new QVBoxLayout(this);
@@ -169,7 +170,7 @@ void SymbolPickerDialog::refresh() {
     list_->clear();
     QListWidgetItem *selected = nullptr;
     for (const SymbolAsset &asset : assets) {
-        auto *item = new QListWidgetItem(symbolIcon(asset), asset.name, list_);
+        auto *item = new QListWidgetItem(symbolIcon(asset, dimensional_), asset.name, list_);
         item->setData(Qt::UserRole, asset.id);
         item->setData(Qt::AccessibleTextRole, asset.name + QStringLiteral("，") + asset.categoryName);
         item->setToolTip(asset.name + QStringLiteral(" · ") + asset.englishName + QLatin1Char('\n') + asset.id);
@@ -194,7 +195,7 @@ void SymbolPickerDialog::updateSelection() {
     if (asset) {
         currentId_ = asset->id;
         // Select a prepared raster at the screen DPR without an SVG icon plugin.
-        preview_->setPixmap(symbolIcon(*asset).pixmap(windowHandle(), QSize(64, 64)));
+        preview_->setPixmap(symbolIcon(*asset, dimensional_).pixmap(windowHandle(), QSize(64, 64)));
         description_->setText(asset->name + QStringLiteral(" · ") + asset->englishName + QLatin1Char('\n') + asset->categoryName);
     } else {
         preview_->clear();

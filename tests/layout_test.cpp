@@ -20,9 +20,11 @@ Document tree(int count, int fanout) {
 }
 
 bool verify(const Document &document, const QMap<QString, QSizeF> &sizes) {
-    const QMap<QString, QPointF> positions = layoutNodes(document, sizes);
+    QMap<QString, qreal> rails;
+    const QMap<QString, QPointF> positions = layoutNodes(document, sizes, &rails);
     // A second layout must be deterministic, not depend on hash iteration order.
-    if (positions != layoutNodes(document, sizes)) return false;
+    QMap<QString, qreal> secondRails;
+    if (positions != layoutNodes(document, sizes, &secondRails) || rails != secondRails) return false;
     QSet<QString> visible;
     QStringList pending{document.root};
     while (!pending.isEmpty()) {
@@ -101,6 +103,25 @@ int main() {
         chain.mindMap = classic;
         CHECK(verify(chain, sizes));
     }
+    Document compact = tree(21, 4);
+    sizes.clear();
+    for (const QString &id : compact.nodes.keys()) sizes[id] = QSizeF(120, 45);
+    for (auto direction : {BranchDirection::Right, BranchDirection::Left}) {
+        compact.branchDirection = direction;
+        const auto positions = layoutNodes(compact, sizes);
+        CHECK(verify(compact, sizes));
+        for (auto it = positions.cbegin(); it != positions.cend(); ++it) {
+            if (it.key() == compact.root) continue;
+            CHECK(direction == BranchDirection::Right ? it->x() > 0 : it->x() < 0);
+        }
+        Document roundTrip;
+        CHECK(roundTrip.parse(compact.serialize()) && roundTrip.branchDirection == direction);
+    }
+    compact.mindMap = false;
+    QMap<QString, qreal> rails;
+    const auto positions = layoutNodes(compact, sizes, &rails);
+    CHECK(rails.size() == 16 && rails.value("5") == rails.value("6"));
+    CHECK(positions.value("5").x() == positions.value("6").x() && positions.value("5").y() < positions.value("6").y());
     qInfo() << "Layout contracts passed: both layouts, deterministic positions, collapse, large labels, 3000 nodes and depth 512";
     return 0;
 #undef CHECK

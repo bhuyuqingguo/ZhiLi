@@ -7,6 +7,7 @@
 namespace BranchClipboard {
 const char *mimeType();
 QByteArray encode(const Document &document, const QString &root, QString *error = nullptr);
+QByteArray encode(const Document &document, const QStringList &roots, QString *error = nullptr);
 QString outline(const Document &document, const QString &root);
 
 // A successful paste appends new children to parent and expands it. Every copied

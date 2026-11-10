@@ -27,7 +27,8 @@ try {
     foreach ($library in @('Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Svg.dll')) {
         Copy-Item -LiteralPath (Join-Path $qtBin $library) -Destination $bundle
     }
-    "[Paths]`nPrefix=.`nPlugins=." | Set-Content -LiteralPath (Join-Path $bundle 'qt.conf') -Encoding ascii
+    "[Paths]`nPrefix=.`nPlugins=.`n[Platforms]`nWindowsArguments=fontengine=freetype" |
+        Set-Content -LiteralPath (Join-Path $bundle 'qt.conf') -Encoding ascii
     $plugins = Join-Path $bundle 'platforms'
     New-Item -ItemType Directory -Path $plugins | Out-Null
     Copy-Item -LiteralPath (Join-Path $QtPrefix 'plugins/platforms/qwindows.dll') -Destination $plugins

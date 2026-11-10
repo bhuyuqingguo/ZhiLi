@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QByteArray>
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -26,6 +27,7 @@ namespace SymbolLibrary {
 const QList<SymbolAsset> &assets();
 const QList<SymbolCategory> &categories();
 const SymbolAsset *find(const QString &id);
+QByteArray svg(const SymbolAsset &asset, bool dimensional = false, bool darkBackground = false);
 // AND-match whitespace-separated words; Chinese/English, case-insensitive.
 // An empty category searches all categories. Unknown categories return no hits.
 QList<SymbolAsset> search(const QString &query = QString(),

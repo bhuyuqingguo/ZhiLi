@@ -106,6 +106,19 @@ int main(int argc, char **argv) {
     CHECK(parts.value("docProps/custom.xml").contains("Include all collapsed descendants"));
     CHECK(!parts.value("ppt/slides/slide1.xml").contains("<p:pic"));
 
+    Document orthogonal = doc;
+    orthogonal.mindMap = false;
+    orthogonal.connectorStyle = ConnectorStyle::Orthogonal;
+    const QString orthogonalPath = temp.filePath("orthogonal.pptx");
+    CHECK(exportPptx(orthogonal, orthogonalPath, &error));
+    CHECK(unpack(orthogonalPath).value("ppt/slides/slide1.xml").contains("prst=\"bentConnector3\""));
+
+    Document curved = doc;
+    curved.connectorStyle = ConnectorStyle::Curved;
+    const QString curvedPath = temp.filePath("curved.pptx");
+    CHECK(exportPptx(curved, curvedPath, &error));
+    CHECK(unpack(curvedPath).value("ppt/slides/slide1.xml").contains("prst=\"curvedConnector3\""));
+
     Document large = tree(101);
     large.mindMap = false;
     const QString largePath = temp.filePath("large.pptx");

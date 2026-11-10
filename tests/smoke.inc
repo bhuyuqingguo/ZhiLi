@@ -35,16 +35,18 @@ int runSmokeTest() {
     QTest::mouseDClick(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, center);
     CHECK(window.editor);
     window.editor->setPlainText(QStringLiteral("研发项目交付"));
-    QTest::keyClick(window.editor, Qt::Key_Return);
+    QTest::keyClick(window.editor, Qt::Key_Return, Qt::ShiftModifier);
     CHECK(window.editor && window.editor->toPlainText().contains('\n'));
     window.editor->clear();
     QInputMethodEvent preedit(QStringLiteral("yanfa"), {});
     QCoreApplication::sendEvent(window.editor, &preedit);
     CHECK(window.editor->toPlainText().isEmpty());
+    QTest::keyClick(window.editor, Qt::Key_Return);
+    CHECK(window.editor && window.editor->toPlainText().isEmpty());
     QInputMethodEvent commit;
     commit.setCommitString(QStringLiteral("研发项目交付"));
     QCoreApplication::sendEvent(window.editor, &commit);
-    QTest::keyClick(window.editor, Qt::Key_Return, Qt::ControlModifier);
+    QTest::keyClick(window.editor, Qt::Key_Return);
     CHECK(!window.editor && window.doc.nodes.value(root).text == QStringLiteral("研发项目交付"));
 
     auto add = [&](const QString &parent, const QString &text) {
@@ -70,6 +72,62 @@ int runSmokeTest() {
     const QString lastSearchMatch = add(second, QStringLiteral("数据安全与离线验证"));
     CHECK(window.doc.nodes.size() == 7);
 
+    {
+        Window routing(false);
+        routing.doc = window.doc;
+        routing.doc.nodes[first].text = QStringLiteral("项目规划\n多行主题\n第三行");
+        routing.doc.nodes[lastSearchMatch].text = QString(120, QChar(0x679D));
+        Node detail;
+        detail.id = "routing-detail";
+        detail.text = QStringLiteral("更深层级");
+        routing.doc.nodes.insert(detail.id, detail);
+        routing.doc.nodes[secondMatch].children.append(detail.id);
+        routing.initializeDocument();
+        QPainterPathStroker stroke;
+        stroke.setWidth(0.5);
+        for (bool classic : {true, false}) {
+            for (auto direction : {BranchDirection::Both, BranchDirection::Left, BranchDirection::Right}) {
+                if (!classic && direction != BranchDirection::Both) continue;
+                routing.chooseLayout(classic, direction);
+                for (auto style : {ConnectorStyle::Orthogonal, ConnectorStyle::Straight, ConnectorStyle::Curved,
+                                   ConnectorStyle::Automatic}) {
+                    routing.chooseConnectorStyle(style);
+                    Document reopened;
+                    CHECK(reopened.parse(routing.doc.serialize()) && reopened.connectorStyle == style);
+                    CHECK(routing.connectorActions.value(style)->isChecked());
+                    bool hasCurve = false;
+                    for (auto edge = routing.edges.cbegin(); edge != routing.edges.cend(); ++edge) {
+                        const auto path = edge.value()->path();
+                        const auto painted = stroke.createStroke(path);
+                        const QString parent = routing.parents.value(edge.key());
+                        for (int i = 0; i < path.elementCount(); ++i)
+                            hasCurve |= path.elementAt(i).isCurveTo();
+                        for (auto node = routing.items.cbegin(); node != routing.items.cend(); ++node) {
+                            if (node.key() == parent || node.key() == edge.key()) continue;
+                            CHECK(!painted.intersects(node->body->sceneBoundingRect().adjusted(2, 2, -2, -2)));
+                        }
+                        for (auto other = routing.edges.cbegin(); other != edge; ++other) {
+                            const QString otherParent = routing.parents.value(other.key());
+                            if (parent == otherParent || parent == other.key() || otherParent == edge.key()) continue;
+                            CHECK(!painted.intersects(stroke.createStroke(other.value()->path())));
+                        }
+                    }
+                    if (style == ConnectorStyle::Curved) CHECK(hasCurve);
+                    if (style == ConnectorStyle::Straight || style == ConnectorStyle::Orthogonal) CHECK(!hasCurve);
+                }
+            }
+        }
+        routing.history(true);
+        CHECK(routing.doc.connectorStyle == ConnectorStyle::Curved);
+        routing.chooseLayout(true);
+        CHECK(routing.visibleRootLane(first) != routing.visibleRootLane(second));
+        routing.moveNode(first, second, -1, true);
+        CHECK(routing.visibleRootLane(first) == BranchDirection::Left &&
+              routing.visibleRootLane(second) == BranchDirection::Left);
+        routing.history(true);
+        CHECK(routing.visibleRootLane(first) == BranchDirection::Right);
+    }
+
     window.selectNode(first);
     window.toggleCollapse();
     CHECK(!window.items.contains(child));
@@ -79,8 +137,13 @@ int runSmokeTest() {
     CHECK(window.items.contains(child));
     window.fit();
     const QPoint childPoint = window.canvas->mapFromScene(window.items.value(child).body->pos());
-    const QPoint targetPoint = window.canvas->mapFromScene(window.items.value(second).body->pos());
+    const auto targetBody = window.items.value(second).body->sceneBoundingRect();
+    const QPoint targetPoint = window.canvas->mapFromScene(QPointF(targetBody.center().x(), targetBody.top())) - QPoint(0, 8);
+    CHECK(window.nodeAt(targetPoint).isEmpty());
     QTest::mousePress(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, childPoint);
+    const auto snapped = window.snapDrop(targetPoint, false);
+    CHECK(snapped.id == second && snapped.side == 0);
+    CHECK(window.snapDrop(targetPoint - QPoint(0, 10), false).id.isEmpty());
     QTest::mouseRelease(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, targetPoint);
     CHECK(window.parents.value(child) == second);
     window.moveNode(second, child, 0);
@@ -95,17 +158,76 @@ int runSmokeTest() {
     CHECK(window.parents.value(child) == second);
     window.history(true);
 
-    // Reorder by dropping a sibling on the leading edge in the structure view.
+    // Terminal siblings are stacked in the structure view, so their leading edge is above.
     window.fit();
     const auto edgeTarget = window.items.value(child).body->sceneBoundingRect();
     const QPoint beforeChild = window.canvas->mapFromScene(QPointF(
-        edgeTarget.left() + edgeTarget.width() * 0.15, edgeTarget.center().y()));
+        edgeTarget.center().x(), edgeTarget.top() + edgeTarget.height() * 0.15));
     QTest::mousePress(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier,
                       window.canvas->mapFromScene(window.items.value(sibling).body->pos()));
     QTest::mouseRelease(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, beforeChild);
     CHECK(window.doc.nodes.value(first).children == (QStringList{sibling, child}));
     window.history(true);
     CHECK(window.doc.nodes.value(first).children == (QStringList{child, sibling}));
+
+    // Ctrl-drag clones the branch without moving the original.
+    window.fit();
+    auto pointFor = [&](const QString &id) {
+        return window.canvas->mapFromScene(window.items.value(id).body->pos());
+    };
+    QTest::mousePress(window.canvas->viewport(), Qt::LeftButton, Qt::ControlModifier, pointFor(child));
+    QTest::mouseRelease(window.canvas->viewport(), Qt::LeftButton, Qt::ControlModifier, pointFor(second));
+    CHECK(window.parents.value(child) == first && window.parents.value(window.selected) == second);
+    CHECK(window.selected != child && window.doc.nodes.value(window.selected).text == window.doc.nodes.value(child).text);
+    window.history(true);
+    CHECK(window.doc.nodes.size() == 7);
+
+    CHECK(window.items.value(child).label->document()->defaultTextOption().alignment() == Qt::AlignHCenter);
+    window.replaceSelection({child, sibling});
+    bool styleDialogOperated = false;
+    QTimer::singleShot(0, &window, [&] {
+        auto *dialog = window.findChild<QDialog *>("topicStyleDialog");
+        if (!dialog) return;
+        auto *align = dialog->findChild<QCheckBox *>("applyAlignment");
+        auto *points = dialog->findChild<QCheckBox *>("applyPoints");
+        auto *alignment = dialog->findChild<QComboBox *>("topicStyleAlignment");
+        auto *size = dialog->findChild<QSpinBox *>("topicStylePoints");
+        if (!align || !points || !alignment || !size) { dialog->reject(); return; }
+        align->setChecked(true);
+        points->setChecked(true);
+        alignment->setCurrentIndex(2);
+        size->setValue(16);
+        styleDialogOperated = true;
+        dialog->accept();
+    });
+    window.changeTopicStyles();
+    CHECK(styleDialogOperated);
+    for (const auto &id : {child, sibling}) {
+        CHECK(window.doc.nodes.value(id).style.alignment == TextAlignment::Right);
+        CHECK(window.items.value(id).label->document()->defaultTextOption().alignment() == Qt::AlignRight);
+        CHECK(window.items.value(id).label->font().pointSize() == 16);
+    }
+    CHECK(window.doc.nodes.value(second).style == TopicStyle());
+    Document styled;
+    CHECK(styled.parse(window.doc.serialize()) && styled.nodes.value(child).style == window.doc.nodes.value(child).style);
+    window.history(true);
+    CHECK(window.doc.nodes.value(child).style == TopicStyle() && window.doc.nodes.value(sibling).style == TopicStyle());
+    window.activateWindow();
+    window.canvas->setFocus();
+    QTest::qWait(60);
+
+    window.selectNode(child);
+    QTest::mouseClick(window.canvas->viewport(), Qt::LeftButton, Qt::ControlModifier, pointFor(sibling));
+    CHECK(window.selectedRoots(true) == (QStringList{child, sibling}));
+    window.copyBranch();
+    window.selectNode(second);
+    window.pasteBranch();
+    const auto copiedChildren = window.doc.nodes.value(second).children;
+    CHECK(copiedChildren.size() == 4);
+    CHECK(window.doc.nodes.value(copiedChildren.at(2)).text == window.doc.nodes.value(child).text);
+    CHECK(window.doc.nodes.value(copiedChildren.at(3)).text == window.doc.nodes.value(sibling).text);
+    window.history(true);
+    CHECK(window.doc.nodes.size() == 7);
 
     // Search visits matches in tree order, expands a collapsed path, and wraps.
     window.selectNode(first);
@@ -446,7 +568,7 @@ int runSmokeTest() {
         QTest::keyClick(contextMenu, Qt::Key_Escape);
         CHECK(!contextMenu->isVisible() && branches.doc.serialize() == beforeRootCut);
         branches.selectNode(branchRoot);
-        CHECK(!branches.cutAction->isEnabled() && !branches.removeAction->isEnabled() && !branches.siblingAction->isEnabled());
+        CHECK(!branches.cutAction->isEnabled() && !branches.removeAction->isEnabled() && branches.siblingAction->isEnabled());
         branches.activateWindow();
         branches.canvas->setFocus();
         QTest::qWait(30);
@@ -471,11 +593,11 @@ int runSmokeTest() {
         const QString symbolId = SymbolLibrary::assets().first().id;
         symbols.setSelectedSymbol(symbolId);
         CHECK(symbols.doc.nodes.value(symbolRoot).symbolId == symbolId);
-        CHECK(symbols.items.value(symbolRoot).symbol && symbols.items.value(symbolRoot).symbolPad->isVisible());
+        CHECK(symbols.items.value(symbolRoot).symbol && symbols.items.value(symbolRoot).symbol->isVisible());
         CHECK(symbols.items.value(symbolRoot).body->sceneBoundingRect().contains(
             symbols.items.value(symbolRoot).label->sceneBoundingRect()));
         CHECK(symbols.items.value(symbolRoot).body->sceneBoundingRect().contains(
-            symbols.items.value(symbolRoot).symbolPad->sceneBoundingRect()));
+            symbols.items.value(symbolRoot).symbol->sceneBoundingRect()));
         const QString symbolPath = temp.filePath("symbol.smap");
         CHECK(symbols.saveTo(symbolPath));
         CHECK(symbols.loadFrom(symbolPath, &error));
@@ -504,9 +626,9 @@ int runSmokeTest() {
         symbols.chooseSymbol();
         qInfo() << "Symbol picker applied";
         CHECK(removed && symbols.doc.nodes.value(symbolRoot).symbolId.isEmpty());
-        CHECK(!symbols.items.value(symbolRoot).symbolPad->isVisible());
+        CHECK(!symbols.items.value(symbolRoot).symbol->isVisible());
         symbols.history(true);
-        CHECK(symbols.doc.serialize() == beforePicker && symbols.items.value(symbolRoot).symbolPad->isVisible());
+        CHECK(symbols.doc.serialize() == beforePicker && symbols.items.value(symbolRoot).symbol->isVisible());
         for (const QString &format : {QString("png"), QString("svg"), QString("pdf")}) {
             const QString output = temp.filePath("symbols." + format);
             CHECK(symbols.exportTo(output, format, &error));
@@ -525,7 +647,7 @@ int runSmokeTest() {
         CHECK(symbols.doc.serialize() == beforePicker && !symbols.dirty);
         symbols.doc.nodes[symbolRoot].symbolId = QStringLiteral("future-unknown-symbol");
         symbols.render();
-        CHECK(!symbols.items.value(symbolRoot).symbolPad->isVisible());
+        CHECK(!symbols.items.value(symbolRoot).symbol->isVisible());
         CHECK(symbols.doc.nodes.value(symbolRoot).symbolId == QStringLiteral("future-unknown-symbol"));
         CHECK(!symbols.exportPowerPointTo(temp.filePath("unknown-symbol.pptx"), &error));
         CHECK(!QFile::exists(temp.filePath("unknown-symbol.pptx")));
@@ -866,10 +988,10 @@ int runSmokeTest() {
         window.render();
         qInfo() << "3000 nodes with 1000 symbols: render" << timer.elapsed() << "ms";
         CHECK(window.items.value("0").symbol && window.items.value("3").symbol);
-        CHECK(window.items.value("0").symbol->renderer() == window.items.value("3").symbol->renderer());
+        CHECK(window.items.value("3").symbol->renderer() == window.items.value("6").symbol->renderer());
         for (int i = 0; i < 3000; i += 3) {
             const NodeItem item = window.items.value(QString::number(i));
-            CHECK(item.symbolPad->isVisible() && item.body->sceneBoundingRect().contains(item.symbolPad->sceneBoundingRect()));
+            CHECK(item.symbol->isVisible() && item.body->sceneBoundingRect().contains(item.symbol->sceneBoundingRect()));
         }
     }
     qInfo() << "ZhiLi smoke test passed";

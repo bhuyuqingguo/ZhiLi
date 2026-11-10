@@ -82,8 +82,8 @@ if(BUILD_TESTING)
   add_test(NAME zhili_template_dialog_large_type COMMAND zhili_template_dialog_test)
   set(zhili_test_platform offscreen)
   if(WIN32)
-    # Qt 5's Windows font engine needs the native QPA integration.
-    set(zhili_test_platform windows)
+    # Match the portable build's Windows QPA and bundled CJK font engine.
+    set(zhili_test_platform "windows:fontengine=freetype")
   endif()
   set_tests_properties(zhili_symbols zhili_template_dialog PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=${zhili_test_platform};QT_FORCE_STDERR_LOGGING=1;QT_FONT_DPI=96" TIMEOUT 30)

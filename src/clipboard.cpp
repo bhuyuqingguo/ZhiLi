@@ -71,10 +71,22 @@ const char *mimeType() {
 }
 
 QByteArray encode(const Document &document, const QString &root, QString *error) {
+    return encode(document, QStringList{root}, error);
+}
+
+QByteArray encode(const Document &document, const QStringList &roots, QString *error) {
     Document branch;
-    branch.root = root;
     branch.mindMap = document.mindMap;
-    QVector<QString> pending{root};
+    if (roots.size() == 1) {
+        branch.root = roots.first();
+    } else {
+        Node container;
+        container.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        container.children = roots;
+        branch.root = container.id;
+        branch.nodes.insert(container.id, container);
+    }
+    QVector<QString> pending = roots.toVector();
     while (!pending.isEmpty()) {
         const QString id = pending.takeLast();
         if (!document.nodes.contains(id) || branch.nodes.contains(id)) {
@@ -94,7 +106,9 @@ QByteArray encode(const Document &document, const QString &root, QString *error)
     const QByteArray bytes = branch.serialize();
     Document checked;
     if (!checked.parse(bytes, error)) return {};
-    return bytes;
+    // Keep single branches readable by existing clients. A prefixed document
+    // carries the synthetic container only for a clipboard with several roots.
+    return roots.size() == 1 ? bytes : QByteArrayLiteral("zhili-forest\n") + bytes;
 }
 
 QString outline(const Document &document, const QString &root) {
@@ -119,9 +133,13 @@ QString outline(const Document &document, const QString &root) {
 
 bool paste(Document *document, const QString &parent, const QByteArray &data,
            QStringList *insertedRoots, QString *error) {
+    const QByteArray marker = QByteArrayLiteral("zhili-forest\n");
+    const bool forest = data.startsWith(marker);
     Document branch;
-    if (!branch.parse(data, error)) return false;
-    return insert(document, parent, branch, {branch.root}, insertedRoots, error);
+    if (!branch.parse(forest ? data.mid(marker.size()) : data, error)) return false;
+    const QStringList roots = forest ? branch.nodes.value(branch.root).children : QStringList{branch.root};
+    if (roots.isEmpty()) return reject(error, QStringLiteral("剪贴板中没有分支"));
+    return insert(document, parent, branch, roots, insertedRoots, error);
 }
 
 bool pasteOutline(Document *document, const QString &parent, const QString &text,

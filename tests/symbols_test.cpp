@@ -110,6 +110,21 @@ int main(int argc, char **argv) {
         QSvgRenderer renderer(svg);
         CHECK(renderer.isValid());
         CHECK(renderer.viewBox() == QRect(0, 0, 64, 64));
+        for (bool darkBackground : {false, true}) {
+            const QByteArray dimensional = SymbolLibrary::svg(asset, true, darkBackground);
+            CHECK(dimensional.contains("<linearGradient") && !dimensional.contains("<image"));
+            QSvgRenderer variant(dimensional);
+            CHECK(variant.isValid());
+            QImage image(64, 64, QImage::Format_ARGB32_Premultiplied);
+            image.fill(Qt::transparent);
+            QPainter painter(&image);
+            variant.render(&painter);
+            painter.end();
+            for (int i = 0; i < 64; ++i) {
+                CHECK(qAlpha(image.pixel(i, 0)) == 0 && qAlpha(image.pixel(i, 63)) == 0);
+                CHECK(qAlpha(image.pixel(0, i)) == 0 && qAlpha(image.pixel(63, i)) == 0);
+            }
+        }
         for (int size : {24, 32, 64, 128}) {
             QImage image(size, size, QImage::Format_ARGB32_Premultiplied);
             image.fill(Qt::transparent);
@@ -238,12 +253,18 @@ int main(int argc, char **argv) {
         for (const QSize &requested : {QSize(400, 300), QSize(360, 270), QSize(1000, 800), QSize(400, 300)}) {
             responsive.resize(requested);
             app.processEvents();
-            // A native window manager can limit a requested size to the work area.
+            // Native window managers may clamp the window to their minimum or
+            // work area. Check the controls at the actual size they display.
             CHECK(responsive.width() >= 360 && responsive.height() >= 270);
+            CHECK(responsive.frameGeometry().width() <= screen.width());
+            CHECK(responsive.frameGeometry().height() <= screen.height());
             CHECK(checkActions());
             auto *results = responsive.findChild<QListWidget *>("symbolList");
             CHECK(results->viewport()->height() >= results->fontMetrics().height() + 20);
-            if (requested.height() <= 300) {
+            const QFontMetrics metrics(responsive.font());
+            const bool compact = responsive.height() < qMax(520, metrics.height() * 16) ||
+                                 responsive.width() < qMax(560, metrics.height() * 12);
+            if (compact) {
                 CHECK(results->viewMode() == QListView::ListMode);
                 CHECK(!responsive.findChild<QLabel *>("symbolPreview")->isVisible());
                 CHECK(!responsive.findChild<QSlider *>("symbolSize")->isVisible());

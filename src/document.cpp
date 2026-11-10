@@ -12,6 +12,48 @@ bool isUnicode(const QString &text) {
     }
     return true;
 }
+
+QJsonObject writeStyle(const TopicStyle &style) {
+    QJsonObject result;
+    if (style.alignment != TextAlignment::Center)
+        result.insert("alignment", style.alignment == TextAlignment::Left ? "left" : "right");
+    if (!style.family.isEmpty()) result.insert("family", style.family);
+    if (style.points != 0) result.insert("points", style.points);
+    if (style.weight != -1) result.insert("bold", style.weight == 1);
+    if (!style.color.isEmpty()) result.insert("color", style.color);
+    return result;
+}
+
+bool readStyle(const QJsonValue &value, TopicStyle &style) {
+    if (value.isUndefined()) return true;
+    if (!value.isObject()) return false;
+    const QJsonObject fields = value.toObject();
+    const auto alignment = fields.value("alignment");
+    if (alignment == QJsonValue("left")) style.alignment = TextAlignment::Left;
+    else if (alignment == QJsonValue("right")) style.alignment = TextAlignment::Right;
+    else if (!alignment.isUndefined() && alignment != QJsonValue("center")) return false;
+    if (fields.contains("family")) {
+        const auto family = fields.value("family");
+        if (!family.isString() || family.toString().size() > 128 || !isUnicode(family.toString())) return false;
+        style.family = family.toString();
+    }
+    if (fields.contains("points")) {
+        style.points = fields.value("points").toInt();
+        if (style.points < 9 || style.points > 48) return false;
+    }
+    if (fields.contains("bold")) {
+        const auto bold = fields.value("bold");
+        if (!bold.isBool()) return false;
+        style.weight = bold.toBool() ? 1 : 0;
+    }
+    if (fields.contains("color")) {
+        static const QRegularExpression hex(QStringLiteral("^#[0-9a-fA-F]{6}$"));
+        style.color = fields.value("color").toString();
+        if (!hex.match(style.color).hasMatch()) return false;
+        style.color = style.color.toLower();
+    }
+    return true;
+}
 }
 
 QByteArray Document::serialize() const {
@@ -22,12 +64,25 @@ QByteArray Document::serialize() const {
             {"children", QJsonArray::fromStringList(node.children)}
         };
         if (!node.symbolId.isEmpty()) fields.insert("symbolId", node.symbolId);
+        if (node.rootLane != BranchDirection::Both)
+            fields.insert("rootLane", node.rootLane == BranchDirection::Right ? "right" : "left");
+        const auto style = writeStyle(node.style);
+        if (!style.isEmpty()) fields.insert("style", style);
         entries.append(fields);
     }
-    return QJsonDocument(QJsonObject{
+    QJsonObject map{
         {"format", "simplemap-json"}, {"version", 1}, {"root", root},
         {"nodes", entries}, {"layout", mindMap ? "mindmap" : "organization"}
-    }).toJson(QJsonDocument::Compact);
+    };
+    if (mindMap && branchDirection != BranchDirection::Both)
+        map.insert("branchDirection", branchDirection == BranchDirection::Right ? "right" : "left");
+    switch (connectorStyle) {
+    case ConnectorStyle::Orthogonal: map.insert("connectorStyle", "orthogonal"); break;
+    case ConnectorStyle::Straight: map.insert("connectorStyle", "straight"); break;
+    case ConnectorStyle::Curved: map.insert("connectorStyle", "curved"); break;
+    case ConnectorStyle::Automatic: break;
+    }
+    return QJsonDocument(map).toJson(QJsonDocument::Compact);
 }
 
 bool Document::parse(const QByteArray &bytes, QString *error) {
@@ -52,6 +107,17 @@ bool Document::parse(const QByteArray &bytes, QString *error) {
     if (!layout.isUndefined() && layout != QJsonValue("mindmap") && layout != QJsonValue("organization"))
         return reject(QStringLiteral("布局类型不受支持"));
     next.mindMap = layout != QJsonValue("organization");
+    const auto direction = object.value("branchDirection");
+    if (!direction.isUndefined() && direction != QJsonValue("right") && direction != QJsonValue("left"))
+        return reject(QStringLiteral("分支方向不受支持"));
+    if (next.mindMap && direction == QJsonValue("right")) next.branchDirection = BranchDirection::Right;
+    if (next.mindMap && direction == QJsonValue("left")) next.branchDirection = BranchDirection::Left;
+    const auto connectors = object.value("connectorStyle");
+    if (connectors == QJsonValue("orthogonal")) next.connectorStyle = ConnectorStyle::Orthogonal;
+    else if (connectors == QJsonValue("straight")) next.connectorStyle = ConnectorStyle::Straight;
+    else if (connectors == QJsonValue("curved")) next.connectorStyle = ConnectorStyle::Curved;
+    else if (!connectors.isUndefined() && connectors != QJsonValue("automatic"))
+        return reject(QStringLiteral("连线线型不受支持"));
 
     // A tree with N nodes can have at most N - 1 child references.
     int remainingLinks = entries.size() - 1;
@@ -63,10 +129,15 @@ bool Document::parse(const QByteArray &bytes, QString *error) {
         node.text = fields.value("text").toString();
         node.symbolId = fields.value("symbolId").toString();
         node.collapsed = fields.value("collapsed").toBool();
+        const auto lane = fields.value("rootLane");
+        if (lane == QJsonValue("right")) node.rootLane = BranchDirection::Right;
+        else if (lane == QJsonValue("left")) node.rootLane = BranchDirection::Left;
+        else if (!lane.isUndefined()) return reject(invalidNode);
         if (node.id.isEmpty() || next.nodes.contains(node.id) || !fields.value("text").isString()
             || node.text.size() > maxText || !isUnicode(node.id) || !isUnicode(node.text)
             || (fields.contains("symbolId") && !fields.value("symbolId").isString())
             || node.symbolId.size() > 128 || !isUnicode(node.symbolId)
+            || !readStyle(fields.value("style"), node.style)
             || !fields.value("children").isArray()
             || (fields.contains("collapsed") && !fields.value("collapsed").isBool()))
             return reject(invalidNode);

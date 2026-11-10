@@ -16,7 +16,8 @@ class QBoxLayout;
 class SymbolPickerDialog : public QDialog {
 public:
     explicit SymbolPickerDialog(QWidget *parent = nullptr,
-                                const QString &initialId = QString());
+                                const QString &initialId = QString(),
+                                bool dimensional = false);
     QString selectedSymbolId() const { return selectedId_; }
 
 protected:
@@ -35,6 +36,7 @@ private:
     QBoxLayout *filters_;
     QPushButton *remove_;
     bool compact_ = false;
+    bool dimensional_;
     QLineEdit *search_;
     QComboBox *category_;
     QListWidget *list_;

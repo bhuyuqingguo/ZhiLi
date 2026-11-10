@@ -73,7 +73,8 @@ void groupProperties(QXmlStreamWriter &out) {
 
 void shape(QXmlStreamWriter &out, int id, const QString &name, const QString &text,
            const QRectF &rect, int points100, const QString &fill, const QString &color,
-           bool rounded, bool bold = false, const QString &description = {}, qint64 leftInset = 63500) {
+           bool rounded, bool bold = false, const QString &description = {}, qint64 leftInset = 63500,
+           const TopicStyle *style = nullptr) {
     out.writeStartElement("p:sp");
     out.writeStartElement("p:nvSpPr");
     out.writeEmptyElement("p:cNvPr");
@@ -111,9 +112,14 @@ void shape(QXmlStreamWriter &out, int id, const QString &name, const QString &te
     QString normalized = text;
     normalized.replace("\r\n", "\n");
     normalized.replace('\r', '\n');
+    const QString alignment = style && style->alignment == TextAlignment::Left ? "l" :
+        style && style->alignment == TextAlignment::Right ? "r" : rounded ? "ctr" : "l";
+    const QString textColor = style && !style->color.isEmpty() ? style->color.mid(1).toUpper() : color;
+    const QString family = style ? style->family : QString();
+    const bool textBold = style && style->weight != -1 ? style->weight == 1 : bold;
     for (const QString &line : normalized.split('\n')) {
         out.writeStartElement("a:p");
-        empty(out, "a:pPr", {{"algn", rounded ? "ctr" : "l"}});
+        empty(out, "a:pPr", {{"algn", alignment}});
         QList<QPair<QString, bool>> runs;
         for (int offset = 0; offset < line.size();) {
             const int count = line.at(offset).isHighSurrogate() && offset + 1 < line.size() ? 2 : 1;
@@ -128,11 +134,13 @@ void shape(QXmlStreamWriter &out, int id, const QString &name, const QString &te
             out.writeStartElement("a:rPr");
             out.writeAttribute("lang", "zh-CN");
             out.writeAttribute("sz", QString::number(qMax(100, points100)));
-            out.writeAttribute("b", bold ? "1" : "0");
-            solid(out, color);
-            empty(out, "a:latin", {{"typeface", run.second ? "Segoe UI Emoji" : "Arial"}});
-            empty(out, "a:ea", {{"typeface", run.second ? "Segoe UI Emoji" : "Source Han Sans CN"}});
-            empty(out, "a:cs", {{"typeface", run.second ? "Segoe UI Emoji" : "Arial"}});
+            out.writeAttribute("b", textBold ? "1" : "0");
+            solid(out, textColor);
+            const QString latin = run.second ? "Segoe UI Emoji" : family.isEmpty() ? "Arial" : family;
+            const QString eastAsian = run.second ? "Segoe UI Emoji" : family.isEmpty() ? "Source Han Sans CN" : family;
+            empty(out, "a:latin", {{"typeface", latin}});
+            empty(out, "a:ea", {{"typeface", eastAsian}});
+            empty(out, "a:cs", {{"typeface", latin}});
             out.writeEndElement();
             out.writeStartElement("a:t");
             out.writeAttribute("xml:space", "preserve");
@@ -176,7 +184,7 @@ void picture(QXmlStreamWriter &out, int id, int relationship, const QRectF &rect
 }
 
 void connector(QXmlStreamWriter &out, int id, int parent, int child, QPointF a, QPointF b,
-               int startSite, int endSite) {
+               int startSite, int endSite, ConnectorStyle style, bool horizontal) {
     out.writeStartElement("p:cxnSp");
     out.writeStartElement("p:nvCxnSpPr");
     empty(out, "p:cNvPr", {{"id", QString::number(id)}, {"name", QStringLiteral("连接线 %1").arg(id)}});
@@ -188,15 +196,21 @@ void connector(QXmlStreamWriter &out, int id, int parent, int child, QPointF a, 
     out.writeEndElement();
     out.writeStartElement("p:spPr");
     out.writeStartElement("a:xfrm");
-    if (b.x() < a.x()) out.writeAttribute("flipH", "1");
-    if (b.y() < a.y()) out.writeAttribute("flipV", "1");
-    empty(out, "a:off", {{"x", QString::number(qRound64(qMin(a.x(), b.x())))},
-                         {"y", QString::number(qRound64(qMin(a.y(), b.y())))}});
-    empty(out, "a:ext", {{"cx", QString::number(qMax<qint64>(1, qRound64(qAbs(b.x() - a.x()))))},
-                         {"cy", QString::number(qMax<qint64>(1, qRound64(qAbs(b.y() - a.y()))))}});
+    const bool rotate = !horizontal && style != ConnectorStyle::Straight;
+    const QPointF delta = rotate ? QPointF(b.y() - a.y(), a.x() - b.x()) : b - a;
+    const QPointF extent(qAbs(delta.x()), qAbs(delta.y()));
+    const QPointF origin = (a + b - extent) / 2;
+    if (rotate) out.writeAttribute("rot", "5400000");
+    if (delta.x() < 0) out.writeAttribute("flipH", "1");
+    if (delta.y() < 0) out.writeAttribute("flipV", "1");
+    empty(out, "a:off", {{"x", QString::number(qRound64(origin.x()))},
+                         {"y", QString::number(qRound64(origin.y()))}});
+    empty(out, "a:ext", {{"cx", QString::number(qMax<qint64>(1, qRound64(extent.x())))},
+                         {"cy", QString::number(qMax<qint64>(1, qRound64(extent.y())))}});
     out.writeEndElement();
     out.writeStartElement("a:prstGeom");
-    out.writeAttribute("prst", "line");
+    out.writeAttribute("prst", style == ConnectorStyle::Orthogonal ? "bentConnector3" :
+                               style == ConnectorStyle::Curved ? "curvedConnector3" : "line");
     empty(out, "a:avLst");
     out.writeEndElement();
     out.writeStartElement("a:ln");
@@ -261,6 +275,8 @@ bool plan(const Document &source, QVector<Page> *pages, QMap<QString, int> *text
             page.title = title + QStringLiteral(" · 总览");
             page.tree.root = source.root;
             page.tree.mindMap = source.mindMap;
+            page.tree.branchDirection = source.branchDirection;
+            page.tree.connectorStyle = source.connectorStyle;
             addNode(page, source, source.root);
             int cost = topicCost(source.nodes.value(source.root));
             while (first < branches.size() && page.tree.nodes.size() < pageNodes) {
@@ -285,6 +301,8 @@ bool plan(const Document &source, QVector<Page> *pages, QMap<QString, int> *text
             page.title = safePrefix(source.nodes.value(initial.first).text.simplified(), 64) + QStringLiteral(" · 分支");
             page.tree.root = initial.first;
             page.tree.mindMap = source.mindMap;
+            page.tree.branchDirection = source.branchDirection;
+            page.tree.connectorStyle = source.connectorStyle;
             addNode(page, source, initial.first);
             int cost = topicCost(source.nodes.value(initial.first));
             QMap<QString, int> depths{{initial.first, 0}};
@@ -395,6 +413,7 @@ QByteArray slideXml(const Page &page, int number, int total, const QMap<QString,
             QMap<QString, QSizeF> sizes;
             for (const Node &node : page.tree.nodes) {
                 QSizeF size = topicSize(displayText(node, textPages));
+                if (node.style.points > 12) size *= node.style.points / 12.0;
                 if (nodeImages.contains(node.id)) size.rwidth() += 30;
                 sizes.insert(node.id, size);
             }
@@ -421,7 +440,7 @@ QByteArray slideXml(const Page &page, int number, int total, const QMap<QString,
             alternative.mindMap = !alternative.mindMap;
             const auto alternatePositions = layoutNodes(alternative, sizes);
             const QRectF alternateBounds = extent(alternatePositions);
-            if (fitScale(alternateBounds) > scale * 1.1) {
+            if (rendered.branchDirection == BranchDirection::Both && fitScale(alternateBounds) > scale * 1.1) {
                 rendered = alternative;
                 positions = alternatePositions;
                 bounds = alternateBounds;
@@ -436,6 +455,8 @@ QByteArray slideXml(const Page &page, int number, int total, const QMap<QString,
                 boxes.insert(it.key(), QRectF(it.value() * scale + offset - QPointF(size.width() / 2, size.height() / 2), size));
                 ids.insert(it.key(), id++);
             }
+            const ConnectorStyle edgeStyle = rendered.connectorStyle == ConnectorStyle::Automatic
+                ? (rendered.mindMap ? ConnectorStyle::Curved : ConnectorStyle::Orthogonal) : rendered.connectorStyle;
             for (const Node &node : page.tree.nodes) {
                 for (const QString &child : node.children) {
                     const QRectF parentBox = boxes.value(node.id), childBox = boxes.value(child);
@@ -445,7 +466,8 @@ QByteArray slideXml(const Page &page, int number, int total, const QMap<QString,
                     const QPointF b = rendered.mindMap ? QPointF(right ? childBox.left() : childBox.right(), childBox.center().y())
                                                        : QPointF(childBox.center().x(), childBox.top());
                     connector(out, id++, ids.value(node.id), ids.value(child), a, b,
-                              rendered.mindMap ? (right ? 3 : 1) : 2, rendered.mindMap ? (right ? 1 : 3) : 0);
+                              rendered.mindMap ? (right ? 3 : 1) : 2, rendered.mindMap ? (right ? 1 : 3) : 0,
+                              edgeStyle, rendered.mindMap);
                 }
             }
             const auto images = slideImages(page, nodeImages);
@@ -453,10 +475,11 @@ QByteArray slideXml(const Page &page, int number, int total, const QMap<QString,
                 const bool root = node.id == page.tree.root;
                 const bool hasImage = nodeImages.contains(node.id);
                 shape(out, ids.value(node.id), QStringLiteral("主题 %1").arg(ids.value(node.id)), displayText(node, textPages),
-                      boxes.value(node.id), qBound(500, qRound(1200 * scale / 9525), 2400),
+                      boxes.value(node.id), qBound(500, qRound((node.style.points ? node.style.points : 12) * 100 * scale / 9525),
+                                                   node.style.points ? 7200 : 2400),
                       root ? "286557" : "E0EDE4", root ? "FFFFFF" : "203D36", true, root,
                       textPages.contains(node.id) ? QStringLiteral("完整主题文字见第 %1 页起").arg(textPages.value(node.id)) : QString(),
-                      hasImage ? qRound64(34 * scale) : 63500);
+                      hasImage ? qRound64(34 * scale) : 63500, &node.style);
                 if (hasImage) {
                     const QRectF box = boxes.value(node.id);
                     picture(out, id++, images.value(nodeImages.value(node.id)),
@@ -642,7 +665,7 @@ bool exportPptx(const Document &document, const QString &path,
             {"ZhiLiCollapsedPolicy", "Include all collapsed descendants"}, {"ZhiLiTextPolicy", "Complete topic text in diagrams or explicitly referenced continuation pages"},
             {"ZhiLiLayoutPolicy", "Paginated branch views; orientation may change for readable text without changing tree relationships"},
             {"ZhiLiSymbolPolicy", images.isEmpty() ? "No symbol images supplied" : "Symbols preserved as separate PNG pictures; text, topic shapes and connectors remain editable"},
-            {"ZhiLiLimitations", "No application-specific notes or per-topic styles; fonts are not embedded; symbol pictures are not editable vector drawings"}};
+            {"ZhiLiLimitations", "No application-specific notes; fonts are not embedded; symbol pictures are not editable vector drawings"}};
         for (int i = 0; i < values.size(); ++i) {
             out.writeStartElement("property"); out.writeAttribute("fmtid", "{D5CDD505-2E9C-101B-9397-08002B2CF9AE}");
             out.writeAttribute("pid", QString::number(i + 2)); out.writeAttribute("name", values.at(i).first);

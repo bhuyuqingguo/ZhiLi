@@ -1,6 +1,8 @@
 #include "symbols.h"
 
 #include <QFile>
+#include <QColor>
+#include <QRegularExpression>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -10,6 +12,40 @@
 // Must remain outside a namespace: rcc's generated symbol is global.
 static void ensureSymbolResources() {
     Q_INIT_RESOURCE(symbols);
+}
+
+QByteArray SymbolLibrary::svg(const SymbolAsset &asset, bool dimensional, bool darkBackground) {
+    QFile file(asset.resourcePath);
+    if (!file.open(QIODevice::ReadOnly)) return {};
+    const QByteArray original = file.readAll();
+    if (!dimensional && !darkBackground) return original;
+    QString image = QString::fromUtf8(original);
+    static const QRegularExpression stroke(QStringLiteral("stroke=\"(#[0-9a-fA-F]{6})\""));
+    static const QRegularExpression fill(QStringLiteral("fill=\"(#[0-9a-fA-F]{6})\""));
+    const QColor ink(stroke.match(image).captured(1));
+    const QColor body(fill.match(image).captured(1));
+    if (darkBackground) {
+        image.replace(stroke, QStringLiteral("stroke=\"#dff7ef\""));
+        if (!dimensional) image.replace(fill, QStringLiteral("fill=\"#467563\""));
+    }
+    if (!dimensional || !ink.isValid() || !body.isValid()) return image.toUtf8();
+
+    // Paint only the symbol's silhouettes. Leave the area around them transparent.
+    const QString lighting = QStringLiteral(
+        "<defs><linearGradient id='surface' gradientUnits='userSpaceOnUse' x1='10' y1='9' x2='53' y2='57'>"
+        "<stop offset='0' stop-color='%1'/><stop offset='.29' stop-color='%2'/>"
+        "<stop offset='.57' stop-color='%3'/><stop offset='1' stop-color='%4'/>"
+        "</linearGradient><linearGradient id='rim' gradientUnits='userSpaceOnUse' x1='8' y1='8' x2='55' y2='57'>"
+        "<stop offset='0' stop-color='%5'/><stop offset='1' stop-color='%6'/>"
+        "</linearGradient></defs>")
+        .arg(body.lighter(109).name(), body.name(), ink.lighter(170).name(), ink.darker(111).name(),
+             darkBackground ? QStringLiteral("#f1fff8") : ink.lighter(148).name(),
+             darkBackground ? QStringLiteral("#a5d7c5") : ink.darker(144).name());
+    image.replace(fill, QStringLiteral("fill=\"url(#surface)\""));
+    image.replace(stroke, QStringLiteral("stroke=\"url(#rim)\""));
+    image.replace(QStringLiteral("stroke-width=\"2.2\""), QStringLiteral("stroke-width=\"2.65\""));
+    image.insert(image.indexOf('>') + 1, lighting);
+    return image.toUtf8();
 }
 
 namespace {
