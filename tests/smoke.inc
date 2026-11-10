@@ -226,7 +226,7 @@ int runSmokeTest() {
         workspace.canvas->setFocus();
         QTest::qWait(50);
         QTest::keyClick(workspace.canvas, Qt::Key_Escape);
-        QCoreApplication::processEvents();
+        QTest::qWait(50);
         CHECK(workspace.focusRoot.isEmpty() && workspace.items.size() == 7 && workspace.overviewPane->isHidden());
         CHECK(workspace.canvas->transform() == fullTransform);
         const QPointF restoredCenter = workspace.canvas->mapToScene(workspace.canvas->viewport()->rect().center());

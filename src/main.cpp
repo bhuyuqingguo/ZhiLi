@@ -78,6 +78,7 @@ public:
         setDragMode(ScrollHandDrag);
         setViewportUpdateMode(BoundingRectViewportUpdate);
         setTransformationAnchor(AnchorUnderMouse);
+        setResizeAnchor(AnchorViewCenter);
     }
 
     std::function<bool(QPoint, Qt::KeyboardModifiers)> press;
@@ -769,6 +770,14 @@ private:
             canvas->setTransform(fullMapTransform);
             canvas->centerOn(fullMapCenter);
             updateZoomLevel();
+            // Scrollbar visibility can resize the viewport after the splitter layout.
+            const QString root = doc.root;
+            const QTransform transform = fullMapTransform;
+            const QPointF center = fullMapCenter;
+            QTimer::singleShot(0, this, [this, root, transform, center] {
+                if (focusRoot.isEmpty() && doc.root == root && !fitMode && canvas->transform() == transform)
+                    canvas->centerOn(center);
+            });
         }
     }
 
