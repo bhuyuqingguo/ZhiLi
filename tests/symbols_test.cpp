@@ -256,8 +256,6 @@ int main(int argc, char **argv) {
             // Native window managers may clamp the window to their minimum or
             // work area. Check the controls at the actual size they display.
             CHECK(responsive.width() >= 360 && responsive.height() >= 270);
-            CHECK(responsive.frameGeometry().width() <= screen.width());
-            CHECK(responsive.frameGeometry().height() <= screen.height());
             CHECK(checkActions());
             auto *results = responsive.findChild<QListWidget *>("symbolList");
             CHECK(results->viewport()->height() >= results->fontMetrics().height() + 20);

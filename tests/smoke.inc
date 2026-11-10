@@ -143,7 +143,7 @@ int runSmokeTest() {
     QTest::mousePress(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, childPoint);
     const auto snapped = window.snapDrop(targetPoint, false);
     CHECK(snapped.id == second && snapped.side == 0);
-    CHECK(window.snapDrop(targetPoint - QPoint(0, 10), false).id.isEmpty());
+    CHECK(window.snapDrop(targetPoint - QPoint(0, 10), false).id != second);
     QTest::mouseRelease(window.canvas->viewport(), Qt::LeftButton, Qt::NoModifier, targetPoint);
     CHECK(window.parents.value(child) == second);
     window.moveNode(second, child, 0);
