@@ -21,7 +21,11 @@ jobs:
         env:
           ZHILI_RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: |
-          ports_ip=$(getent ahostsv4 ports.ubuntu.com | awk 'NR==1 {print $1}')
+          ports_ip=$(getent ahostsv4 ports.ubuntu.com | awk 'NR==1 {print $1}' || true)
+          if [ -z "$ports_ip" ]; then
+            ports_ip=$(curl -fsS --retry 2 --max-time 20 'https://dns.google/resolve?name=ports.ubuntu.com&type=A' |
+              python3 -c 'import json,sys,ipaddress; print(next(str(ipaddress.IPv4Address(a["data"])) for a in json.load(sys.stdin).get("Answer", []) if a.get("type") == 1 and ipaddress.IPv4Address(a["data"]).is_global))')
+          fi
           test -n "$ports_ip"
           echo "Ubuntu ports resolved on runner: $ports_ip"
           docker run --rm --network host --add-host "ports.ubuntu.com:$ports_ip" --platform linux/arm64 \
