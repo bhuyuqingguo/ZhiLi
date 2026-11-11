@@ -2,21 +2,39 @@
 
 枝理是一款离线桌面思维导图工具。它从银河麒麟等桌面系统的日常需求出发，把记录思路、整理分支、批量修改和交付图稿集中在一张画布上。导图保存在本机，同一个开放的 `.smap` 文件可以在不同平台继续编辑。
 
-[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.3 发布说明](docs/releases/v1.0.3.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
+[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.4 发布说明](docs/releases/v1.0.4.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
 
 ![枝理 Windows 工作区，工具栏可直接打开、保存、转换文件及切换布局](docs/screenshots/workspace.png)
+
+## v1.0.4 新功能
+
+对齐 MindMaster 的常用编辑习惯，新增完整快捷键设置、大纲侧栏、批量录入、主题拆分与合并，以及更多选择和移动操作。启动默认最大化，枝条生长动画约 1.65 秒，可点击或按 Esc 跳过，也可在帮助菜单关闭。
+
+「帮助 → 快捷键设置」可以搜索功能、修改按键、增加备用键、检查冲突和恢复默认，菜单与操作提示同步更新。第二页提供 MindMaster 官方快捷键目录的完整对照，清楚区分可用功能与未完成项目。[编辑习惯、差异与迁移说明](docs/MINDMASTER_PARITY.md)
+
+| 启动动画定帧 | 快捷键设置 |
+| --- | --- |
+| ![枝理启动时的枝条生长与主题节点动画定帧](docs/screenshots/startup.png) | ![可搜索、修改和恢复默认的快捷键设置](docs/screenshots/shortcut-settings.png) |
+
+![大纲与画布共用主题数据，可以同步编辑与调整层级](docs/screenshots/outline-editing.png)
+
+![关系线、自动外框和独立浮动主题](docs/screenshots/relationships-floating.png)
+
+关系线 **Ctrl+R**、直线关系线 **Ctrl+Shift+R**、外框 **Ctrl+Shift+B**、浮动主题 **Alt+F**。双击关系线或外框编辑标题，拖动关系线控制点改变曲率；拖动分支到空白处可变为浮动分支，再拖到主题上接回导图。空白处双击也可创建浮动主题。**Alt+方向键** 微移浮动主题。
+
+这些元素保存在开放的 SMAP v2 中，支持撤销、重开、分支内复制及 PNG／SVG／PDF 导出。draw.io 写成可编辑图形。旧版枝理无法打开 v2；PPTX、Visio 与大纲等格式尚不能完整写出新元素时会提示，避免静默丢失。普通树状导图仍使用 SMAP v1 和原有导出。
 
 ## 下载与启动
 
 | 平台 | 下载与启动 |
 | --- | --- |
-| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.3-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
-| Linux ARM64 | 下载 `ZhiLi-v1.0.3-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
+| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.4-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
+| Linux ARM64 | 下载 `ZhiLi-v1.0.4-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
 | macOS | 可用 Qt5 从源码构建 `simplemap.app`，应用包包含枝理图标。当前 GitHub Release 提供 Windows x64 和 Linux ARM64 便携包。 |
 
-完整包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.3-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
+完整包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.4-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
 
-已有原版 `v1.0.2` 便携包，可下载同平台的 `v1.0.2-to-v1.0.3` 增量包、对应校验文件和 `ZhiLi-v1.0.3-update.py`。更新工具校验基线并在新目录重建新版，旧目录可留作回退。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
+已有原版 `v1.0.3` 便携包，可下载同平台的 `v1.0.3-to-v1.0.4` 增量包、对应校验文件和 `ZhiLi-v1.0.4-update.py`。更新工具校验基线并在新目录重建新版，旧目录可留作回退。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
 
 ## 用一张图上手
 
@@ -24,12 +42,18 @@
 
 | 要做什么 | 怎么操作 |
 | --- | --- |
-| 录入想法 | 双击或按 **F2** 编辑。**Enter** 加同级，**Tab** 或 **Insert** 加子主题。编辑时 **Enter** 确认、**Shift+Enter** 换行。 |
+| 录入想法 | 双击或按 **F2** 编辑，**Space** 从末尾编辑，**Shift+Space** 从开头编辑。**Enter** 加同级，**Tab** 或 **Insert** 加子主题，**Shift+Insert** 插入父主题。编辑时 **Enter** 确认，**Shift / Ctrl / Alt+Enter** 换行。 |
+| 添加备注 | 选中主题后按 **Ctrl+T**，也可双击主题上的「备注」标记。备注随 `.smap` 文件保存。 |
 | 框选和整理分支 | 点击画布右下角的框选按钮，再从空白处拖动，也可直接按 **Shift** 拖动空白处。**Ctrl+单击** 可逐项增减，从任一选中项拖动整组。 |
-| 聚焦或查找 | **Ctrl+Shift+J** 同时打开全图概览与分支编辑区，单击全图中的主题切换分支，**Esc** 返回原全图视图。**Ctrl+F** 查找，**F3** 跳到下一个结果。 |
-| 缩放和平移 | **Ctrl+滚轮** 缩放，**Ctrl+0** 适应窗口，拖动画布空白处平移。 |
+| 聚焦或查找 | **F4** 同时打开全图概览与分支编辑区，单击全图中的主题切换分支，**Esc** 返回。**F3** 居中主题。**Ctrl+F** 查找，**Ctrl+Shift+F3** 跳到下一个结果。 |
+| 缩放和平移 | **Ctrl+滚轮** 缩放，**Ctrl+0** 恢复 100%，**Alt+Shift+F3** 适应窗口，拖动画布空白处平移。 |
+| 大纲与批量录入 | **F10** 打开同步大纲，**Enter** 加同级、**Tab / Shift+Tab** 调整层级。**Ctrl+M** 一次录入缩进大纲。 |
 | 批量统一样式 | 多选后按 **Ctrl+Shift+F**，勾选需要修改的对齐、字体、字号、字重或颜色。 |
 | 保存与分享 | **Ctrl+S** 保存。右键可复制当前分支为透明图片，或只导出该分支。 |
+
+**Ctrl+D** 在选中分支后创建副本。右键菜单的「调整分支顺序」支持按标题排列子主题。「视图 → 分支展开层级」支持折叠整个分支或按层展开。
+
+**Ctrl+Shift+Home / End** 将选中主题移到同级首尾，**Shift+Delete** 移除主题但保留子级。**Ctrl+B / I / U** 批量设置粗体、斜体和下划线。拖拽时靠近画布边缘会自动滚动，按 **Esc** 可取消此次拖拽。
 
 窗口底部会根据编辑、框选、拖动、多选或聚焦状态给出快捷键提示。**F1** 打开离线帮助和快捷键速查，「帮助 → 关于枝理」显示应用版本和运行环境。
 

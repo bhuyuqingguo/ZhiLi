@@ -78,7 +78,9 @@ void writeDrawio(QXmlStreamWriter &xml, const Document &document) {
         if (node.style.alignment == TextAlignment::Left) style += "align=left;";
         if (node.style.alignment == TextAlignment::Right) style += "align=right;";
         if (node.style.points) style += QStringLiteral("fontSize=%1;").arg(node.style.points);
-        if (node.style.weight >= 0) style += QStringLiteral("fontStyle=%1;").arg(node.style.weight);
+        const int fontStyle = (node.style.weight == -1 ? (root ? 1 : 0) : node.style.weight)
+            | (node.style.italic ? 2 : 0) | (node.style.underline ? 4 : 0) | (node.style.strikeOut ? 8 : 0);
+        style += QStringLiteral("fontStyle=%1;").arg(fontStyle);
         if (!node.style.color.isEmpty()) style += "fontColor=" + node.style.color + ';';
         xml.writeStartElement("mxCell");
         xml.writeAttribute("id", layout.ids.value(node.id));
@@ -105,6 +107,7 @@ void writeDrawio(QXmlStreamWriter &xml, const Document &document) {
         style += "edgeStyle=orthogonalEdgeStyle;";
     for (const auto &node : qAsConst(document.nodes)) {
         for (const auto &child : node.children) {
+            if (document.floating.contains(child)) continue;
             xml.writeStartElement("mxCell");
             xml.writeAttribute("id", QString::number(layout.nextId++));
             xml.writeAttribute("style", style);
@@ -117,6 +120,39 @@ void writeDrawio(QXmlStreamWriter &xml, const Document &document) {
             xml.writeAttribute("as", "geometry");
             xml.writeEndElement();
         }
+    }
+    for (const auto &link : document.relationships) {
+        xml.writeStartElement("mxCell");
+        xml.writeAttribute("id", QString::number(layout.nextId++));
+        xml.writeAttribute("value", link.text);
+        xml.writeAttribute("edge", "1"); xml.writeAttribute("parent", "1");
+        xml.writeAttribute("source", layout.ids.value(link.from)); xml.writeAttribute("target", layout.ids.value(link.to));
+        xml.writeAttribute("style", link.straight ? "endArrow=classic;dashed=1;strokeColor=#90704b;" : "endArrow=classic;curved=1;dashed=1;strokeColor=#90704b;");
+        xml.writeStartElement("mxGeometry"); xml.writeAttribute("relative", "1"); xml.writeAttribute("as", "geometry");
+        if (!link.straight) {
+            const QPointF point = (layout.positions.value(link.from) + layout.positions.value(link.to)) / 2 + link.bend - layout.bounds.topLeft() + QPointF(24,24);
+            xml.writeStartElement("Array"); xml.writeAttribute("as", "points");
+            xml.writeEmptyElement("mxPoint"); xml.writeAttribute("x", QString::number(point.x())); xml.writeAttribute("y", QString::number(point.y()));
+            xml.writeEndElement();
+        }
+        xml.writeEndElement(); xml.writeEndElement();
+    }
+    for (const auto &frame : document.boundaries) {
+        QRectF bounds; QStringList pending = frame.members; QSet<QString> seen;
+        while (!pending.isEmpty()) {
+            const auto id = pending.takeLast(); if (seen.contains(id)) continue; seen.insert(id);
+            const auto size = layout.sizes.value(id);
+            bounds |= QRectF(layout.positions.value(id) - QPointF(size.width()/2, size.height()/2), size);
+            pending += document.nodes.value(id).children;
+        }
+        bounds.adjust(-20,-20,20,20); bounds.translate(-layout.bounds.topLeft() + QPointF(24,24));
+        xml.writeStartElement("mxCell"); xml.writeAttribute("id", QString::number(layout.nextId++));
+        xml.writeAttribute("value", frame.text); xml.writeAttribute("vertex", "1"); xml.writeAttribute("parent", "1");
+        xml.writeAttribute("style", "rounded=1;fillColor=none;strokeColor=#71a48b;dashed=1;verticalAlign=top;pointerEvents=0;");
+        xml.writeEmptyElement("mxGeometry"); xml.writeAttribute("as", "geometry");
+        xml.writeAttribute("x", QString::number(bounds.x())); xml.writeAttribute("y", QString::number(bounds.y()));
+        xml.writeAttribute("width", QString::number(bounds.width())); xml.writeAttribute("height", QString::number(bounds.height()));
+        xml.writeEndElement();
     }
     xml.writeEndElement();
     xml.writeEndElement();
@@ -290,6 +326,10 @@ bool writeVisio(const Document &document, QByteArray *bytes) {
 
 bool exportExchange(const Document &document, const QString &path,
                     const QString &format, QString *error) {
+    if (format != "drawio" && (!document.floating.isEmpty() || !document.relationships.isEmpty() || !document.boundaries.isEmpty())) {
+        if (error) *error = QStringLiteral("此导图含关系线、外框或浮动主题，当前目标格式尚不能完整保留。请使用 SMAP、draw.io、SVG、PNG 或 PDF。");
+        return false;
+    }
     if (format == "canvas" || format == "txt") {
         const QByteArray bytes = format == "canvas" ? writeCanvas(document) :
             BranchClipboard::outline(document, document.root).toUtf8() + '\n';

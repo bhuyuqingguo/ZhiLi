@@ -87,6 +87,58 @@ int runSmokeTest() {
     CHECK(window.doc.nodes.size() == 7);
 
     {
+        Window editing(false);
+        editing.doc = window.doc;
+        editing.doc.nodes[child].text = QStringLiteral("Zulu");
+        editing.doc.nodes[sibling].text = QStringLiteral("Alpha");
+        Node leaf;
+        leaf.id = "detail-test-leaf";
+        editing.doc.nodes.insert(leaf.id, leaf);
+        editing.doc.nodes[child].children.append(leaf.id);
+        editing.initializeDocument();
+        editing.selectNode(first);
+        editing.setBranchDetail(1);
+        CHECK(editing.items.contains(child) && !editing.items.contains(leaf.id));
+        CHECK(editing.undoStack.size() == 1);
+        editing.setBranchDetail(-1);
+        CHECK(editing.items.contains(leaf.id));
+        editing.history(true);
+        CHECK(!editing.items.contains(leaf.id));
+        editing.history(true);
+        CHECK(editing.items.contains(leaf.id));
+
+        editing.sortChildren(true);
+        CHECK(editing.doc.nodes.value(first).children == (QStringList{sibling, child}));
+        editing.sortChildren(true);
+        CHECK(editing.undoStack.size() == 1);
+        editing.history(true);
+        CHECK(editing.doc.nodes.value(first).children == (QStringList{child, sibling}));
+
+        const QString note = QStringLiteral("核对验收记录") + QLatin1Char(10) + QStringLiteral("下周复核");
+        QTimer::singleShot(0, &editing, [&] {
+            auto *dialog = editing.findChild<QDialog *>("topicNotesDialog");
+            if (!dialog) return;
+            dialog->findChild<QPlainTextEdit *>("topicNotesText")->setPlainText(note);
+            dialog->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+        });
+        editing.findChild<QAction *>("topicNotesAction")->trigger();
+        CHECK(editing.doc.nodes.value(first).notes == note && editing.items.value(first).note);
+        CHECK(editing.duplicateBranchAction->isEnabled());
+        editing.duplicateBranchAction->trigger();
+        const QString duplicate = editing.selected;
+        CHECK(duplicate != first && editing.doc.nodes.value(duplicate).notes == note);
+        CHECK(editing.doc.nodes.value(root).children == (QStringList{first, duplicate, second}));
+        CHECK(editing.doc.nodes.value(duplicate).children.size() == 2);
+        editing.history(true);
+        CHECK(!editing.doc.nodes.contains(duplicate) && editing.doc.nodes.value(first).notes == note);
+        editing.history(true);
+        CHECK(editing.doc.nodes.value(first).notes.isEmpty() && !editing.items.value(first).note);
+        window.activateWindow();
+        window.canvas->setFocus();
+        QTest::qWait(40);
+    }
+
+    {
         Window workspace(false);
         workspace.doc = window.doc;
         workspace.doc.nodes[first].style.alignment = TextAlignment::Left;
@@ -120,7 +172,7 @@ int runSmokeTest() {
             return hintShown && workspace.shortcutHint->text().contains(QStringLiteral("批量样式")) &&
                 (workspace.additionalSelection.contains(child) || workspace.selected == child);
         };
-        QTest::keyClick(workspace.canvas, Qt::Key_B, Qt::ControlModifier | Qt::ShiftModifier);
+        QTest::keyClick(workspace.canvas, Qt::Key_B, Qt::ControlModifier | Qt::AltModifier);
         CHECK(areaButton->isChecked() && selectArea(Qt::NoModifier));
         areaButton->click();
         CHECK(!areaButton->isChecked() && selectArea(Qt::ShiftModifier));
@@ -458,13 +510,13 @@ int runSmokeTest() {
     window.activateWindow();
     window.canvas->setFocus();
     QTest::qWait(60);
-    QTest::keyClick(window.canvas, Qt::Key_F3);
+    QTest::keyClick(window.canvas, Qt::Key_F3, Qt::ControlModifier | Qt::ShiftModifier);
     CHECK(window.selected == sibling);
-    QTest::keyClick(window.canvas, Qt::Key_F3);
+    QTest::keyClick(window.canvas, Qt::Key_F3, Qt::ControlModifier | Qt::ShiftModifier);
     CHECK(window.selected == secondMatch);
-    QTest::keyClick(window.canvas, Qt::Key_F3);
+    QTest::keyClick(window.canvas, Qt::Key_F3, Qt::ControlModifier | Qt::ShiftModifier);
     CHECK(window.selected == lastSearchMatch);
-    QTest::keyClick(window.canvas, Qt::Key_F3);
+    QTest::keyClick(window.canvas, Qt::Key_F3, Qt::ControlModifier | Qt::ShiftModifier);
     CHECK(window.selected == child);
     window.history(true);
     CHECK(window.doc.nodes.value(first).collapsed && !window.items.contains(child));
@@ -1032,6 +1084,8 @@ int runSmokeTest() {
     // Windows can clamp requested dimensions to the scaled desktop work area.
     const auto toolbarMatchesWindow = [&] {
         const bool roomy = window.width() >= qMax(840, toolbar->sizeHint().width() + 24);
+        if (toolbar->isVisible() != roomy || compact->isVisible() == roomy)
+            qWarning() << "Toolbar sizing" << window.width() << toolbar->sizeHint() << toolbar->isVisible() << compact->isVisible();
         return toolbar->isVisible() == roomy && compact->isVisible() != roomy;
     };
     window.resize(1160, 760);
@@ -1064,7 +1118,7 @@ int runSmokeTest() {
     window.activateWindow();
     window.canvas->setFocus();
     QTest::qWait(60);
-    QTest::keyClick(window.canvas, Qt::Key_0, Qt::ControlModifier);
+    QTest::keyClick(window.canvas, Qt::Key_F3, Qt::AltModifier | Qt::ShiftModifier);
     QTest::qWait(60);
     CHECK(window.fitMode);
     CHECK(qAbs(window.canvas->transform().m11() - narrowZoom) < 0.02);

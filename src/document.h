@@ -10,16 +10,21 @@ struct TopicStyle {
     QString family;
     int points = 0;
     int weight = -1;
+    bool italic = false;
+    bool underline = false;
+    bool strikeOut = false;
     QString color;
 
     bool operator==(const TopicStyle &other) const {
         return alignment == other.alignment && family == other.family && points == other.points
-            && weight == other.weight && color == other.color;
+            && weight == other.weight && color == other.color && italic == other.italic
+            && underline == other.underline && strikeOut == other.strikeOut;
     }
 };
 
 struct Node {
     QString id, text;
+    QString notes;
     // Optional built-in symbol identifier. Unknown IDs remain round-trippable.
     QString symbolId;
     QStringList children;
@@ -29,6 +34,17 @@ struct Node {
 };
 
 enum class ConnectorStyle { Automatic, Orthogonal, Straight, Curved };
+
+struct Relationship {
+    QString id, from, to, text;
+    bool straight = false;
+    QPointF bend = QPointF(0, -80);
+};
+
+struct Boundary {
+    QString id, text;
+    QStringList members;
+};
 
 struct Document {
     static constexpr int maxNodes = 100000;
@@ -41,6 +57,12 @@ struct Document {
     bool mindMap = true;
     BranchDirection branchDirection = BranchDirection::Both;
     ConnectorStyle connectorStyle = ConnectorStyle::Automatic;
+    // Floating roots remain children of the storage root, but have no tree edge.
+    QMap<QString, QPointF> floating;
+    QVector<Relationship> relationships;
+    QVector<Boundary> boundaries;
+
+    void pruneDecorations();
 
     QByteArray serialize() const;
     bool parse(const QByteArray &bytes, QString *error = nullptr);

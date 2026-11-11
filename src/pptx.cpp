@@ -136,6 +136,9 @@ void shape(QXmlStreamWriter &out, int id, const QString &name, const QString &te
             out.writeAttribute("lang", "zh-CN");
             out.writeAttribute("sz", QString::number(qMax(100, points100)));
             out.writeAttribute("b", textBold ? "1" : "0");
+            if (style && style->italic) out.writeAttribute("i", "1");
+            if (style && style->underline) out.writeAttribute("u", "sng");
+            if (style && style->strikeOut) out.writeAttribute("strike", "sngStrike");
             solid(out, textColor);
             const QString latin = run.second ? "Segoe UI Emoji" : family.isEmpty() ? "Arial" : family;
             const QString eastAsian = run.second ? "Segoe UI Emoji" : family.isEmpty() ? "Source Han Sans CN" : family;
@@ -614,6 +617,8 @@ bool exportPptx(const Document &document, const QString &path, QString *error) {
 
 bool exportPptx(const Document &document, const QString &path,
                 const QMap<QString, QByteArray> &nodePngs, QString *error) {
+    if (!document.floating.isEmpty() || !document.relationships.isEmpty() || !document.boundaries.isEmpty())
+        return fail(error, QStringLiteral("当前 PPTX 分页尚不能完整保留关系线、外框和浮动主题。请先使用 SVG、PDF、PNG、draw.io 或 SMAP 导出。"));
     Document checked;
     if (!checked.parse(document.serialize(), error)) return false;
     for (const Node &node : document.nodes)

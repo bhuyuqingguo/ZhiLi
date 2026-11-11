@@ -53,6 +53,19 @@ bool insert(Document *document, const QString &parent, const Document &source,
     }
     next.nodes[parent].children.append(inserted);
     next.nodes[parent].collapsed = false;
+    for (auto link : source.relationships) {
+        if (!ids.contains(link.from) || !ids.contains(link.to)) continue;
+        link.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        link.from = ids.value(link.from); link.to = ids.value(link.to);
+        next.relationships.append(link);
+    }
+    for (auto frame : source.boundaries) {
+        QStringList members;
+        for (const auto &id : frame.members) if (ids.contains(id)) members.append(ids.value(id));
+        if (members.isEmpty()) continue;
+        frame.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        frame.members = members; next.boundaries.append(frame);
+    }
 
     // The combined tree may exceed the destination's remaining depth or byte
     // budget even when both individual trees are valid.
@@ -96,13 +109,16 @@ QByteArray encode(const Document &document, const QStringList &roots, QString *e
         const Node node = document.nodes.value(id);
         // Qt 5.12 may replace lone surrogates during JSON serialization. Check
         // the original strings first so a "lossless" copy never normalizes them.
-        if (!validUnicode(node.id) || !validUnicode(node.text) || !validUnicode(node.symbolId)) {
+        if (!validUnicode(node.id) || !validUnicode(node.text) || !validUnicode(node.notes) || !validUnicode(node.symbolId)) {
             reject(error, QStringLiteral("分支文字包含无效字符，无法无损复制"));
             return {};
         }
         branch.nodes.insert(id, node);
         pending += node.children.toVector();
     }
+    branch.relationships = document.relationships;
+    branch.boundaries = document.boundaries;
+    branch.pruneDecorations();
     const QByteArray bytes = branch.serialize();
     Document checked;
     if (!checked.parse(bytes, error)) return {};

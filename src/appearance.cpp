@@ -286,6 +286,15 @@ bool editTopicStyle(QWidget *parent, const TopicStyle &current, int selectionCou
     weight->addItems({QStringLiteral("跟随默认"), QStringLiteral("常规"), QStringLiteral("加粗")});
     weight->setCurrentIndex(current.weight + 1);
     const auto *changeWeight = row(QStringLiteral("字重"), "applyWeight", weight);
+    auto *italic = new QCheckBox(QStringLiteral("倾斜"));
+    italic->setChecked(current.italic);
+    const auto *changeItalic = row(QStringLiteral("斜体"), "applyItalic", italic);
+    auto *underline = new QCheckBox(QStringLiteral("显示下划线"));
+    underline->setChecked(current.underline);
+    const auto *changeUnderline = row(QStringLiteral("下划线"), "applyUnderline", underline);
+    auto *strikeOut = new QCheckBox(QStringLiteral("显示删除线"));
+    strikeOut->setChecked(current.strikeOut);
+    const auto *changeStrikeOut = row(QStringLiteral("删除线"), "applyStrikeOut", strikeOut);
 
     auto *colorControl = new QWidget;
     auto *colorRow = new QHBoxLayout(colorControl);
@@ -331,6 +340,12 @@ bool editTopicStyle(QWidget *parent, const TopicStyle &current, int selectionCou
     change->family = changeFamily->isChecked();
     change->points = changePoints->isChecked();
     change->weight = changeWeight->isChecked();
+    change->style.italic = italic->isChecked();
+    change->style.underline = underline->isChecked();
+    change->style.strikeOut = strikeOut->isChecked();
+    change->italic = changeItalic->isChecked();
+    change->underline = changeUnderline->isChecked();
+    change->strikeOut = changeStrikeOut->isChecked();
     change->color = changeColor->isChecked();
     change->descendants = descendants->isChecked();
     return true;

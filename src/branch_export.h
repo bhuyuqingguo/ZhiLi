@@ -23,5 +23,9 @@ inline Document extractBranch(const Document &source, const QString &branchRoot)
         for (const auto &child : node->children) pending.append(child);
     }
     if (branchRoot != source.root) branch.nodes[branchRoot].rootLane = BranchDirection::Both;
+    branch.floating = source.floating;
+    branch.relationships = source.relationships;
+    branch.boundaries = source.boundaries;
+    branch.pruneDecorations();
     return branch;
 }

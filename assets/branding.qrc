@@ -4,5 +4,6 @@
   </qresource>
   <qresource prefix="/help">
     <file alias="zh-CN.html">help/zh-CN.html</file>
+    <file alias="mindmaster-shortcuts.tsv">help/mindmaster-shortcuts.tsv</file>
   </qresource>
 </RCC>

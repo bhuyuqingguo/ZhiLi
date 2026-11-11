@@ -29,6 +29,9 @@ struct TopicStyleChange {
     bool family = false;
     bool points = false;
     bool weight = false;
+    bool italic = false;
+    bool underline = false;
+    bool strikeOut = false;
     bool color = false;
     bool descendants = false;
 };

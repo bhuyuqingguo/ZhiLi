@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <functional>
 
-QMap<QString, QPointF> layoutNodes(const Document &document, const QMap<QString, QSizeF> &sizes,
+static QMap<QString, QPointF> layoutTree(const Document &document, const QMap<QString, QSizeF> &sizes,
                                   QMap<QString, qreal> *leafRails, QVector<qreal> *layerSizes) {
     const auto &nodes = document.nodes;
     const bool classic = document.mindMap;
@@ -97,6 +97,21 @@ QMap<QString, QPointF> layoutNodes(const Document &document, const QMap<QString,
                 placeGroup(left, 1, 0, -1);
             }
         }
+    }
+    return positions;
+}
+
+QMap<QString, QPointF> layoutNodes(const Document &document, const QMap<QString, QSizeF> &sizes,
+                                  QMap<QString, qreal> *leafRails, QVector<qreal> *layerSizes) {
+    Document tree = document;
+    for (auto it = document.floating.cbegin(); it != document.floating.cend(); ++it)
+        tree.nodes[tree.root].children.removeAll(it.key());
+    auto positions = layoutTree(tree, sizes, leafRails, layerSizes);
+    for (auto it = document.floating.cbegin(); it != document.floating.cend(); ++it) {
+        if (!document.nodes.value(document.root).children.contains(it.key())) continue;
+        tree.root = it.key(); tree.branchDirection = BranchDirection::Right;
+        const auto branch = layoutTree(tree, sizes, nullptr, nullptr);
+        for (auto pos = branch.cbegin(); pos != branch.cend(); ++pos) positions.insert(pos.key(), pos.value() + it.value());
     }
     return positions;
 }

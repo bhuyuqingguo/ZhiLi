@@ -54,8 +54,30 @@ int main() {
     changed = legacyObject;
     changed["version"] = 1.5;
     CHECK(rejects(encode(changed)));
-    changed["version"] = 2;
+    changed["version"] = 3;
     CHECK(rejects(encode(changed)));
+    {
+        Document decorated = doc;
+        decorated.floating.insert("first", QPointF(-240, 180));
+        Relationship link; link.id = "link"; link.from = "first"; link.to = "second"; link.text = QStringLiteral("依赖");
+        decorated.relationships.append(link);
+        Boundary frame; frame.id = "frame"; frame.members = QStringList{"first", "second"}; frame.text = QStringLiteral("范围");
+        decorated.boundaries.append(frame);
+        const auto bytes = decorated.serialize();
+        Document roundtrip;
+        CHECK(roundtrip.parse(bytes, &error) && roundtrip.serialize() == bytes);
+        CHECK(QJsonDocument::fromJson(bytes).object().value("version").toInt() == 2);
+        auto object = QJsonDocument::fromJson(bytes).object();
+        object["floating"] = QJsonObject{{"root", QJsonArray{1, 2}}};
+        CHECK(!roundtrip.parse(encode(object), &error) && roundtrip.serialize() == bytes);
+        object = QJsonDocument::fromJson(bytes).object();
+        auto links = object.value("relationships").toArray(); auto bad = links[0].toObject();
+        bad["to"] = "missing"; links[0] = bad; object["relationships"] = links;
+        CHECK(!roundtrip.parse(encode(object), &error) && roundtrip.serialize() == bytes);
+        const Document branch = extractBranch(decorated, "first");
+        CHECK(branch.floating.isEmpty() && branch.relationships.isEmpty() && branch.boundaries.size() == 1);
+        CHECK(roundtrip.parse(branch.serialize(), &error));
+    }
 
     QByteArray extraLink = legacy;
     extraLink.replace(R"("second", "first")", R"("second", "first", "first")");
@@ -90,8 +112,10 @@ int main() {
     first.collapsed = true;
     first.rootLane = BranchDirection::Right;
     first.symbolId = "future-symbol";
+    first.notes = QStringLiteral("验收说明") + QLatin1Char(10) + QStringLiteral("保留换行 🌿");
     first.style.alignment = TextAlignment::Right;
     first.style.color = "#315426";
+    first.style.italic = first.style.underline = first.style.strikeOut = true;
     Node third;
     third.id = "third";
     third.text = QStringLiteral("隐藏的分支");
@@ -104,9 +128,19 @@ int main() {
     const auto &branchRoot = branch.nodes.value(branch.root);
     CHECK(branchRoot.collapsed && branchRoot.rootLane == BranchDirection::Both);
     CHECK(branchRoot.symbolId == first.symbolId && branchRoot.style == first.style && branchRoot.children == first.children);
+    CHECK(branchRoot.notes == first.notes);
     CHECK(branch.nodes.value("third").text == third.text);
     Document reopened;
     CHECK(reopened.parse(branch.serialize(), &error) && reopened.serialize() == branch.serialize());
+    CHECK(reopened.nodes.value(branch.root).style == first.style);
+    for (const auto &key : {QByteArray("italic"), QByteArray("underline"), QByteArray("strikeOut")}) {
+        auto invalidStyle = branch.serialize();
+        invalidStyle.replace('"' + key + "\":true", '"' + key + "\":1");
+        CHECK(!reopened.parse(invalidStyle, &error) && reopened.serialize() == branch.serialize());
+    }
+    QByteArray invalidNotes = branch.serialize();
+    invalidNotes.replace(QByteArrayLiteral("\"notes\":"), QByteArrayLiteral("\"notes\":null,\"ignored\":"));
+    CHECK(!reopened.parse(invalidNotes, &error) && reopened.serialize() == branch.serialize());
     CHECK(extractBranch(source, source.root).serialize() == sourceSnapshot);
     CHECK(extractBranch(source, "missing").root.isEmpty() && source.serialize() == sourceSnapshot);
 
