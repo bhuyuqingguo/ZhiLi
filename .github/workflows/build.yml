@@ -21,7 +21,7 @@ jobs:
         env:
           ZHILI_RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: |
-          docker run --rm --platform linux/arm64 -e ZHILI_RELEASE_VERSION -v "$PWD:/src" -w /src ubuntu:20.04 bash -ec '
+          docker run --rm --network host --platform linux/arm64 -e ZHILI_RELEASE_VERSION -v "$PWD:/src" -w /src ubuntu:20.04 bash -ec '
             apt-get -o Acquire::Retries=5 update
             DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends               build-essential cmake file qtbase5-dev libqt5svg5-dev
             bash packaging/linux-arm64-portable.sh
