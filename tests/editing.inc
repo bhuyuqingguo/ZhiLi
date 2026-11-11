@@ -67,6 +67,11 @@ int runEditingTest() {
     QTest::keyClick(editing.canvas, Qt::Key_Space);
     VERIFY_EDIT(editing.editor && editing.editor->textCursor().position() == editing.editor->toPlainText().size());
     VERIFY_EDIT(!editing.editor->textCursor().hasSelection());
+    VERIFY_EDIT(editing.editor->frameShape() == QFrame::NoFrame);
+    VERIFY_EDIT(editing.editor->testAttribute(Qt::WA_TranslucentBackground));
+    VERIFY_EDIT(!editing.items.value("a").label->isVisible());
+    VERIFY_EDIT(editing.editorProxy->pos() == editing.items.value("a").label->scenePos());
+    if (!artifacts.isEmpty()) VERIFY_EDIT(editing.grab().save(QDir(artifacts).filePath("inline-editing.png")));
     for (const auto modifier : {Qt::ControlModifier, Qt::ShiftModifier, Qt::AltModifier}) {
         QTest::keyClick(editing.editor, Qt::Key_Return, modifier);
         VERIFY_EDIT(editing.editor);
@@ -74,6 +79,7 @@ int runEditingTest() {
     VERIFY_EDIT(editing.editor->toPlainText().count('\n') == 3 && editing.doc.nodes.size() == 7);
     QTest::keyClick(editing.editor, Qt::Key_Escape);
     VERIFY_EDIT(!editing.editor && editing.doc.serialize() == initial);
+    VERIFY_EDIT(editing.items.value("a").label->isVisible());
     QTest::keyClick(editing.canvas, Qt::Key_Space, Qt::ShiftModifier);
     VERIFY_EDIT(editing.editor && editing.editor->textCursor().position() == 0);
     editing.finishEdit(false);

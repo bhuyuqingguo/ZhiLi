@@ -2148,19 +2148,27 @@ private:
         editor->setFont(fontForTopic(node, selected == viewRoot(), parents.value(selected) == viewRoot()));
         alignTopicText(editor->document(), node.style.alignment);
         editor->setPlainText(node.text);
+        editor->setFrameShape(QFrame::NoFrame);
+        editor->setStyleSheet(QStringLiteral("QPlainTextEdit#topicEditor { background:transparent; border:0; border-radius:0; padding:0; color:%1; }")
+            .arg(items.value(selected).label->defaultTextColor().name()));
+        editor->setAttribute(Qt::WA_TranslucentBackground);
+        editor->setAutoFillBackground(false);
+        editor->viewport()->setAutoFillBackground(false);
+        editor->viewport()->setAttribute(Qt::WA_TranslucentBackground);
+        editor->setMinimumSize(0, 0);
+        editor->document()->setDocumentMargin(items.value(selected).label->document()->documentMargin());
         editor->setTabChangesFocus(false);
         if (cursorPosition < 0) editor->selectAll();
         else editor->moveCursor(cursorPosition == 0 ? QTextCursor::Start : QTextCursor::End);
         editorProxy = scene->addWidget(editor);
         editorProxy->setZValue(5);
-        QRectF bounds = items.value(selected).body->sceneBoundingRect();
-        bounds.setWidth(qMax(bounds.width(), 230.0));
-        const qreal minimumHeight = editor->fontMetrics().height() * 2 + 16;
+        QRectF bounds = items.value(selected).label->sceneBoundingRect();
+        const qreal minimumHeight = editor->fontMetrics().height() + 8;
         const qreal maximumHeight = qMax(minimumHeight, qMin(320.0,
             canvas->viewport()->height() / canvas->transform().m22() - 60));
         bounds.setHeight(qBound(minimumHeight, bounds.height(), maximumHeight));
-        bounds.moveCenter(items.value(selected).body->pos());
         editorProxy->setGeometry(bounds);
+        items.value(selected).label->hide();
         canvas->ensureVisible(editorProxy, 30, 30);
         updateActionStates();
         editor->setFocus(Qt::OtherFocusReason);
@@ -2184,6 +2192,7 @@ private:
             return false;
         }
         const QString id = editId;
+        if (items.contains(id)) items.value(id).label->show();
         QGraphicsProxyWidget *proxy = editorProxy;
         editor = nullptr;
         editorProxy = nullptr;

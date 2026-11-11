@@ -67,6 +67,27 @@
 
 ## 官方依据
 
+### 2026-11-11 重度编辑复核
+
+以下优先级依据日常录入、整理、检索和交付流程判断，不是厂商的用户使用频率统计。v1.0.4 已发布；透明原位文字编辑是发布后的修复，不属于 v1.0.4 安装包。
+
+| 优先级 | 尚有差距 | 下一步应达到的体验 |
+| --- | --- | --- |
+| P0 | 文字编辑与显示衔接 | 透明原位输入；继续检查中文候选窗、换行、长文字自动扩展、光标与选择连续性。当前仍不支持局部富文本。 |
+| P0 | 查找替换与筛选 | 除全图查找外，补替换、范围选择、结果计数、备注搜索、只显示命中主题。 |
+| P0 | 选择、粘贴、格式刷 | 全选覆盖折叠主题；按对象类型选中、反选；选择性粘贴文本或格式；连续点击刷样式。 |
+| P1 | 高频内容 | 图片、网页及文件链接、主题间跳转；简单优先级、完成状态、标签和按状态筛选。 |
+| P1 | 结构元素细节 | 概要、标注、关系线端点改接与避障、外框样式批量修改；当前基础对象已可编辑但不等于完整对标。 |
+| P1 | 文档工作流 | 多文档标签、最近文件、跨图复制核对、打印与分页预览。 |
+| P1 | 交换保真 | 新元素写入 PPTX、Visio 等目标，明确导入和再次导出的损失；当前有损目标会拒绝写出。 |
+
+热键并非全量一致。Ctrl+Shift+S 在枝理为另存为，MindMaster 为保存所有文档；Ctrl+Shift+M 在枝理为格式转换，MindMaster 为激活窗口；Ctrl+Alt+V、Ctrl+Shift+C、Alt+A 和 Ctrl+] 也存在语义差异。完整目录用于审计，不代表所有列出的功能已经实现。
+
+MindManager 的筛选、任务属性、链接和附件体现出重度整理场景的价值；枝理应先做轻量标记、检索和导航，无需据此加入完整项目管理体系。
+
+- [MindManager 25 官方发布说明：筛选、连接高亮及可访问性](https://download.mindjet.com/MindManager_25_Windows_Release_Notes_EN.pdf)
+- [MindManager 官方任务与筛选说明](https://www.mindmanager.com/en/pages/mindmanager-project-management/)
+
 - [完整快捷键目录](https://edraw.wondershare.cn/mindmaster/guide/shortcuts.html)
 - [主题编辑](https://edraw.wondershare.cn/mindmaster/guide/edit-topics.html)
 - [添加及批量添加主题](https://edraw.wondershare.cn/mindmaster/guide/add-topics.html)
