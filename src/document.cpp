@@ -74,6 +74,8 @@ QByteArray Document::serialize() const {
             {"children", QJsonArray::fromStringList(node.children)}
         };
         if (!node.notes.isEmpty()) fields.insert("notes", node.notes);
+        if (!node.imagePng.isEmpty()) fields.insert("imagePng", QString::fromLatin1(node.imagePng.toBase64()));
+        if (!node.links.isEmpty()) fields.insert("links", QJsonArray::fromStringList(node.links));
         if (!node.symbolId.isEmpty()) fields.insert("symbolId", node.symbolId);
         if (node.rootLane != BranchDirection::Both)
             fields.insert("rootLane", node.rootLane == BranchDirection::Right ? "right" : "left");
@@ -86,6 +88,8 @@ QByteArray Document::serialize() const {
         {"nodes", entries}, {"layout", mindMap ? "mindmap" : "organization"}
     };
     if (!floating.isEmpty() || !relationships.isEmpty() || !boundaries.isEmpty()) map.insert("version", 2);
+    for (const auto &node : nodes)
+        if (!node.imagePng.isEmpty() || !node.links.isEmpty()) { map.insert("version", 3); break; }
     QJsonObject positions;
     for (auto it = floating.cbegin(); it != floating.cend(); ++it)
         positions.insert(it.key(), QJsonArray{it->x(), it->y()});
@@ -122,7 +126,7 @@ bool Document::parse(const QByteArray &bytes, QString *error) {
     if (!json.isObject()) return reject(QStringLiteral("JSON 文件必须以对象为根"));
     const QJsonObject object = json.object();
     if (object.value("format").toString() != "simplemap-json" ||
-        (object.value("version") != QJsonValue(1) && object.value("version") != QJsonValue(2)))
+        (object.value("version") != QJsonValue(1) && object.value("version") != QJsonValue(2) && object.value("version") != QJsonValue(3)))
         return reject(QStringLiteral("文件格式或版本不受支持"));
 
     Document next;
@@ -153,6 +157,26 @@ bool Document::parse(const QByteArray &bytes, QString *error) {
         node.id = fields.value("id").toString();
         node.text = fields.value("text").toString();
         node.notes = fields.value("notes").toString();
+        if (fields.contains("imagePng")) {
+            const auto encoded = fields.value("imagePng");
+            if (!encoded.isString() || encoded.toString().size() > 12 * 1024 * 1024) return reject(invalidNode);
+            const QByteArray base64 = encoded.toString().toLatin1();
+            node.imagePng = QByteArray::fromBase64(base64);
+            if (node.imagePng.toBase64() != base64 || node.imagePng.size() < 24 ||
+                !node.imagePng.startsWith(QByteArray::fromHex("89504e470d0a1a0a")) || node.imagePng.mid(12,4) != "IHDR") return reject(invalidNode);
+            if(node.imagePng.mid(8,4)!=QByteArray::fromHex("0000000d") || !node.imagePng.endsWith(QByteArray::fromHex("0000000049454e44ae426082"))) return reject(invalidNode);
+            const auto dimension = [&node](int at) { quint32 n = 0; for (int i=0;i<4;++i) n = (n << 8) | quint8(node.imagePng[at+i]); return n; };
+            if (!dimension(16) || !dimension(20) || dimension(16) > 4096 || dimension(20) > 4096) return reject(invalidNode);
+        }
+        if (fields.contains("links")) {
+            if (!fields.value("links").isArray() || fields.value("links").toArray().size() > 32) return reject(invalidNode);
+            for (const auto &value : fields.value("links").toArray()) {
+                const QString link = value.toString(); const QUrl url(link, QUrl::StrictMode);
+                if (!value.isString() || link.size() > 4096 || !isUnicode(link) || !url.isValid() ||
+                    !QStringList{"https", "http", "mailto", "file"}.contains(url.scheme().toLower())) return reject(invalidNode);
+                node.links.append(link);
+            }
+        }
         node.symbolId = fields.value("symbolId").toString();
         node.collapsed = fields.value("collapsed").toBool();
         const auto lane = fields.value("rootLane");

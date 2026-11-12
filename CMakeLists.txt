@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
-project(SimpleMap VERSION 1.0.4 LANGUAGES CXX)
+project(SimpleMap VERSION 1.0.5 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt5 5.9 REQUIRED COMPONENTS Widgets Svg)
 
 qt5_add_resources(zhili_template_resources assets/templates.qrc)
-add_library(zhili_core STATIC src/document.cpp src/layout.cpp src/clipboard.cpp
+add_library(zhili_core STATIC src/document.cpp src/layout.cpp src/clipboard.cpp src/editing.cpp
   src/pptx.cpp src/importer.cpp src/emmx_binary.cpp src/mindnode_next.cpp src/exchange.cpp src/templates.cpp ${zhili_template_resources})
 target_link_libraries(zhili_core PUBLIC Qt5::Core)
 qt5_add_resources(zhili_font_resources assets/fonts.qrc)
@@ -62,6 +62,12 @@ if(BUILD_TESTING)
   target_link_libraries(zhili_layout_test PRIVATE zhili_core)
   add_executable(zhili_clipboard_test tests/clipboard_test.cpp)
   target_link_libraries(zhili_clipboard_test PRIVATE zhili_core)
+  add_executable(zhili_editing_core_test tests/editing_core_test.cpp)
+  target_link_libraries(zhili_editing_core_test PRIVATE zhili_core)
+  if(MSVC)
+    target_compile_options(zhili_editing_core_test PRIVATE /utf-8)
+  endif()
+  add_test(NAME zhili_editing_core COMMAND zhili_editing_core_test)
   add_executable(zhili_symbol_document_test tests/symbol_document_test.cpp)
   target_link_libraries(zhili_symbol_document_test PRIVATE zhili_core)
   add_executable(zhili_pptx_test tests/pptx_test.cpp)

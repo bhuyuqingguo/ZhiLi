@@ -617,6 +617,8 @@ bool exportPptx(const Document &document, const QString &path, QString *error) {
 
 bool exportPptx(const Document &document, const QString &path,
                 const QMap<QString, QByteArray> &nodePngs, QString *error) {
+    for(const auto &node:document.nodes) if(!node.imagePng.isEmpty() || !node.links.isEmpty())
+        return fail(error,QStringLiteral("PPTX 分页暂不能完整保留主题图片与链接。请保存为 SMAP 或导出 PNG、SVG、PDF。"));
     if (!document.floating.isEmpty() || !document.relationships.isEmpty() || !document.boundaries.isEmpty())
         return fail(error, QStringLiteral("当前 PPTX 分页尚不能完整保留关系线、外框和浮动主题。请先使用 SVG、PDF、PNG、draw.io 或 SMAP 导出。"));
     Document checked;

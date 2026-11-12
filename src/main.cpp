@@ -2,6 +2,7 @@
 #include "branch_export.h"
 #include "clipboard.h"
 #include "document.h"
+#include "editing.h"
 #include "exchange.h"
 #include "layout.h"
 #include "symbols.h"
@@ -400,6 +401,8 @@ struct NodeItem {
     QGraphicsSimpleTextItem *badge;
     QGraphicsSimpleTextItem *note = nullptr;
     QGraphicsSvgItem *symbol = nullptr;
+    QGraphicsPixmapItem *image = nullptr;
+    QGraphicsSimpleTextItem *link = nullptr;
     QColor branchColor;
     qreal labelLimit = 0;
 };
@@ -606,6 +609,10 @@ public:
             if (editor && itemAt(at, editorProxy)) return false;
             const QString id = nodeAt(at);
             if (!finishEdit()) return false;
+            if (formatBrush) {
+                if (!id.isEmpty()) { selectNode(id); pasteTopicStyle(); }
+                return true;
+            }
             if (placingFloating && id.isEmpty()) {
                 placingFloating = false; canvas->unsetCursor(); createFloating(dragOrigin); return true;
             }
@@ -672,7 +679,8 @@ public:
             } else {
                 selectNode(id);
                 auto *note = items.value(id).note;
-                if (note && itemAt(at, note)) editNotes();
+                if (items.value(id).link && itemAt(at, items.value(id).link)) openTopicLinks();
+                else if (note && itemAt(at, note)) editNotes();
                 else startEdit();
             }
             return true;
@@ -721,6 +729,12 @@ public:
             if (fitMode) fitTimer.start(0);
         };
         applyAppearance();
+        versionTimer.setInterval(60000);
+        connect(&versionTimer, &QTimer::timeout, this, [this] {
+            if (!dirty || filePath.isEmpty()) return; QString error;
+            if (!LocalHistory::record(filePath, doc.serialize(), &error)) statusBar()->showMessage(QStringLiteral("历史快照失败：%1").arg(error), 6000);
+        });
+        versionTimer.start();
         recoveryTimer.setSingleShot(true);
         recoveryTimer.setInterval(900);
         connect(&recoveryTimer, &QTimer::timeout, this, [this] { writeRecovery(); });
@@ -846,11 +860,13 @@ private:
     }
 
     void initializeDocument() {
+        formatBrush = false; canvas->unsetCursor();
         selectedDecoration.clear(); relationshipSource.clear(); placingFloating = false;
         focusRoot.clear();
         undoStack.clear();
         redoStack.clear();
         query.clear();
+        lastFindOptions=FindOptions();
         lastMatch.clear();
         selected = doc.root;
         additionalSelection.clear();
@@ -1157,9 +1173,10 @@ private:
                                     : QStringLiteral("已复制分支，可在其他主题下粘贴"), 4000);
     }
 
-    void pasteBranch(bool asSibling = false) {
+    void pasteBranch(bool asSibling = false, PasteContent mode = PasteContent::Original, bool keepStyle = true, bool keepNotes = true) {
         const QMimeData *mime = QApplication::clipboard()->mimeData();
-        if (mime && mime->hasFormat("application/x-zhili-decoration+json")) { pasteDecoration(mime->data("application/x-zhili-decoration+json")); return; }
+        if (mode == PasteContent::Original && mime && !mime->hasFormat(BranchClipboard::mimeType()) && mime->hasImage()) { setTopicImage(qvariant_cast<QImage>(mime->imageData())); return; }
+        if (mode == PasteContent::Original && mime && mime->hasFormat("application/x-zhili-decoration+json")) { pasteDecoration(mime->data("application/x-zhili-decoration+json")); return; }
         if (!mime || (!mime->hasFormat(BranchClipboard::mimeType()) && !mime->hasText())) {
             statusBar()->showMessage(QStringLiteral("剪贴板中没有分支或文本大纲"), 4000);
             return;
@@ -1168,9 +1185,7 @@ private:
         QStringList inserted;
         QString error;
         const QString parent = asSibling && selected != viewRoot() ? parents.value(selected) : selected;
-        const bool pasted = mime->hasFormat(BranchClipboard::mimeType())
-            ? BranchClipboard::paste(&next, parent, mime->data(BranchClipboard::mimeType()), &inserted, &error)
-            : BranchClipboard::pasteOutline(&next, parent, mime->text(), &inserted, &error);
+        const bool pasted = pasteContent(&next, parent, mime->data(BranchClipboard::mimeType()), mime->text(), mode, keepStyle, keepNotes, &inserted, &error);
         if (!pasted || inserted.isEmpty()) {
             statusBar()->showMessage(QStringLiteral("粘贴失败：%1").arg(error), 6000);
             return;
@@ -1561,6 +1576,9 @@ private:
             return;
         }
         const QString parent = parents.value(roots.first());
+        int images=0;
+        for(const auto &id:roots) if(!doc.nodes.value(id).imagePng.isEmpty()) ++images;
+        if(images>1) { statusBar()->showMessage(QStringLiteral("一个主题目前只能放一张图片，请先调整图片所在主题再合并"),5000); return; }
         for (const auto &id : roots) {
             if (parents.value(id) != parent) {
                 statusBar()->showMessage(QStringLiteral("仅可合并同一父主题下的主题"), 4000);
@@ -1572,6 +1590,8 @@ private:
         QStringList text, notes;
         for (const auto &id : roots) {
             const Node node = doc.nodes.value(id);
+            if(!node.imagePng.isEmpty()) next.nodes[target].imagePng=node.imagePng;
+            if(id!=target) next.nodes[target].links.append(node.links);
             text.append(node.text);
             if (!node.notes.isEmpty()) notes.append(node.notes);
             if (id == target) continue;
@@ -1582,6 +1602,7 @@ private:
         next.nodes[target].text = text.join('\n');
         next.nodes[target].notes = notes.join(QStringLiteral("\n\n"));
         next.nodes[target].collapsed = false;
+        next.nodes[target].links.removeDuplicates();
         Document checked;
         QString error;
         if (!checked.parse(next.serialize(), &error)) { statusBar()->showMessage(error, 5000); return; }
@@ -1630,6 +1651,12 @@ private:
     }
 
     void revealTopic(const QString &id) {
+        if (!doc.nodes.contains(id)) return;
+        if (!focusRoot.isEmpty()) {
+            QString ancestor=id;
+            while (!ancestor.isEmpty() && ancestor!=focusRoot) ancestor=parents.value(ancestor);
+            if (ancestor.isEmpty()) leaveFocus();
+        }
         QStringList collapsed;
         for (QString ancestor = id; ancestor != viewRoot() && parents.contains(ancestor);) {
             ancestor = parents.value(ancestor);
@@ -2107,7 +2134,7 @@ private:
         if (undoAction) undoAction->setEnabled(!editingActive && !undoStack.isEmpty());
         if (redoAction) redoAction->setEnabled(!editingActive && !redoStack.isEmpty());
         if (focusAction) focusAction->setEnabled(!editingActive && selected != viewRoot());
-        if (leaveFocusAction) leaveFocusAction->setEnabled(!editingActive && (!focusRoot.isEmpty() ||
+        if (leaveFocusAction) leaveFocusAction->setEnabled(!editingActive && (formatBrush || !focusRoot.isEmpty() ||
             placingFloating || !relationshipSource.isEmpty() || !selectedDecoration.isEmpty()));
         if (!selectedDecoration.isEmpty()) {
             if (removeAction) removeAction->setEnabled(!editingActive);
@@ -2247,23 +2274,8 @@ private:
     }
 
     void search(bool prompt) {
-        if (prompt || query.isEmpty()) {
-            bool ok = false;
-            const QString value = QInputDialog::getText(this, QStringLiteral("查找主题"),
-                QStringLiteral("输入主题关键词"), QLineEdit::Normal, query, &ok).trimmed();
-            if (!ok || value.isEmpty()) return;
-            query = value;
-            lastMatch.clear();
-        }
-        QStringList matches;
-        QVector<QString> pending{doc.root};
-        while (!pending.isEmpty()) {
-            const QString id = pending.takeLast();
-            const Node &node = qAsConst(doc.nodes)[id];
-            if (node.text.contains(query, Qt::CaseInsensitive)) matches.append(id);
-            for (auto child = node.children.crbegin(); child != node.children.crend(); ++child)
-                pending.append(*child);
-        }
+        if (prompt || query.isEmpty()) { findReplace(); return; }
+        const QStringList matches = findTopics(doc, query, lastFindOptions);
         if (matches.isEmpty()) {
             statusBar()->showMessage(QStringLiteral("未找到匹配主题"), 4000);
             return;
@@ -2400,18 +2412,26 @@ private:
 
     bool saveTo(const QString &path) {
         const QByteArray data = doc.serialize();
+        QString historyError;
+        QFile previous(path);
+        if (previous.exists() && previous.size() <= Document::maxBytes && previous.open(QIODevice::ReadOnly)) {
+            Document valid; const auto bytes=previous.readAll();
+            if(valid.parse(bytes)) LocalHistory::record(path,bytes,&historyError);
+            previous.close();
+        }
         QString error = QStringLiteral("文件超过 50 MiB");
         if (data.size() > Document::maxBytes || !writeAtomically(path, data, &error)) {
             QMessageBox::warning(this, QStringLiteral("保存失败"), error);
             return false;
         }
         filePath = path;
+        LocalHistory::record(path,data,&historyError);
         needsSaveAs = false;
         saved = doc;
         dirty = false;
         clearRecovery();
         updateTitle();
-        statusBar()->showMessage(QStringLiteral("已保存  %1").arg(QFileInfo(path).fileName()), 4000);
+        statusBar()->showMessage(historyError.isEmpty() ? QStringLiteral("已保存  %1").arg(QFileInfo(path).fileName()) : QStringLiteral("文件已保存，但历史快照失败：%1").arg(historyError), 6000);
         return true;
     }
 
@@ -2498,6 +2518,8 @@ private:
                 compact = QStringLiteral("Enter 加同级 · Tab 缩进");
                 hint = compact + QStringLiteral("  ·  Shift+Tab 提升一级  ·  F2 编辑文字");
             }
+        } else if (formatBrush) {
+            compact=QStringLiteral("点击目标刷入样式 · Esc 退出"); hint=compact;
         } else if (gestureHint == GestureHint::Box) {
             compact = QStringLiteral("松开左键完成框选");
             hint = QStringLiteral("%1  ·  %2+单击增减选中项  ·  Esc 取消").arg(compact, copyModifierText());
@@ -3094,11 +3116,12 @@ private:
                [this] { copyDraggedBranches({selected}, selected, -1); }, true);
         auto *topicStyle = action(edit, QStringLiteral("主题样式…"), "Ctrl+Shift+F",
                                   [this] { changeTopicStyles(); }, true);
-        auto *copyStyle = action(edit, QStringLiteral("复制主题样式"), "Ctrl+Shift+C", [this] {
+        auto *copyStyle = action(edit, QStringLiteral("连续格式刷"), "Ctrl+Shift+C", [this] {
             copiedStyle = doc.nodes.value(selected).style;
             hasCopiedStyle = true;
+            formatBrush = true; canvas->setCursor(Qt::CrossCursor);
             updateActionStates();
-            statusBar()->showMessage(QStringLiteral("已复制主题样式  ·  %1 粘贴").arg(shortcutSettings.hint(pasteStyleShortcut)), 4000);
+            statusBar()->showMessage(QStringLiteral("格式刷：连续点击目标主题，Esc 退出；%1 可批量粘贴样式").arg(shortcutSettings.hint(pasteStyleShortcut)), 4000);
         }, true);
         pasteStyleAction = action(edit, QStringLiteral("粘贴主题样式"), pasteStyleShortcut, [this] { pasteTopicStyle(); }, true);
         copyStyle->setObjectName("copyTopicStyleAction");
@@ -3130,14 +3153,20 @@ private:
         cutAction->setObjectName("cutBranchAction");
         auto *paste = action(edit, QStringLiteral("粘贴分支 / 文本大纲"), "Ctrl+V", [this] { pasteBranch(); }, true);
         paste->setObjectName("pasteBranchAction");
-        action(edit, QStringLiteral("粘贴为同级"), "Ctrl+Alt+V", [this] { pasteBranch(true); }, true);
+        auto *specialPaste=action(edit, QStringLiteral("选择性粘贴…"), "Ctrl+Alt+V", [this] { pasteSpecial(); }, true);
+        action(edit, QStringLiteral("粘贴为同级"), "", [this] { pasteBranch(true); }, true);
+        auto *imageAction=action(edit, QStringLiteral("插入 / 替换图片…"), "Ctrl+Shift+P", [this] { chooseImage(); }, true);
+        action(edit, QStringLiteral("移除主题图片"), "", [this] { if(!doc.nodes.value(selected).imagePng.isEmpty()) { checkpoint(); doc.nodes[selected].imagePng.clear(); changed(); } }, true);
+        auto *linkAction=action(edit, QStringLiteral("主题链接…"), "Ctrl+K", [this] { editLinks(); }, true);
+        action(edit, QStringLiteral("打开主题链接…"), "", [this] { openTopicLinks(); }, true);
+        action(edit, QStringLiteral("本地历史版本…"), "", [this] { showVersions(); }, true);
         edit->addSeparator();
         auto *undo = action(edit, QStringLiteral("撤销"), "Ctrl+Z", [this] { history(true); }, true);
         undoAction = undo;
         undoAction->setShortcuts({QKeySequence("Ctrl+Z"), QKeySequence("Alt+Backspace")});
         redoAction = action(edit, QStringLiteral("重做"), "Ctrl+Y", [this] { history(false); }, true);
         redoAction->setShortcuts({QKeySequence("Ctrl+Y"), QKeySequence("Ctrl+Shift+Z"), QKeySequence("Alt+Shift+Backspace")});
-        auto *find = action(edit, QStringLiteral("查找"), "Ctrl+F", [this] { search(true); });
+        auto *find = action(edit, QStringLiteral("查找与替换…"), "Ctrl+F", [this] { findReplace(); });
         action(edit, QStringLiteral("查找下一个"), "Ctrl+Shift+F3", [this] { search(false); }, true);
 
         auto *navigation = edit->addMenu(QStringLiteral("移动选中项"));
@@ -3206,6 +3235,7 @@ private:
             else focusBranch();
         }, true);
         leaveFocusAction = action(view, QStringLiteral("返回全图／取消插入"), "Escape", [this] {
+            if (formatBrush) { formatBrush=false; canvas->unsetCursor(); updateActionStates(); return; }
             relationshipSource.clear(); placingFloating = false; selectedDecoration.clear(); canvas->unsetCursor();
             leaveFocus(); render();
         }, true);
@@ -3294,6 +3324,7 @@ private:
         context->addSeparator();
         for (auto *item : {editTopic, notesAction, topicStyle, copyStyle, pasteStyleAction, symbolAction, child, siblingAction})
             context->addAction(item);
+        for(auto *item : {specialPaste,imageAction,linkAction}) context->addAction(item);
         context->addSeparator();
         context->addMenu(reorder);
         context->addMenu(selection);
@@ -3399,6 +3430,8 @@ private:
         bar->addSeparator();
         topicStyle->setIcon(toolbarIcon("M4 6h16 M12 6v14 M8 20h8 M4 6v3 M20 6v3"));
         for (auto *item : {child, relationAction, boundaryAction, floatingAction, topicStyle, undo, find}) bar->addAction(item);
+        copyStyle->setIcon(toolbarIcon("M4 3h16v7H4z M8 10v4h4v7h4V12h-4v-2"));
+        bar->addAction(copyStyle);
         relationAction->setIcon(toolbarIcon("M4 17C4 3 20 3 20 17M16 13L20 17L22 12"));
         boundaryAction->setIcon(toolbarIcon("M8 4H5Q3 4 3 6V9M16 4H19Q21 4 21 6V9M3 15V18Q3 20 5 20H8M21 15V18Q21 20 19 20H16"));
         floatingAction->setIcon(toolbarIcon("M5 7H19Q21 7 21 9V15Q21 17 19 17H5Q3 17 3 15V9Q3 7 5 7M9 12H15M12 9V15"));
@@ -3457,6 +3490,7 @@ private:
     }
 
 #include "decorations.inc"
+#include "editing_ui.inc"
 
     void render() {
         const bool lostFocus = !focusRoot.isEmpty() && !doc.nodes.contains(focusRoot);
@@ -3585,6 +3619,22 @@ private:
                 item.note->setBrush(root ? QColor("#d5eee3") : appearance.highContrast ? ink : item.branchColor.darker(125));
                 item.note->setToolTip(QStringLiteral("双击编辑主题备注（Ctrl+T）"));
             }
+            if (!node.imagePng.isEmpty()) {
+                if (!item.image) { item.image=scene->addPixmap(QPixmap()); item.image->setZValue(2); item.image->setData(0,id); item.image->setAcceptedMouseButtons(Qt::NoButton); }
+                if(item.image->data(Qt::UserRole).toByteArray()!=node.imagePng) {
+                    QPixmap pixmap; pixmap.loadFromData(node.imagePng,"PNG");
+                    pixmap.setDevicePixelRatio(qMax(1.0,qMax(pixmap.width()/220.0,pixmap.height()/140.0)));
+                    item.image->setPixmap(pixmap); item.image->setTransformationMode(Qt::SmoothTransformation);
+                    // Role 1 belongs to relationship/boundary objects; keep the image cache separate.
+                    item.image->setData(Qt::UserRole,node.imagePng);
+                }
+            } else { delete item.image; item.image=nullptr; }
+            if (!node.links.isEmpty()) {
+                if(!item.link) { item.link=scene->addSimpleText(QStringLiteral("链接")); item.link->setZValue(3); item.link->setData(0,id); item.link->setAcceptedMouseButtons(Qt::NoButton); }
+                item.link->setBrush(root ? QColor("#d5eee3") : item.branchColor.darker(125));
+                QFont linkFont=QApplication::font(); linkFont.setPointSize(9); item.link->setFont(linkFont);
+                item.link->setToolTip(node.links.join('\n')+QStringLiteral("\n双击打开 · Ctrl+K 编辑"));
+            } else { delete item.link; item.link=nullptr; }
             const QString &display = node.text;
             const QFont font = fontForTopic(node, root, branch);
             const qreal maxWidth = doc.mindMap || root ? 248 : 166;
@@ -3610,9 +3660,11 @@ private:
             const QSizeF label = item.label->boundingRect().size();
             const qreal padding = root ? 44 : branch ? 28 : doc.mindMap ? 20 : 12;
             const qreal noteWidth = item.note ? item.note->boundingRect().width() + 12 : 0;
-            const QSizeF size(label.width() + padding + (asset ? 42 : 0) + noteWidth,
+            const qreal imageHeight=item.image ? item.image->boundingRect().height()+12 : 0;
+            const qreal linkWidth=item.link ? item.link->boundingRect().width()+12 : 0;
+            const QSizeF size(qMax(label.width() + padding + (asset ? 42 : 0) + noteWidth + linkWidth, item.image ? item.image->boundingRect().width()+24 : 0.0),
                               qMax(root ? 64.0 : branch ? 48.0 : asset ? 42.0 : 34.0,
-                                   label.height() + (root ? 18 : branch ? 12 : 8)));
+                                   label.height() + (root ? 18 : branch ? 12 : 8)) + imageHeight);
             sizes[id] = size;
             QPainterPath shape;
             const qreal radius = root ? 16 : doc.mindMap ? (branch ? 13 : 14) : 7;
@@ -3640,6 +3692,8 @@ private:
             delete it->badge;
             delete it->note;
             delete it->symbol;
+            delete it->image;
+            delete it->link;
             it = items.erase(it);
         }
         for (auto it = edges.begin(); it != edges.end();) {
@@ -3690,7 +3744,11 @@ private:
             item.body->setPos(point);
             const bool symbolVisible = item.symbol && item.symbol->isVisible();
             const qreal noteWidth = item.note ? item.note->boundingRect().width() + 12 : 0;
-            const QPointF contentCenter = point - QPointF(noteWidth / 2, 0);
+            const qreal imageHeight=item.image ? item.image->boundingRect().height()+12 : 0;
+            const qreal linkWidth=item.link ? item.link->boundingRect().width()+12 : 0;
+            const QPointF contentCenter = point - QPointF((noteWidth+linkWidth) / 2, -imageHeight / 2);
+            if(item.image) item.image->setPos(point+QPointF(-item.image->boundingRect().width()/2,-size.height()/2+10));
+            if(item.link) item.link->setPos(point+QPointF(size.width()/2-linkWidth+4,imageHeight/2-item.link->boundingRect().height()/2));
             item.label->setPos(contentCenter - QPointF(label.width() / 2 - (symbolVisible ? 21 : 0), label.height() / 2));
             if (symbolVisible) {
                 const auto iconSize = item.symbol->boundingRect().size() * item.symbol->scale();
@@ -3699,7 +3757,7 @@ private:
             }
             if (item.note) {
                 const QRectF bounds = item.note->boundingRect();
-                item.note->setPos(point + QPointF(size.width() / 2 - bounds.width() - 8, -bounds.height() / 2));
+                item.note->setPos(point + QPointF(size.width() / 2 - bounds.width() - 8 - linkWidth, imageHeight/2 - bounds.height() / 2));
             }
             item.badge->setPos(point + QPointF(size.width() / 2 + 5, -item.badge->boundingRect().height() / 2));
             paintNodeOutline(item, id == rootId, highlights.contains(id));

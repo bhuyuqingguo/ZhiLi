@@ -2,11 +2,36 @@
 
 枝理是一款离线桌面思维导图工具。它从银河麒麟等桌面系统的日常需求出发，把记录思路、整理分支、批量修改和交付图稿集中在一张画布上。导图保存在本机，同一个开放的 `.smap` 文件可以在不同平台继续编辑。
 
-[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.4 发布说明](docs/releases/v1.0.4.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
+[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.5 发布说明](docs/releases/v1.0.5.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
 
 ![枝理 Windows 工作区，工具栏可直接打开、保存、转换文件及切换布局](docs/screenshots/workspace.png)
 
-## v1.0.4 新功能
+## v1.0.5 新功能
+
+这版补齐选择性粘贴、连续格式刷、查找替换、主题图片与链接、本地历史版本，以及直接粘贴 Markdown。双击编辑改为透明原位输入。
+
+![图片、链接与编辑工具在同一张画布中](docs/screenshots/editing-workbench.png)
+
+![双击主题后透明原位编辑，保留原有主题背景](docs/screenshots/inline-editing.png)
+
+| 选择性粘贴 | 查找与替换 |
+| --- | --- |
+| ![选择内容格式、位置、文字样式和备注](docs/screenshots/paste-special.png) | ![搜索文字和备注，限定分支并批量替换](docs/screenshots/find-replace.png) |
+
+![本地历史版本预览与恢复](docs/screenshots/local-history.png)
+
+| 常用流程 | 操作 |
+| --- | --- |
+| 选择性粘贴 | **Ctrl+Alt+V**：原始分支、缩进大纲、Markdown、单主题文字或已复制的样式；可选子级 / 同级与保留项目。 |
+| 连续格式刷 | 选来源后 **Ctrl+Shift+C**，点击目标，**Esc** 退出；**Ctrl+Shift+V** 批量粘贴文字样式。 |
+| 查找替换 | **Ctrl+F**：结果列表、主题 / 备注、大小写、折叠内容、全图 / 当前分支；一次替换或全部替换均可撤销。 |
+| 图片和链接 | **Ctrl+Shift+P** 插入或替换图片，**Ctrl+V** 粘贴图片；**Ctrl+K** 编辑多个网址或本地文件链接，双击链接标记打开。 |
+| 历史版本 | 「编辑 → 本地历史版本」预览与恢复；保存和编辑中的每分钟自动留快照，每文件最多 30 份 / 200 MiB，内容相同不重复。恢复可撤销，保存才覆盖原文件。 |
+| Markdown | 直接 **Ctrl+V** 粘贴标题与列表，转为主题层级；选择性粘贴可强制按 Markdown 或纯文字处理。 |
+
+图片和链接使用开放的 **SMAP v3**，需 1.0.5 或更新版打开；图片嵌入文件，外部文件链接不嵌入附件。每主题一张图片（插入时最长边压缩至 1600 像素）、最多 32 个链接。PNG/SVG/PDF 保留视觉内容；尚不能完整保留新内容的交换目标会提示并拒绝有损导出。局部富文本、容器样式刷、主题间链接和其他软件图片附件的自动迁移尚未完成。Markdown 以标题和列表结构为主，不保留代码块与富文本排版。[详细范围](docs/releases/v1.0.5.md)
+
+## 已有编辑能力
 
 对齐 MindMaster 的常用编辑习惯，新增完整快捷键设置、大纲侧栏、批量录入、主题拆分与合并，以及更多选择和移动操作。启动默认最大化，枝条生长动画约 1.65 秒，可点击或按 Esc 跳过，也可在帮助菜单关闭。
 
@@ -28,13 +53,13 @@
 
 | 平台 | 下载与启动 |
 | --- | --- |
-| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.4-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
-| Linux ARM64 | 下载 `ZhiLi-v1.0.4-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
+| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.5-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
+| Linux ARM64 | 下载 `ZhiLi-v1.0.5-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
 | macOS | 可用 Qt5 从源码构建 `simplemap.app`，应用包包含枝理图标。当前 GitHub Release 提供 Windows x64 和 Linux ARM64 便携包。 |
 
-完整包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.4-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
+完整包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.5-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
 
-已有原版 `v1.0.3` 便携包，可下载同平台的 `v1.0.3-to-v1.0.4` 增量包、对应校验文件和 `ZhiLi-v1.0.4-update.py`。更新工具校验基线并在新目录重建新版，旧目录可留作回退。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
+已有原版 `v1.0.4` 便携包，可下载同平台的 `v1.0.4-to-v1.0.5` 增量包、对应校验文件和 `ZhiLi-v1.0.5-update.py`。更新工具校验基线并在新目录重建新版，旧目录可留作回退。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
 
 ## 用一张图上手
 

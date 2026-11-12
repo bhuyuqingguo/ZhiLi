@@ -54,7 +54,7 @@ int main() {
     changed = legacyObject;
     changed["version"] = 1.5;
     CHECK(rejects(encode(changed)));
-    changed["version"] = 3;
+    changed["version"] = 4;
     CHECK(rejects(encode(changed)));
     {
         Document decorated = doc;

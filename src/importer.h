@@ -1,6 +1,7 @@
 #pragma once
 
 #include "document.h"
+bool importMarkdownText(const QString &text, Document *out, QString *error = nullptr);
 
 // Local conversion of supported mind-map, drawing and presentation files.
 // Only topic hierarchy, order and plain text are imported. Success returns

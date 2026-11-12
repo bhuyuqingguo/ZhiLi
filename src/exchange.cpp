@@ -326,6 +326,9 @@ bool writeVisio(const Document &document, QByteArray *bytes) {
 
 bool exportExchange(const Document &document, const QString &path,
                     const QString &format, QString *error) {
+    for(const auto &node:document.nodes) if(!node.imagePng.isEmpty() || !node.links.isEmpty()) {
+        if(error) *error=QStringLiteral("此转换目标暂不能完整保留主题图片与链接。请保存为 SMAP；需要视觉副本时可导出 PNG、SVG 或 PDF。"); return false;
+    }
     if (format != "drawio" && (!document.floating.isEmpty() || !document.relationships.isEmpty() || !document.boundaries.isEmpty())) {
         if (error) *error = QStringLiteral("此导图含关系线、外框或浮动主题，当前目标格式尚不能完整保留。请使用 SMAP、draw.io、SVG、PNG 或 PDF。");
         return false;

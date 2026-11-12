@@ -499,8 +499,8 @@ int runSmokeTest() {
         CHECK(QTest::qWaitForWindowActive(&window, 1000));
     window.canvas->setFocus();
     QTimer::singleShot(0, &window, [] {
-        if (auto *dialog = qobject_cast<QInputDialog *>(QApplication::activeModalWidget())) {
-            dialog->setTextValue(QStringLiteral(" 与 "));
+        if (auto *dialog = qobject_cast<QDialog *>(QApplication::activeModalWidget())) {
+            dialog->findChild<QLineEdit *>("findText")->setText(QStringLiteral("与"));
             dialog->accept();
         }
     });

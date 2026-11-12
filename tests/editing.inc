@@ -404,7 +404,91 @@ int runEditingTest() {
         editing.changed(); editing.fit(); QTest::qWait(50);
         VERIFY_EDIT(editing.grab().save(QDir(artifacts).filePath("relationships-floating.png")));
     }
-    qInfo() << "Editing, startup, relationships, boundaries, floating, undo, copy and export passed.";
+    reset();
+    QImage topicImage(320,180,QImage::Format_ARGB32_Premultiplied); topicImage.fill(QColor("#dceee4"));
+    qInfo()<<"Testing embedded image lifecycle";
+    { QPainter painter(&topicImage); painter.setRenderHint(QPainter::Antialiasing); painter.setPen(QPen(QColor("#258265"),5)); painter.drawEllipse(QRect(65,35,110,110)); painter.drawLine(170,90,260,50); painter.drawLine(170,90,260,135); }
+    VERIFY_EDIT(editing.setTopicImage(topicImage));
+    qInfo()<<"Image inserted";
+    VERIFY_EDIT(editing.items["a"].image && !editing.items["a"].image->pixmap().isNull());
+    VERIFY_EDIT(editing.scene->items().contains(editing.items["a"].image));
+    editing.render(); VERIFY_EDIT(editing.scene->items().contains(editing.items["a"].image));
+    VERIFY_EDIT(editing.items["a"].body->sceneBoundingRect().contains(editing.items["a"].image->sceneBoundingRect()));
+    const auto mediaBytes=editing.doc.nodes["a"].imagePng;
+    editing.undoAction->trigger(); VERIFY_EDIT(editing.doc.nodes["a"].imagePng.isEmpty() && !editing.items["a"].image);
+    qInfo()<<"Image undone";
+    editing.redoAction->trigger(); VERIFY_EDIT(editing.doc.nodes["a"].imagePng==mediaBytes);
+    qInfo()<<"Image redone";
+    VERIFY_EDIT(writeClipboard([&] { auto *mime=new QMimeData; mime->setImageData(topicImage); return mime; }));
+    editing.pasteBranch(); VERIFY_EDIT(editing.doc.nodes["a"].imagePng==mediaBytes);
+    QTimer::singleShot(50,[&] {
+        auto *dialog=qobject_cast<QDialog *>(QApplication::activeModalWidget()); if(!dialog) return;
+        auto *input=dialog->findChild<QPlainTextEdit *>(); if(!input) { dialog->reject(); return; }
+        input->setPlainText("https://example.com/project");
+        dialog->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::Save)->click();
+    }); editing.editLinks(); VERIFY_EDIT(editing.doc.nodes["a"].links==QStringList{"https://example.com/project"});
+    VERIFY_EDIT(editing.items["a"].link && !editing.items["a"].link->toolTip().isEmpty());
+    const auto mediaPath=temporary.filePath(QStringLiteral("高效编辑.smap")); VERIFY_EDIT(editing.saveTo(mediaPath));
+    qInfo()<<"Media saved";
+    Document media; VERIFY_EDIT(media.readFile(mediaPath,&error));
+    VERIFY_EDIT(media.nodes["a"].imagePng==mediaBytes && media.nodes["a"].links==editing.doc.nodes["a"].links);
+    const auto mediaCopy=BranchClipboard::encode(media,"a",&error); QStringList mediaRoots;
+    VERIFY_EDIT(BranchClipboard::paste(&media,"r",mediaCopy,&mediaRoots,&error));
+    qInfo()<<"Media copied";
+    VERIFY_EDIT(media.nodes[mediaRoots.first()].imagePng==mediaBytes && media.nodes[mediaRoots.first()].links==media.nodes["a"].links);
+    VERIFY_EDIT(editing.exportTo(temporary.filePath("media.svg"),"svg",&error));
+    qInfo()<<"Media exported";
+    QFile mediaSvg(temporary.filePath("media.svg")); VERIFY_EDIT(mediaSvg.open(QIODevice::ReadOnly)); VERIFY_EDIT(mediaSvg.readAll().contains("data:image/png;base64"));
+    VERIFY_EDIT(!exportExchange(media,temporary.filePath("lossy-media.opml"),"opml",&error));
+    editing.doc.nodes["a"].style.italic=true; editing.changed(); editing.selectNode("a");
+    qInfo()<<"Testing continuous format brush";
+    editing.findChild<QAction *>("copyTopicStyleAction")->trigger(); VERIFY_EDIT(editing.formatBrush);
+    const auto brushPoint=editing.canvas->mapFromScene(editing.items["b"].body->pos());
+    editing.canvas->press(brushPoint,Qt::NoModifier); VERIFY_EDIT(editing.doc.nodes["b"].style.italic && editing.formatBrush);
+    editing.leaveFocusAction->trigger(); VERIFY_EDIT(!editing.formatBrush);
+    editing.undoAction->trigger(); VERIFY_EDIT(!editing.doc.nodes["b"].style.italic);
+    // Exercise the actual dialog: one transactional replace covers topic and note fields.
+    bool dialogVerified=false;
+    qInfo()<<"Testing find/replace dialog";
+    QTimer::singleShot(50,[&] {
+        auto *dialog=qobject_cast<QDialog *>(QApplication::activeModalWidget()); if(!dialog) return;
+        auto *find=dialog->findChild<QLineEdit *>("findText"); auto *replacement=dialog->findChild<QLineEdit *>("replacementText");
+        if(!find || !replacement) { dialog->reject(); return; }
+        find->setText(QStringLiteral("主题")); replacement->setText(QStringLiteral("工作"));
+        if(!artifacts.isEmpty()) dialog->grab().save(QDir(artifacts).filePath("find-replace.png"));
+        for(auto *button:dialog->findChildren<QPushButton *>()) if(button->text()==QStringLiteral("全部替换")) button->click();
+        dialogVerified=editing.doc.nodes["r"].text==QStringLiteral("工作 r") && editing.doc.nodes["x"].text==QStringLiteral("工作 x");
+        dialog->accept();
+    });
+    editing.findReplace(); VERIFY_EDIT(dialogVerified);
+    qInfo()<<"Testing Markdown and selective paste";
+    editing.undoAction->trigger(); VERIFY_EDIT(editing.doc.nodes["r"].text==QStringLiteral("主题 r"));
+    editing.selectNode("r");
+    VERIFY_EDIT(writeClipboard([] { auto *mime=new QMimeData; mime->setText(QStringLiteral("# 会议纪要\n## 结论\n- 持续打磨编辑体验")); return mime; }));
+    const auto beforeMarkdown=editing.doc.nodes.size(); editing.pasteBranch(); VERIFY_EDIT(editing.doc.nodes.size()==beforeMarkdown+3);
+    VERIFY_EDIT(editing.doc.nodes[editing.selected].text==QStringLiteral("会议纪要"));
+    editing.undoAction->trigger(); VERIFY_EDIT(editing.doc.nodes.size()==beforeMarkdown);
+    VERIFY_EDIT(writeClipboard([] { auto *mime=new QMimeData; mime->setText(QStringLiteral("第一行\n第二行")); return mime; }));
+    QTimer::singleShot(50,[&] {
+        auto *dialog=qobject_cast<QDialog *>(QApplication::activeModalWidget()); if(!dialog) return;
+        const auto combos=dialog->findChildren<QComboBox *>(); if(combos.size()!=2) { dialog->reject(); return; }
+        combos.first()->setCurrentIndex(3);
+        if(!artifacts.isEmpty()) dialog->grab().save(QDir(artifacts).filePath("paste-special.png"));
+        dialog->accept();
+    }); editing.pasteSpecial(); VERIFY_EDIT(editing.doc.nodes[editing.selected].text==QStringLiteral("第一行\n第二行")); editing.undoAction->trigger();
+    editing.doc.nodes["r"].text=QStringLiteral("新保存版本"); editing.changed(); VERIFY_EDIT(editing.saveTo(mediaPath));
+    const auto beforeRestore=editing.doc.serialize(); bool historyDialog=false;
+    qInfo()<<"Testing local history restore";
+    QTimer::singleShot(50,[&] {
+        auto *dialog=qobject_cast<QDialog *>(QApplication::activeModalWidget()); if(!dialog) return;
+        auto *list=dialog->findChild<QListWidget *>(); if(!list || list->count()<2) { dialog->reject(); return; }
+        list->setCurrentRow(list->count()-1); historyDialog=true;
+        if(!artifacts.isEmpty()) dialog->grab().save(QDir(artifacts).filePath("local-history.png"));
+        dialog->findChild<QDialogButtonBox *>()->button(QDialogButtonBox::RestoreDefaults)->click();
+    }); editing.showVersions(); VERIFY_EDIT(historyDialog && editing.dirty && editing.doc.nodes["r"].text==QStringLiteral("主题 r"));
+    editing.undoAction->trigger(); VERIFY_EDIT(editing.doc.serialize()==beforeRestore);
+    if(!artifacts.isEmpty()) { editing.doc.nodes["r"].text=QStringLiteral("高效编辑工作台"); editing.doc.nodes["a"].text=QStringLiteral("图片与参考链接"); editing.doc.nodes["b"].text=QStringLiteral("选择性粘贴 · 连续格式刷"); editing.doc.nodes["c"].text=QStringLiteral("查找替换 · Markdown"); editing.doc.nodes["d"].text=QStringLiteral("本地历史版本"); editing.changed(); editing.fit(); QTest::qWait(50); VERIFY_EDIT(editing.grab().save(QDir(artifacts).filePath("editing-workbench.png"))); }
+    qInfo() << "Editing, media, format brush, replace, Markdown, undo, persistence and export passed.";
 #undef VERIFY_EDIT
     return 0;
 }

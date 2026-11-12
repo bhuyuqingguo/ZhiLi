@@ -25,6 +25,8 @@ struct TopicStyle {
 struct Node {
     QString id, text;
     QString notes;
+    QByteArray imagePng;
+    QStringList links;
     // Optional built-in symbol identifier. Unknown IDs remain round-trippable.
     QString symbolId;
     QStringList children;

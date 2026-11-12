@@ -1413,6 +1413,21 @@ bool parseBinaryEmmx(const Archive &archive, const QStringList &entries, const Q
 }
 }
 
+bool importMarkdownText(const QString &text, Document *out, QString *error) {
+    if (!out || text.size() > Document::maxBytes || text.toUtf8().size() > Document::maxBytes)
+        return fail(error, QStringLiteral("Markdown 超过文件大小限制"));
+    for (int i = 0; i < text.size(); ++i) {
+        if (text[i].isHighSurrogate()) {
+            if (++i >= text.size() || !text[i].isLowSurrogate()) return fail(error, QStringLiteral("Markdown 包含无效字符"));
+        } else if (text[i].isLowSurrogate()) return fail(error, QStringLiteral("Markdown 包含无效字符"));
+    }
+    QString normalized = text; normalized.replace("\r\n", "\n"); normalized.replace('\r', '\n');
+    Document next, checked;
+    if (!parseMarkdown(normalized.split('\n'), QStringLiteral("粘贴内容"), &next, error) ||
+        !checked.parse(next.serialize(), error)) return false;
+    *out = std::move(checked); return true;
+}
+
 bool importMindMap(const QString &path, Document *out, QStringList *warnings, QString *error) {
     if (!out) return fail(error, QStringLiteral("没有导入目标"));
     const QFileInfo source(path);
