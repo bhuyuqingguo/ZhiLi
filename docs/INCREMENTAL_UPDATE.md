@@ -1,6 +1,8 @@
 # 便携包增量升级接口
 
-`tools/zhili_update.py` 使用 Python 3.8+ 标准库，可在离线环境运行。Release 中同一工具以 `ZhiLi-v1.0.5-update.py` 提供。输入目录根部是 `simplemap.exe` 或 `ZhiLi`。Windows x64 和 Linux ARM64 各自使用对应的增量包，Linux ARM64 包应在 Linux 上应用，以保留执行权限。
+v1.0.6 不提供从 v1.0.5 升级的增量包。新压缩包的顶层多了入口文件，麒麟目录也从 `ZhiLi/` 改成了 `zhili/`。现有更新器只对比解压后的 `ZhiLi/` 目录，套上去不会装上新的入口。
+
+`tools/zhili_update.py` 使用 Python 3.8+ 标准库，可在离线环境运行。Release 中同一工具以 `ZhiLi-v1.0.5-update.py` 提供，对应 v1.0.5 及之前的包。那些包的输入目录根部是 `simplemap.exe` 或 `ZhiLi`。Windows x64 和 Linux ARM64 各自使用对应的增量包，Linux ARM64 包应在 Linux 上应用，以保留执行权限。
 
 ## 生成增量包
 
