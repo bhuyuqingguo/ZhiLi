@@ -1,159 +1,29 @@
-name: Portable desktop builds
+name: Checks
 
 on:
-  push:
-    tags: ['v[0-9]+.[0-9]+.[0-9]+', 'v*-test.*']
   pull_request:
-  workflow_dispatch:
+  push:
 
 permissions:
   contents: read
 
 jobs:
-  linux-arm64:
-    runs-on: ubuntu-22.04-arm
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - name: Build against Qt 5.12 and glibc 2.31
-        env:
-          ZHILI_RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-        run: |
-          ports_ip=$(getent ahostsv4 ports.ubuntu.com | awk 'NR==1 {print $1}' || true)
-          if [ -z "$ports_ip" ]; then
-            ports_ip=$(curl -fsS --retry 2 --max-time 20 'https://dns.google/resolve?name=ports.ubuntu.com&type=A' |
-              python3 -c 'import json,sys,ipaddress; print(next(str(ipaddress.IPv4Address(a["data"])) for a in json.load(sys.stdin).get("Answer", []) if a.get("type") == 1 and ipaddress.IPv4Address(a["data"]).is_global))')
-          fi
-          test -n "$ports_ip"
-          echo "Ubuntu ports resolved on runner: $ports_ip"
-          docker run --rm --network host --add-host "ports.ubuntu.com:$ports_ip" --platform linux/arm64 \
-            -e ZHILI_RELEASE_VERSION -e http_proxy -e https_proxy -e HTTP_PROXY -e HTTPS_PROXY -e no_proxy -e NO_PROXY \
-            -v "$PWD:/src" -w /src ubuntu:20.04 bash -ec '
-            apt-get -o Acquire::Retries=5 update
-            DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends               build-essential cmake file qtbase5-dev libqt5svg5-dev
-            bash packaging/linux-arm64-portable.sh
-          '
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: zhili-linux-arm64
-          path: build-linux-arm64-portable/dist/*
-          if-no-files-found: error
-
-  windows-x64:
-    runs-on: windows-2022
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: '3.12'
-      - name: Fetch Qt 5.15.2 Windows SDK
-        timeout-minutes: 10
-        shell: pwsh
-        run: |
-          python -m pip install --timeout 20 aqtinstall==3.3.0
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O build-qt --base https://ftp.fau.de/qtproject --timeout 15 --archives qtbase qtsvg
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Fetch Qt license notices
-        timeout-minutes: 3
-        shell: pwsh
-        run: |
-          $dir = 'build-windows-x64/qt-license-notices'
-          New-Item -ItemType Directory -Force $dir | Out-Null
-          foreach ($notice in @('LICENSE.LGPL3','LICENSE.GPL3')) {
-            curl.exe -fLsS --retry 2 --max-time 45 "https://raw.githubusercontent.com/qt/qtbase/v5.15.2/$notice" -o "$dir/$notice"
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
-      - name: Build, test and package Windows x64
-        env:
-          ZHILI_RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-        shell: pwsh
-        run: ./packaging/windows-x64.ps1 -QtPrefix build-qt/5.15.2/msvc2019_64
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: zhili-windows-x64
-          path: build-windows-x64/dist/*
-          if-no-files-found: error
-
-  qt-sources:
-    if: startsWith(github.ref, 'refs/tags/')
+  linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Fetch matching Qt Base and Qt SVG source archives
-        run: |
-          mkdir dist
-          for module in qtbase qtsvg; do
-            name="$module-everywhere-src-5.15.2.tar.xz"
-            path="archive/qt/5.15/5.15.2/submodules/$name"
-            (curl -fLsS --retry 2 --max-time 150 "https://ftp.fau.de/qtproject/$path" -o "dist/$name" ||
-              curl -fLsS --retry 2 --max-time 150 "https://download.qt.io/$path" -o "dist/$name") &
-            if [ "$module" = qtbase ]; then base_pid=$!; else svg_pid=$!; fi
-          done
-          wait "$base_pid"
-          wait "$svg_pid"
-          for file in dist/*; do xz -t "$file"; done
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: zhili-qt-sources
-          path: dist/*
-          if-no-files-found: error
-
-  publish-release:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: [linux-arm64, windows-x64, qt-sources]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          pattern: zhili-*
-          path: dist
-          merge-multiple: true
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        if: ${{ !contains(github.ref_name, '-test.') }}
-        with:
-          python-version: '3.12'
-      - name: Build and verify incremental packages
-        if: ${{ !contains(github.ref_name, '-test.') }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          TAG: ${{ github.ref_name }}
-          BASELINE: v1.0.4
+      - name: Install Qt 5
         run: |
-          (cd dist && sha256sum -c -- *.sha256)
-          mkdir baseline
-          gh release download "$BASELINE" --pattern "ZhiLi-$BASELINE-*" --dir baseline
-          (cd baseline && sha256sum -c -- *.sha256)
-          python3 packaging/release_updates.py "$BASELINE" "$TAG" baseline dist
-          cp tools/zhili_update.py "dist/ZhiLi-$TAG-update.py"
-          (cd dist && sha256sum "ZhiLi-$TAG-update.py" > "ZhiLi-$TAG-update.py.sha256")
-      - name: Publish versioned packages and notes
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
-          GH_REPO: ${{ github.repository }}
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential cmake qtbase5-dev libqt5svg5-dev
+      - name: Compile and run the test suite
         run: |
-          (cd dist && sha256sum -c -- *.sha256)
-          if find dist -type f -iname '*.mp4' -print -quit | grep -q .; then
-            echo "Video files are excluded from ZhiLi releases." >&2
-            exit 1
-          fi
-          if [[ "$TAG" == *-test.* ]]; then
-            gh release create "$TAG" dist/* --verify-tag --prerelease \
-              --title "枝理 ZhiLi $TAG" \
-              --notes $'解压试用版。Windows x64 解压后运行 simplemap.exe。Linux ARM64 解压后运行 ZhiLi，需要系统 Qt5 运行库。\n\n银河麒麟 V10 SP1 / 飞腾 D2000 实机、中文输入法和混合 DPI 仍需现场验收。'
-          else
-            gh release create "$TAG" dist/* --verify-tag --latest \
-              --title "枝理 ZhiLi $TAG" --notes-file "docs/releases/$TAG.md"
-          fi
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+          cmake --build build --parallel
+          (cd build && ctest --output-on-failure)
+      - name: Portable layout checks
+        run: python3 tests/test_portable_layout.py

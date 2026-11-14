@@ -12,21 +12,10 @@ cmake -S "$root" -B "$build" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
 cmake --build "$build" --parallel 2
 (cd "$build" && ctest --output-on-failure)
 
-work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
-stage="$work/ZhiLi"
-mkdir -p "$stage/licenses" "$stage/examples"
-install -m 755 "$build/simplemap" "$stage/ZhiLi"
-cp "$root/README.md" "$stage/"
-cp "$root"/assets/fonts/OFL-*.txt "$stage/licenses/"
-cp "$root/assets/symbols/LICENSE.txt" "$stage/licenses/SYMBOLS-CC0.txt"
-cp "$root/src/vendor/miniz/LICENSE" "$stage/licenses/MINIZ-MIT.txt"
-cp "$root"/examples/*.smap "$stage/examples/"
-
-file "$stage/ZhiLi"
-ldd "$stage/ZhiLi"
+file "$build/simplemap"
+ldd "$build/simplemap"
 result=0
-(cd "$stage" && timeout 3s env QT_QPA_PLATFORM=offscreen ./ZhiLi) || result=$?
+(cd "$build" && timeout 3s env QT_QPA_PLATFORM=offscreen ./simplemap) || result=$?
 if [[ "$result" != 124 ]]; then
     echo "Portable app failed startup check (exit $result)." >&2
     exit 1
@@ -40,5 +29,5 @@ if [[ ! $version =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?
     exit 1
 fi
 archive="ZhiLi-v${version#v}-Linux-ARM64-Portable.tar.gz"
-tar -C "$work" -czf "$out/$archive" ZhiLi
-(cd "$out" && sha256sum "$archive" > "$archive.sha256")
+python3 "$root/packaging/assemble.py" kylin --app "$build/simplemap" --output "$out/$archive"
+(cd "$out" && sha256sum "$archive" > SHA256SUMS.txt)

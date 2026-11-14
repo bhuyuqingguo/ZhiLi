@@ -1,18 +1,18 @@
 # 枝理发布包构建与验收
 
-正式 tag 形如 `v1.0.0`，发布说明放在 `docs/releases/<tag>.md`。测试 tag 形如 `v1.0.0-test.1`，对应预发布。GitHub Actions 并行构建 ARM64 和 Windows x64，运行回归测试并生成 SHA-256。两个平台通过测试且下载包校验一致后才发布。ARM64 使用 Ubuntu 20.04 构建容器，实际兼容性须在目标机验收。
+正式 tag 形如 `v1.0.0`，发布说明放在 `docs/releases/<tag>.md`。测试 tag 形如 `v1.0.0-test.1`，对应预发布。GitHub Actions 在 Ubuntu 上编译并运行回归测试和打包检查，不在 Actions 里打发布包。Windows x64 与麒麟 ARM64 的压缩包在发布机生成。ARM64 使用 Ubuntu 20.04 的 glibc 2.31 和系统 Qt，实际兼容性须在目标机验收。
 
 从已发布的同平台便携包生成更新时，可调用[离线增量升级接口](INCREMENTAL_UPDATE.md)。
 
 ## Linux ARM64 免安装包
 
-在原生 ARM64 构建机准备 `build-essential`、`cmake`、`file`、`qtbase5-dev` 和 `libqt5svg5-dev`。构建目录需可写。脚本生成 tar.gz 和 SHA-256，运行端依赖系统 Qt5 和 glibc。
+在原生 ARM64 构建机准备 `build-essential`、`cmake`、`file`、`qtbase5-dev` 和 `libqt5svg5-dev`。构建目录需可写。脚本生成 tar.gz 和 SHA-256。运行端依赖系统 Qt5 和 glibc。压缩包顶层只有 `zhili.sh` 和 `zhili/`。用户执行 `zhili.sh`。首次运行在桌面写入快捷方式。
 
 ```bash
 bash packaging/linux-arm64-portable.sh
 ```
 
-输出位于 `build-linux-arm64-portable/dist/`。解压进入 `ZhiLi` 目录并执行 `./ZhiLi`。如需在目标发行版构建可安装的 deb，仍可运行 `bash packaging/linux-arm64.sh 1.0~preview.1`。
+输出位于 `build-linux-arm64-portable/dist/`。没有 ARM64 机器时，可以用装好 Ubuntu 20.04 arm64 根文件系统的 `bash packaging/kylin-arm64-cross.sh`。如需在目标发行版构建可安装的 deb，仍可运行 `bash packaging/linux-arm64.sh 1.0~preview.1`。这次发布不附带 deb。
 
 ## Windows x64 免安装包
 
@@ -22,7 +22,7 @@ bash packaging/linux-arm64-portable.sh
 ./packaging/windows-x64.ps1 -QtPrefix 'C:\Qt\5.15.2\msvc2019_64'
 ```
 
-输出位于 `build-windows-x64/dist/`。解压后运行 `ZhiLi\simplemap.exe`。Qt 和 VC v14 x64 运行库随程序目录部署，Windows 10 / 11 提供 UCRT。发布 ZIP 时同时提供对应 Qt Base 和 Qt SVG 源码及许可。 [Microsoft 应用本地部署说明](https://learn.microsoft.com/en-us/cpp/windows/choosing-a-deployment-method) · [Qt LGPL 分发说明](https://www.qt.io/development/open-source-lgpl-obligations)
+输出位于 `build-windows-x64/dist/`。解压后顶层是 `ZhiLi.exe` 和 `ZhiLi/`。用户只运行 `ZhiLi.exe`。Qt 运行库放在 `ZhiLi/` 里。v1.0.6 的 Windows 包用官方 Qt 5.15.2 MinGW 套件交叉编译，脚本是 `packaging/windows-mingw.sh`。上面的 PowerShell 脚本仍给装有 Visual Studio 的机器使用，打出来的顶层布局相同。Qt 5.15.2 源码包沿用 v1.0.5 发布页上的那两份。 [Microsoft 应用本地部署说明](https://learn.microsoft.com/en-us/cpp/windows/choosing-a-deployment-method) · [Qt LGPL 分发说明](https://www.qt.io/development/open-source-lgpl-obligations)
 
 ## 目标机验收
 

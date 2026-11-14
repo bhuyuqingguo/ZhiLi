@@ -2,7 +2,7 @@
 
 枝理是一款离线桌面思维导图工具。它从银河麒麟等桌面系统的日常需求出发，把记录思路、整理分支、批量修改和交付图稿集中在一张画布上。导图保存在本机，同一个开放的 `.smap` 文件可以在不同平台继续编辑。
 
-[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.5 发布说明](docs/releases/v1.0.5.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
+[下载最新版](https://github.com/bhuyuqingguo/ZhiLi/releases/latest) · [v1.0.6 发布说明](docs/releases/v1.0.6.md) · [格式兼容清单](docs/FORMAT_COMPATIBILITY.md) · [反馈问题](https://github.com/bhuyuqingguo/ZhiLi/issues)
 
 ![枝理 Windows 工作区，工具栏可直接打开、保存、转换文件及切换布局](docs/screenshots/workspace.png)
 
@@ -53,13 +53,13 @@
 
 | 平台 | 下载与启动 |
 | --- | --- |
-| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.5-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |
-| Linux ARM64 | 下载 `ZhiLi-v1.0.5-Linux-ARM64-Portable.tar.gz`，解压后运行 `ZhiLi/ZhiLi`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
-| macOS | 可用 Qt5 从源码构建 `simplemap.app`，应用包包含枝理图标。当前 GitHub Release 提供 Windows x64 和 Linux ARM64 便携包。 |
+| Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.6-Windows-x64.zip`，解压后双击 `ZhiLi.exe`。程序目录在旁边的 `ZhiLi/` 里，不要单独把 exe 拷走。 |
+| 银河麒麟 V10 ARM64 | 下载 `ZhiLi-v1.0.6-Linux-ARM64-Portable.tar.gz`，解压后双击 `zhili.sh`。需要 glibc 2.31 或兼容版本，以及系统 Qt5 Core、Gui、Widgets、Svg 和桌面平台插件。 |
+| macOS | 可用 Qt5 从源码构建 `simplemap.app`。这次发布不提供 macOS 包。 |
 
-完整包和对应 SHA-256 校验文件均带发布版本号。Windows 程序未做代码签名。Linux 可运行 `uname -m` 确认架构为 `aarch64`，用 `sha256sum -c ZhiLi-v1.0.5-Linux-ARM64-Portable.tar.gz.sha256` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
+第一次打开会在桌面放上带枝理图标的快捷方式。之后如果整个目录换了位置，快捷方式会改到新位置。删掉快捷方式之后，不会自动再造。Windows 程序未做代码签名。用发布页的 `SHA256SUMS.txt` 校验下载。银河麒麟 V10 SP1／飞腾 D2000 的输入法、混合 DPI 和真机行为仍需现场验收。 [目标平台验收清单](docs/TARGET_ACCEPTANCE.md)
 
-已有原版 `v1.0.4` 便携包，可下载同平台的 `v1.0.4-to-v1.0.5` 增量包、对应校验文件和 `ZhiLi-v1.0.5-update.py`。更新工具校验基线并在新目录重建新版，旧目录可留作回退。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
+v1.0.6 不提供从 v1.0.5 的增量包。压缩包顶层已经改成一个入口加一个文件夹，旧的更新器对不上。 [离线增量升级说明](docs/INCREMENTAL_UPDATE.md)
 
 ## 用一张图上手
 
