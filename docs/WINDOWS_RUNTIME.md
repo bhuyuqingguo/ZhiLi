@@ -4,7 +4,7 @@
 
 ## 修复现有 v1.0.5
 
-关闭枝理，将 `枝理-v1.0.5-UCRT修复包-r1.zip` 解压。把其中 `运行库` 文件夹内的**全部 41 个 DLL**复制到原来的 `simplemap.exe` 同目录，再启动原来的程序。不要复制到 `System32`、`SysWOW64` 或仅复制到 `platforms` 文件夹；不需要改动导图或重新安装软件。
+关闭枝理，将 `ZhiLi-v1.0.5-Windows-x64-UCRT-repair-r1.zip`（本地交付名为 `枝理-v1.0.5-UCRT修复包-r1.zip`）解压。把其中 `运行库` 文件夹内的**全部 41 个 DLL**复制到原来的 `simplemap.exe` 同目录，再启动原来的程序。不要复制到 `System32`、`SysWOW64` 或仅复制到 `platforms` 文件夹；不需要改动导图或重新安装软件。
 
 也可以使用补齐运行库的完整包 `ZhiLi-v1.0.5-Windows-x64-UCRT-fix1.zip`，解压到新的固定目录后运行其中的 `simplemap.exe`。原来的完整包和增量包保持不变，以免破坏已有校验值及增量升级基线。
 
