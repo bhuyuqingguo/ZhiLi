@@ -51,6 +51,8 @@
 
 ## 下载与启动
 
+**启动提示缺少 `api-ms-win-crt-runtime-l1-1-0.dll`？** 已提供 v1.0.5 的 UCRT 修复包与补齐运行库的完整包，见 [Windows 运行库修复说明](docs/WINDOWS_RUNTIME.md)。适用于截图所示的运行库缺失问题；Windows 7 SP1 x64 尚未经过真机全面验收。
+
 | 平台 | 下载与启动 |
 | --- | --- |
 | Windows 10 / 11 x64 | 下载 `ZhiLi-v1.0.5-Windows-x64.zip`，解压后运行 `ZhiLi/simplemap.exe`，保留同目录的 DLL 和 `platforms` 文件夹。 |

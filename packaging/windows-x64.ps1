@@ -46,6 +46,7 @@ try {
         Sort-Object { [version]$_.Parent.Parent.Name } -Descending | Select-Object -First 1
     if (!$crt) { throw 'The x64 Visual C++ application-local runtime was not found.' }
     Copy-Item -Path (Join-Path $crt.FullName '*.dll') -Destination $bundle
+    & (Join-Path $PSScriptRoot 'copy-ucrt.ps1') -Destination $bundle
     foreach ($file in @('Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Svg.dll', 'platforms/qwindows.dll', 'iconengines/qsvgicon.dll', 'imageformats/qsvg.dll', 'vcruntime140.dll', 'msvcp140.dll')) {
         if (!(Test-Path -LiteralPath (Join-Path $bundle $file) -PathType Leaf)) {
             throw "Bundle is missing $file"
